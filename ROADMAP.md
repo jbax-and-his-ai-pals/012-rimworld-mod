@@ -28,7 +28,7 @@ Legend: `[x]` done, `[~]` in progress, `[ ]` planned. Each phase builds on the o
 
 ## Phase 3: the living town
 
-- [ ] **3.1 Town plan generator**: an ordered list of projects (houses, stalls, walls, gardens) laid out around a plaza (pure and tested)
+- [x] **3.1 Town plan generator**: an ordered list of projects (houses, stalls, walls, gardens) laid out around a plaza (pure and tested)
 - [ ] **3.2 Staged builders**: villagers walk to a site and the building appears in stages
 - [ ] **3.3 Lots and reconciliation**: planned lots are revealed as the town decides; the town never builds on cells the player has claimed or used; the player can claim lots
 - [ ] **3.4 Growth driven by standing**

@@ -12,10 +12,10 @@ Legend: `[x]` done, `[~]` in progress, `[ ]` planned. Each phase builds on the o
 
 ## Phase 1: terminals and security
 
-- [ ] **1.1 Cipher-lock minigame logic**: a pure, tested puzzle (candidate codes, positional-match feedback, attempts, decoy purges, lockout), difficulty from the hacker's Intellectual skill
-- [ ] **1.2 Minigame window and job**: a game window driven by the logic; the hack job opens it on arrival; success, failure and lockout apply to the terminal
-- [ ] **1.3 Security groups**: turrets with a dormant state, placed in sensitive rooms away from the start and grouped per building
-- [ ] **1.4 Security consoles**: a console in a nearby security office switches its group between hostile, standby, allied and disabled, gated by the minigame
+- [x] **1.1 Cipher-lock minigame logic**: a pure, tested puzzle (candidate codes, positional-match feedback, attempts, decoy purges, lockout), difficulty from the hacker's Intellectual skill
+- [x] **1.2 Minigame window and job**: a game window driven by the logic; the hack job opens it on arrival; success, failure and lockout apply to the terminal
+- [~] **1.3 Security groups**: turrets with a dormant state, placed in sensitive rooms away from the start and grouped per building (groups and droids done in the gated layout; open-layout placement and standby mode still to do)
+- [~] **1.4 Security consoles**: a console in a nearby security office switches its group between hostile, standby, allied and disabled, gated by the minigame
 - [ ] **1.5 Settings and docs** for density and default states
 
 ## Phase 2: the enclave

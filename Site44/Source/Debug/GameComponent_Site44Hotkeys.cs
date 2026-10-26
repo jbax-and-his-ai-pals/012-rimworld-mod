@@ -114,6 +114,12 @@ namespace Site44
                 if (enclave != null)
                 {
                     Site44Quests.OpenMap(enclave);
+                    if (GenCommandLine.CommandLineArgPassed("site44grow"))
+                    {
+                        Map enclaveMap = Find.Maps.Find(m => m.GetComponent<MapComponent_Enclave>().active);
+                        enclaveMap?.GetComponent<MapComponent_Enclave>().AddStanding(400); Log.Message("[Site-44] grow test: enclave map " + (enclaveMap != null) + ", maps " + Find.Maps.Count + ", speed set.");
+                        Find.TickManager.CurTimeSpeed = TimeSpeed.Ultrafast;
+                    }
                 }
             }
 

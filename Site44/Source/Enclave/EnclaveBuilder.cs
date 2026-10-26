@@ -76,55 +76,63 @@ namespace Site44
 
         public static void Build(Map map, IntVec3 origin, TownProject p, Faction faction)
         {
+            for (int ly = 0; ly < p.Height; ly++)
+            {
+                for (int lx = 0; lx < p.Width; lx++)
+                {
+                    BuildTile(map, origin, p, lx, ly);
+                }
+            }
+
+            Furnish(map, origin, p, faction);
+        }
+
+        public static void BuildTile(Map map, IntVec3 origin, TownProject p, int lx, int ly)
+        {
             ThingDef wall = ThingDefOf.Wall;
             ThingDef door = ThingDefOf.Door;
             ThingDef wood = ThingDefOf.WoodLog;
             TerrainDef floor = Terrain("WoodPlankFloor", TerrainDefOf.Soil);
             bool roofed = p.Kind != TownProjectKind.Garden && p.Kind != TownProjectKind.Stall && p.Kind != TownProjectKind.WallSegment;
-
-            for (int ly = 0; ly < p.Height; ly++)
+            IntVec3 c = new IntVec3(origin.x + p.X + lx, 0, origin.z + p.Y + ly);
+            if (!c.InBounds(map))
             {
-                for (int lx = 0; lx < p.Width; lx++)
-                {
-                    IntVec3 c = new IntVec3(origin.x + p.X + lx, 0, origin.z + p.Y + ly);
-                    if (!c.InBounds(map))
-                    {
-                        continue;
-                    }
-
-                    PlanTile tile = p.Tiles[ly * p.Width + lx];
-                    switch (tile)
-                    {
-                        case PlanTile.Wall:
-                        case PlanTile.Window:
-                            TrySpawn(map, wall, c, wood);
-                            if (roofed)
-                            {
-                                map.roofGrid.SetRoof(c, RoofDefOf.RoofConstructed);
-                            }
-
-                            break;
-                        case PlanTile.Door:
-                            map.terrainGrid.SetTerrain(c, floor);
-                            TrySpawn(map, door, c, wood);
-                            if (roofed)
-                            {
-                                map.roofGrid.SetRoof(c, RoofDefOf.RoofConstructed);
-                            }
-
-                            break;
-                        case PlanTile.Floor:
-                            map.terrainGrid.SetTerrain(c, p.Kind == TownProjectKind.Stall ? Terrain("Gravel", TerrainDefOf.Soil) : floor);
-                            if (roofed)
-                            {
-                                map.roofGrid.SetRoof(c, RoofDefOf.RoofConstructed);
-                            }
-
-                            break;
-                    }
-                }
+                return;
             }
 
+            switch (p.Tiles[ly * p.Width + lx])
+            {
+                case PlanTile.Wall:
+                case PlanTile.Window:
+                    TrySpawn(map, wall, c, wood);
+                    if (roofed)
+                    {
+                        map.roofGrid.SetRoof(c, RoofDefOf.RoofConstructed);
+                    }
+
+                    break;
+                case PlanTile.Door:
+                    map.terrainGrid.SetTerrain(c, floor);
+                    TrySpawn(map, door, c, wood);
+                    if (roofed)
+                    {
+                        map.roofGrid.SetRoof(c, RoofDefOf.RoofConstructed);
+                    }
+
+                    break;
+                case PlanTile.Floor:
+                    map.terrainGrid.SetTerrain(c, p.Kind == TownProjectKind.Stall ? Terrain("Gravel", TerrainDefOf.Soil) : floor);
+                    if (roofed)
+                    {
+                        map.roofGrid.SetRoof(c, RoofDefOf.RoofConstructed);
+                    }
+
+                    break;
+            }
+        }
+
+        public static void Finish(Map map, IntVec3 origin, TownProject p, Faction faction)
+        {
             Furnish(map, origin, p, faction);
         }
 

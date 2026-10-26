@@ -40,3 +40,10 @@ Status legend: `[ ]` open, `[~]` in progress, `[x]` done.
 
 Loot amount, crate density, casket density, survivor casket count, hostile casket share, stray corpses, preserved-room chance, dust amount, furniture ruin level, open versus gated layout, locked-vault share, security on/off and strength, hot zones on/off, quest frequency, and a site-map-size override.
 
+
+## Settled complex (decided direction)
+- One map: the enclave camp starts at the complex's front door and the complex around it is the same map.
+- Growth is driven mainly by the player's standing and by sectors the player has cleared. In rare cases the town grows on its own: residents stumble on a valuable room, or take part in an event such as a raid.
+- Half-settled look: claimed rooms are cleaned and refurbished in stages; unclaimed ones stay dusty, unmaintained and unexplored. The camp cannot afford to maintain them.
+- Keep the generic town generator usable by itself, and provide a way for existing settlements from other mods to know about and interact with Site-44.
+- Open: whether the player must be present when an organic expansion or raid happens (see conversation).

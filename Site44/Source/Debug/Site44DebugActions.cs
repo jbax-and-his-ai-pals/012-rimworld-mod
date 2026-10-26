@@ -20,6 +20,20 @@ namespace Site44
             return facility;
         }
 
+        [DebugAction("Site-44", "Enclave: add 100 standing", allowedGameStates = AllowedGameStates.Playing)]
+        private static void EnclaveStanding()
+        {
+            MapComponent_Enclave enclave = Find.CurrentMap?.GetComponent<MapComponent_Enclave>();
+            if (enclave == null || !enclave.active)
+            {
+                Messages.Message("[Site-44] this map is not an enclave.", MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+
+            enclave.AddStanding(100);
+            Messages.Message("[Site-44] standing now " + enclave.standing + ".", MessageTypeDefOf.NeutralEvent, false);
+        }
+
         [DebugAction("Site-44", "Generate ruin quest (choose type)", allowedGameStates = AllowedGameStates.Playing)]
         private static void GenerateRuinQuest()
         {

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
+using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
@@ -13,6 +14,7 @@ namespace Site44
     {
         private readonly Queue<SiteTypeDef> questQueue = new Queue<SiteTypeDef>();
         private float nextQuestAt = -1f;
+        private float enclaveAt = -1f;
         private float heroAt = -1f;
         private List<Pawn> heroList = new List<Pawn>();
 
@@ -66,6 +68,12 @@ namespace Site44
             if (GenCommandLine.CommandLineArgPassed("site44quest") || SiteTypes.CommandLineValue("site44quest") != null)
             {
                 string wanted = SiteTypes.CommandLineValue("site44quest");
+                if (wanted == "Enclave")
+                {
+                    enclaveAt = Time.realtimeSinceStartup + 6f;
+                    return;
+                }
+
                 IEnumerable<SiteTypeDef> types = SiteTypes.All;
                 if (string.IsNullOrEmpty(wanted))
                 {
@@ -96,6 +104,16 @@ namespace Site44
                 {
                     HeroMode.Toggle(first);
                     Log.Message("[Site-44] hero mode on for " + first.LabelShort + ": " + (first.equipment?.Primary?.LabelCap.ToString() ?? "unarmed") + ", " + first.apparel.WornApparel.Count + " apparel.");
+                }
+            }
+
+            if (enclaveAt > 0f && Time.realtimeSinceStartup >= enclaveAt)
+            {
+                enclaveAt = -1f;
+                Site enclave = Site44Quests.GenerateEnclaveQuest();
+                if (enclave != null)
+                {
+                    Site44Quests.OpenMap(enclave);
                 }
             }
 

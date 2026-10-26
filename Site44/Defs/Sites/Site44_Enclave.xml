@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- A friendly walled settlement of people who live beside the ruins and guide delvers. -->
+  <SitePartDef>
+    <defName>Site44_EnclaveSitePart</defName>
+    <label>delvers' enclave</label>
+    <description>A small settlement of people who make a living around the ruins: trading, mending, guiding.</description>
+    <siteTexture>World/WorldObjects/Sites/GenericSite</siteTexture>
+    <expandingIconTexture>World/WorldObjects/Expanding/Sites/ItemStash</expandingIconTexture>
+    <minMapSize>(200, 1, 200)</minMapSize>
+    <tags>
+      <li>Site44Enclave</li>
+    </tags>
+  </SitePartDef>
+
+  <GenStepDef>
+    <defName>Site44_EnclaveSite</defName>
+    <linkWithSite>Site44_EnclaveSitePart</linkWithSite>
+    <order>800</order>
+    <genStep Class="Site44.GenStep_Enclave" />
+  </GenStepDef>
+
+  <FactionDef ParentName="FactionBase">
+    <defName>Site44_Enclave</defName>
+    <label>delvers' enclave</label>
+    <description>Settlers, tinkers and guides who live at the edge of the ruins.</description>
+    <fixedName>The Hold</fixedName>
+    <pawnSingular>holder</pawnSingular>
+    <pawnsPlural>holders</pawnsPlural>
+    <factionIconPath>World/WorldObjects/Expanding/Town</factionIconPath>
+    <colorSpectrum>
+      <li>(0.85, 0.72, 0.38)</li>
+    </colorSpectrum>
+    <humanlikeFaction>true</humanlikeFaction>
+    <hidden>true</hidden>
+    <autoFlee>true</autoFlee>
+    <canUseAvoidGrid>true</canUseAvoidGrid>
+    <techLevel>Industrial</techLevel>
+    <permanentEnemy>false</permanentEnemy>
+    <backstoryFilters>
+      <li>
+        <categories>
+          <li>Outlander</li>
+        </categories>
+      </li>
+    </backstoryFilters>
+  </FactionDef>
+
+  <QuestScriptDef>
+    <defName>OpportunitySite_Site44Enclave</defName>
+    <rootSelectionWeight>0.35</rootSelectionWeight>
+    <rootMinPoints>0</rootMinPoints>
+    <autoAccept>true</autoAccept>
+    <questNameRules>
+      <rulesStrings>
+        <li>questName->[place] of [people]</li>
+        <li>place->The Hold</li>
+        <li>place->Haven</li>
+        <li>place->Lantern Camp</li>
+        <li>place->The Lee</li>
+        <li>people->Delvers</li>
+        <li>people->the Ruins</li>
+        <li>people->Wire and Lamp</li>
+      </rulesStrings>
+    </questNameRules>
+    <questDescriptionRules>
+      <rulesStrings>
+        <li>questDescription->Travelers speak of a settlement near [map_definite] where people live off the ruins and welcome those who delve. They will trade, patch wounds and share what they know, for the right company.</li>
+      </rulesStrings>
+    </questDescriptionRules>
+    <root Class="QuestNode_Sequence">
+      <nodes>
+        <li Class="QuestNode_GetMap" />
+        <li Class="QuestNode_Root_Site">
+          <sitePartDef>Site44_EnclaveSitePart</sitePartDef>
+          <worldObjectDef>Site</worldObjectDef>
+          <factionDef>Ancients</factionDef>
+          <distanceFromColonyRange>5~14</distanceFromColonyRange>
+          <selectLandmarkChance>0</selectLandmarkChance>
+        </li>
+        <li Class="QuestNode_WorldObjectTimeout">
+          <worldObject>$site</worldObject>
+          <isQuestTimeout>true</isQuestTimeout>
+          <delayTicks>$(randInt(40,60)*60000)</delayTicks>
+          <inSignalDisable>site.MapGenerated</inSignalDisable>
+          <destroyOnCleanup>true</destroyOnCleanup>
+          <node Class="QuestNode_Sequence">
+            <nodes>
+              <li Class="QuestNode_Letter">
+                <label TKey="LetterLabelQuestExpired">Quest expired: [resolvedQuestName]</label>
+                <text TKey="LetterTextQuestExpired">The settlement has moved on. The quest [resolvedQuestName] has expired.</text>
+              </li>
+              <li Class="QuestNode_End">
+                <outcome>Fail</outcome>
+              </li>
+            </nodes>
+          </node>
+        </li>
+        <li Class="QuestNode_NoWorldObject">
+          <worldObject>$site</worldObject>
+          <node Class="QuestNode_End" />
+        </li>
+      </nodes>
+    </root>
+  </QuestScriptDef>
+
+</Defs>

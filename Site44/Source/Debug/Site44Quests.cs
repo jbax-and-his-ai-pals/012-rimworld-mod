@@ -29,6 +29,16 @@ namespace Site44
             return site;
         }
 
+        public static Site GenerateEnclaveQuest()
+        {
+            System.Collections.Generic.HashSet<Site> existing = new System.Collections.Generic.HashSet<Site>(
+                Find.WorldObjects.Sites.Where(s => s.parts.Any(p => p.def.defName == "Site44_EnclaveSitePart")));
+            Quest quest = QuestUtility.GenerateQuestAndMakeAvailable(Site44DefOf.OpportunitySite_Site44Enclave, 500f);
+            Site site = Find.WorldObjects.Sites.FirstOrDefault(s => s.parts.Any(p => p.def.defName == "Site44_EnclaveSitePart") && !existing.Contains(s));
+            Log.Message("[Site-44] enclave quest generated: " + (quest == null ? "none" : quest.name) + ", site tile " + (site == null ? "none" : site.Tile.ToString()) + ".");
+            return site;
+        }
+
         public static Map OpenMap(Site site)
         {
             Map map = GetOrGenerateMapUtility.GetOrGenerateMap(site.Tile, site.PreferredMapSize, null);

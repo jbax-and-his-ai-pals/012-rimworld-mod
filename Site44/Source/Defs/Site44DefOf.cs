@@ -24,6 +24,9 @@ namespace Site44
         public static SitePartDef Site44_Ruin;
         public static QuestScriptDef OpportunitySite_Site44Ruin;
         public static FactionDef Site44_Facility;
+        public static FactionDef Site44_Enclave;
+        public static SitePartDef Site44_EnclaveSitePart;
+        public static QuestScriptDef OpportunitySite_Site44Enclave;
 
         static Site44DefOf()
         {

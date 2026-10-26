@@ -21,8 +21,26 @@ namespace Site44
         public string sectorId;
         public int requiredTier;
         private bool used;
+        private int lockedUntil;
 
         public bool Hacked => used;
+
+        public bool UsesCipherLock => Site44Settings.Current.hackMinigame && (kind == TerminalKind.Gate || kind == TerminalKind.Diagnostic);
+
+        public bool LockedOut => Find.TickManager.TicksGame < lockedUntil;
+
+        public int PuzzleTier => kind == TerminalKind.Gate ? Mathf.Clamp(requiredTier, 0, 3) : 1;
+
+        public void LockOut(Pawn hacker)
+        {
+            lockedUntil = Find.TickManager.TicksGame + 2 * GenDate.TicksPerHour;
+            Messages.Message(hacker.LabelShort + " is locked out of the terminal. It will accept new attempts in two hours.", this, MessageTypeDefOf.NegativeEvent, false);
+            MapComponent_Facility facility = Map.GetComponent<MapComponent_Facility>();
+            if (facility.Tier < FacilityFaction.AllyTier)
+            {
+                facility.MaybeTriggerAlarm(Position);
+            }
+        }
 
         public SkillDef PrimarySkill => kind == TerminalKind.Valve ? SkillDefOf.Construction : SkillDefOf.Intellectual;
 
@@ -50,6 +68,7 @@ namespace Site44
             Scribe_Values.Look(ref sectorId, "sectorId");
             Scribe_Values.Look(ref requiredTier, "requiredTier");
             Scribe_Values.Look(ref used, "used");
+            Scribe_Values.Look(ref lockedUntil, "lockedUntil");
         }
 
         private string KindLabel()
@@ -107,6 +126,10 @@ namespace Site44
             if (used)
             {
                 yield return new FloatMenuOption(label + " (already done)", null);
+            }
+            else if (LockedOut)
+            {
+                yield return new FloatMenuOption(label + " (locked out)", null);
             }
             else if (selPawn.skills == null || selPawn.skills.GetSkill(PrimarySkill).TotallyDisabled)
             {

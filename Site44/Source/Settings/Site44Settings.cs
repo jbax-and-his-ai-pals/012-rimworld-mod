@@ -29,6 +29,7 @@ namespace Site44
         public bool openLayout = true;
         public float lockedVaultShare = 0.25f;
         public bool securityEnabled;
+        public bool hackMinigame = true;
         public bool hotZonesEnabled = true;
 
         // Special rooms
@@ -85,6 +86,7 @@ namespace Site44
             Scribe_Values.Look(ref openLayout, "openLayout", true);
             Scribe_Values.Look(ref lockedVaultShare, "lockedVaultShare", 0.25f);
             Scribe_Values.Look(ref securityEnabled, "securityEnabled");
+            Scribe_Values.Look(ref hackMinigame, "hackMinigame", true);
             Scribe_Values.Look(ref hotZonesEnabled, "hotZonesEnabled", true);
             Scribe_Values.Look(ref recRoomFrequency, "recRoomFrequency", 1f);
             Scribe_Values.Look(ref secureRoomDensity, "secureRoomDensity", 1f);
@@ -195,6 +197,8 @@ namespace Site44
                 "On: every door is a plain door and the whole complex can be explored in any order.\nOff: sectors are sealed behind terminal gates and clearance levels.");
             s.lockedVaultShare = Percent(list, "Locked vaults (open layout)", s.lockedVaultShare, 0f, 1f,
                 "In the open layout, the share of terminal gates that stay locked as optional vaults, opened by hacking a terminal.");
+            list.CheckboxLabeled("Cipher-lock hacking", ref s.hackMinigame,
+                "On: gate and diagnostic terminals open a code-guessing puzzle; skill gives more attempts and fewer decoys. A failed attempt locks the terminal for two hours.\nOff: terminals are hacked with a plain timed job.");
             list.CheckboxLabeled("Facility security (experimental)", ref s.securityEnabled,
                 "Turrets, patrol mechanoids and alarm squads inside the complex. Off by default so the first exploration is safe.");
             list.CheckboxLabeled("Overheated sectors (gated layout only)", ref s.hotZonesEnabled,

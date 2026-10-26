@@ -20,6 +20,10 @@
       <HintPath>$(Managed)\Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(Managed)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>$(Managed)\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>false</Private>

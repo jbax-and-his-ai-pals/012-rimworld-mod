@@ -1762,6 +1762,9 @@ namespace Site44
                 return;
             }
 
+            MapComponent_Facility facilityComp = map.GetComponent<MapComponent_Facility>();
+            SecurityGroup group = new SecurityGroup { id = facilityComp.securityGroups.Count + 1 };
+            facilityComp.securityGroups.Add(group);
             int turrets = Mathf.Clamp(2 + zone.Depth / 3, 2, 6);
             for (int i = 0; i < turrets; i++)
             {
@@ -1774,6 +1777,7 @@ namespace Site44
                 Thing turret = ThingMaker.MakeThing(Site44DefOf.Site44_SecurityTurret);
                 turret.SetFaction(faction);
                 GenSpawn.Spawn(turret, cell, map);
+                group.turrets.Add(turret);
             }
 
             List<Pawn> mechs = new List<Pawn>();
@@ -1785,12 +1789,19 @@ namespace Site44
                 {
                     GenSpawn.Spawn(mech, cell, map);
                     mechs.Add(mech);
+                    group.droids.Add(mech);
                 }
             }
 
             if (mechs.Count > 0)
             {
                 LordMaker.MakeNewLord(faction, new LordJob_DefendPoint(World(main.Anchor), null, 14f), map, mechs);
+            }
+
+            IntVec3 consoleSpot;
+            if (TryFindSpotInRoom(main, Site44DefOf.Site44_Terminal.size, out consoleSpot))
+            {
+                SpawnConsole(Site44DefOf.Site44_Terminal, consoleSpot, TerminalKind.Security).groupId = group.id;
             }
         }
 

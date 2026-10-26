@@ -28,6 +28,7 @@ namespace Site44
 
         private List<string> unlockedSectors = new List<string>();
         private List<int> hotAnchors = new List<int>();
+        public List<SecurityGroup> securityGroups = new List<SecurityGroup>();
 
         public MapComponent_Facility(Map map) : base(map)
         {
@@ -143,6 +144,19 @@ namespace Site44
             AddPoints(Progression.ReactorPoints);
         }
 
+        public SecurityGroup GroupById(int id)
+        {
+            foreach (SecurityGroup g in securityGroups)
+            {
+                if (g.id == id)
+                {
+                    return g;
+                }
+            }
+
+            return null;
+        }
+
         public void MaybeTriggerAlarm(IntVec3 near)
         {
             if (Site44Tuning.SecurityEnabled && Rand.Value < AlarmChance)
@@ -226,10 +240,12 @@ namespace Site44
             Scribe_Values.Look(ref targetZones, "targetZones");
             Scribe_Collections.Look(ref unlockedSectors, "unlockedSectors", LookMode.Value);
             Scribe_Collections.Look(ref hotAnchors, "hotAnchors", LookMode.Value);
+            Scribe_Collections.Look(ref securityGroups, "securityGroups", LookMode.Deep);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 unlockedSectors = unlockedSectors ?? new List<string>();
                 hotAnchors = hotAnchors ?? new List<int>();
+                securityGroups = securityGroups ?? new List<SecurityGroup>();
             }
         }
     }

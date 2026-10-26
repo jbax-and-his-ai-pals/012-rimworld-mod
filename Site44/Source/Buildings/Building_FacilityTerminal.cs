@@ -12,24 +12,26 @@ namespace Site44
         Gate,
         Diagnostic,
         Valve,
-        Reactor
+        Reactor,
+        Security
     }
 
     public class Building_FacilityTerminal : Building
     {
         public TerminalKind kind;
         public string sectorId;
+        public int groupId = -1;
         public int requiredTier;
         private bool used;
         private int lockedUntil;
 
         public bool Hacked => used;
 
-        public bool UsesCipherLock => Site44Settings.Current.hackMinigame && (kind == TerminalKind.Gate || kind == TerminalKind.Diagnostic);
+        public bool UsesCipherLock => Site44Settings.Current.hackMinigame && (kind == TerminalKind.Gate || kind == TerminalKind.Diagnostic || kind == TerminalKind.Security);
 
         public bool LockedOut => Find.TickManager.TicksGame < lockedUntil;
 
-        public int PuzzleTier => kind == TerminalKind.Gate ? Mathf.Clamp(requiredTier, 0, 3) : 1;
+        public int PuzzleTier => kind == TerminalKind.Gate ? Mathf.Clamp(requiredTier, 0, 3) : (kind == TerminalKind.Security ? 2 : 1);
 
         public void LockOut(Pawn hacker)
         {
@@ -66,6 +68,7 @@ namespace Site44
             base.ExposeData();
             Scribe_Values.Look(ref kind, "kind");
             Scribe_Values.Look(ref sectorId, "sectorId");
+            Scribe_Values.Look(ref groupId, "groupId", -1);
             Scribe_Values.Look(ref requiredTier, "requiredTier");
             Scribe_Values.Look(ref used, "used");
             Scribe_Values.Look(ref lockedUntil, "lockedUntil");
@@ -78,6 +81,7 @@ namespace Site44
                 case TerminalKind.Diagnostic: return "diagnostic";
                 case TerminalKind.Valve: return "coolant valve";
                 case TerminalKind.Reactor: return "reactor";
+                case TerminalKind.Security: return "security console";
                 default: return sectorId != null && sectorId.StartsWith("vault") ? "secure room" : "sector gate " + sectorId;
             }
         }
@@ -109,6 +113,7 @@ namespace Site44
                 case TerminalKind.Diagnostic: return "Run diagnostic";
                 case TerminalKind.Valve: return "Divert coolant";
                 case TerminalKind.Reactor: return "Restart reactor";
+                case TerminalKind.Security: return "Access security console";
                 default: return "Hack terminal";
             }
         }
@@ -153,6 +158,33 @@ namespace Site44
             }
         }
 
+        private void OpenSecurityMenu(Pawn hacker)
+        {
+            MapComponent_Facility facility = Map.GetComponent<MapComponent_Facility>();
+            SecurityGroup group = facility.GroupById(groupId);
+            if (group == null || group.mode != SecurityMode.Hostile)
+            {
+                used = true;
+                return;
+            }
+
+            List<FloatMenuOption> options = new List<FloatMenuOption>
+            {
+                new FloatMenuOption("Seize control (turrets and droids join you)", () => ApplySecurityMode(group, SecurityMode.Allied, hacker)),
+                new FloatMenuOption("Shut down (destroy the group)", () => ApplySecurityMode(group, SecurityMode.Disabled, hacker)),
+                new FloatMenuOption("Leave it running", null)
+            };
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+
+        private void ApplySecurityMode(SecurityGroup group, SecurityMode mode, Pawn hacker)
+        {
+            used = true;
+            group.SetMode(mode);
+            Messages.Message(hacker.LabelShort + (mode == SecurityMode.Allied ? " seizes the security network." : " shuts the security network down."),
+                new LookTargets(Position, Map), MessageTypeDefOf.PositiveEvent);
+        }
+
         public void Hack(Pawn hacker)
         {
             if (used)
@@ -164,6 +196,12 @@ namespace Site44
             if (kind == TerminalKind.Gate && facility.Tier < requiredTier)
             {
                 Messages.Message("Access denied: clearance " + DirectorVoice.TierName(requiredTier) + " required.", this, MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+
+            if (kind == TerminalKind.Security)
+            {
+                OpenSecurityMenu(hacker);
                 return;
             }
 

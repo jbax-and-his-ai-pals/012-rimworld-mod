@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <KeyBindingDef>
+    <defName>Site44_ToggleFog</defName>
+    <label>toggle fog of war (Site-44)</label>
+    <category>Game</category>
+    <defaultKeyCodeA>F9</defaultKeyCodeA>
+  </KeyBindingDef>
+
+  <KeyBindingDef>
+    <defName>Site44_UnsealAll</defName>
+    <label>unseal all sectors (Site-44 test)</label>
+    <category>Game</category>
+    <defaultKeyCodeA>F8</defaultKeyCodeA>
+  </KeyBindingDef>
+
+  <KeyBindingDef>
+    <defName>Site44_HeroMode</defName>
+    <label>toggle hero mode on selected colonists (Site-44 test)</label>
+    <category>Game</category>
+    <defaultKeyCodeA>F7</defaultKeyCodeA>
+  </KeyBindingDef>
+
+</Defs>

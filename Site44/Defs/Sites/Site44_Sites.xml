@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from the site type table: one site part, generation step and quest per ruined-complex type. -->
+<Defs>
+
+  <SitePartDef>
+    <defName>Site44_Ruin_Medical</defName>
+    <label>ruined medical center</label>
+    <description>The ruins of a hospital complex: wards, operating theaters, a pharmacy and a morgue, picked over but never emptied.</description>
+    <siteTexture>World/WorldObjects/Sites/GenericSite</siteTexture>
+    <expandingIconTexture>World/WorldObjects/Expanding/Sites/ItemStash</expandingIconTexture>
+    <minMapSize>(200, 1, 200)</minMapSize>
+    <tags><li>Site44RuinMedical</li></tags>
+  </SitePartDef>
+
+  <GenStepDef>
+    <defName>Site44_RuinSite_Medical</defName>
+    <linkWithSite>Site44_Ruin_Medical</linkWithSite>
+    <order>800</order>
+    <genStep Class="Site44.GenStep_Facility" />
+  </GenStepDef>
+
+  <QuestScriptDef>
+    <defName>OpportunitySite_Site44_Medical</defName>
+    <rootSelectionWeight>0.4</rootSelectionWeight>
+    <rootMinPoints>0</rootMinPoints>
+    <autoAccept>true</autoAccept>
+    <questNameRules>
+      <rulesStrings>
+        <li>questName->[place] of [people]</li>
+        <li>place->Clinic</li>
+        <li>place->Ward</li>
+        <li>place->Hospital</li>
+        <li>place->Infirmary</li>
+        <li>people->the Sleepless</li>
+        <li>people->Quiet Hands</li>
+        <li>people->the Last Shift</li>
+        <li>people->Gauze and Lamplight</li>
+      </rulesStrings>
+    </questNameRules>
+    <questDescriptionRules>
+      <rulesStrings>
+        <li>questDescription->Scouts report the ruins of a large medical center not far from [map_definite]. Wards, operating rooms and a pharmacy may still hold medicine, though not everyone inside is resting peacefully.</li>
+      </rulesStrings>
+    </questDescriptionRules>
+    <root Class="QuestNode_Sequence">
+      <nodes>
+        <li Class="QuestNode_GetMap" />
+        <li Class="QuestNode_Root_Site">
+          <sitePartDef>Site44_Ruin_Medical</sitePartDef>
+          <worldObjectDef>Site</worldObjectDef>
+          <factionDef>Ancients</factionDef>
+          <distanceFromColonyRange>5~16</distanceFromColonyRange>
+          <selectLandmarkChance>0</selectLandmarkChance>
+        </li>
+        <li Class="QuestNode_WorldObjectTimeout">
+          <worldObject>$site</worldObject>
+          <isQuestTimeout>true</isQuestTimeout>
+          <delayTicks>$(randInt(20,40)*60000)</delayTicks>
+          <inSignalDisable>site.MapGenerated</inSignalDisable>
+          <destroyOnCleanup>true</destroyOnCleanup>
+          <node Class="QuestNode_Sequence">
+            <nodes>
+              <li Class="QuestNode_Letter">
+                <label TKey="LetterLabelQuestExpired">Quest expired: [resolvedQuestName]</label>
+                <text TKey="LetterTextQuestExpired">The ruins have been scavenged by others, or buried again by the wasteland. The quest [resolvedQuestName] has expired.</text>
+              </li>
+              <li Class="QuestNode_End"><outcome>Fail</outcome></li>
+            </nodes>
+          </node>
+        </li>
+        <li Class="QuestNode_NoWorldObject">
+          <worldObject>$site</worldObject>
+          <node Class="QuestNode_End" />
+        </li>
+      </nodes>
+    </root>
+  </QuestScriptDef>
+
+  <SitePartDef>
+    <defName>Site44_Ruin_Barracks</defName>
+    <label>ruined barracks base</label>
+    <description>A ruined military base: bunk rooms, a mess hall, an armory and motor pools.</description>
+    <siteTexture>World/WorldObjects/Sites/GenericSite</siteTexture>
+    <expandingIconTexture>World/WorldObjects/Expanding/Sites/ItemStash</expandingIconTexture>
+    <minMapSize>(200, 1, 200)</minMapSize>
+    <tags><li>Site44RuinBarracks</li></tags>
+  </SitePartDef>
+
+  <GenStepDef>
+    <defName>Site44_RuinSite_Barracks</defName>
+    <linkWithSite>Site44_Ruin_Barracks</linkWithSite>
+    <order>800</order>
+    <genStep Class="Site44.GenStep_Facility" />
+  </GenStepDef>
+
+  <QuestScriptDef>
+    <defName>OpportunitySite_Site44_Barracks</defName>
+    <rootSelectionWeight>0.4</rootSelectionWeight>
+    <rootMinPoints>0</rootMinPoints>
+    <autoAccept>true</autoAccept>
+    <questNameRules>
+      <rulesStrings>
+        <li>questName->[place] of [people]</li>
+        <li>place->Garrison</li>
+        <li>place->Barracks</li>
+        <li>place->Outpost</li>
+        <li>place->Fortress</li>
+        <li>people->the Fallen Legion</li>
+        <li>people->Rusted Colors</li>
+        <li>people->the Last Watch</li>
+        <li>people->Iron and Dust</li>
+      </rulesStrings>
+    </questNameRules>
+    <questDescriptionRules>
+      <rulesStrings>
+        <li>questDescription->Scouts report an abandoned military base not far from [map_definite]. The armory and bunk rooms should still hold gear, though something may have been left to guard it.</li>
+      </rulesStrings>
+    </questDescriptionRules>
+    <root Class="QuestNode_Sequence">
+      <nodes>
+        <li Class="QuestNode_GetMap" />
+        <li Class="QuestNode_Root_Site">
+          <sitePartDef>Site44_Ruin_Barracks</sitePartDef>
+          <worldObjectDef>Site</worldObjectDef>
+          <factionDef>Ancients</factionDef>
+          <distanceFromColonyRange>5~16</distanceFromColonyRange>
+          <selectLandmarkChance>0</selectLandmarkChance>
+        </li>
+        <li Class="QuestNode_WorldObjectTimeout">
+          <worldObject>$site</worldObject>
+          <isQuestTimeout>true</isQuestTimeout>
+          <delayTicks>$(randInt(20,40)*60000)</delayTicks>
+          <inSignalDisable>site.MapGenerated</inSignalDisable>
+          <destroyOnCleanup>true</destroyOnCleanup>
+          <node Class="QuestNode_Sequence">
+            <nodes>
+              <li Class="QuestNode_Letter">
+                <label TKey="LetterLabelQuestExpired">Quest expired: [resolvedQuestName]</label>
+                <text TKey="LetterTextQuestExpired">The ruins have been scavenged by others, or buried again by the wasteland. The quest [resolvedQuestName] has expired.</text>
+              </li>
+              <li Class="QuestNode_End"><outcome>Fail</outcome></li>
+            </nodes>
+          </node>
+        </li>
+        <li Class="QuestNode_NoWorldObject">
+          <worldObject>$site</worldObject>
+          <node Class="QuestNode_End" />
+        </li>
+      </nodes>
+    </root>
+  </QuestScriptDef>
+
+  <SitePartDef>
+    <defName>Site44_Ruin_Research</defName>
+    <label>ruined research complex</label>
+    <description>A ruined research complex of laboratories, containment rooms and server halls.</description>
+    <siteTexture>World/WorldObjects/Sites/GenericSite</siteTexture>
+    <expandingIconTexture>World/WorldObjects/Expanding/Sites/ItemStash</expandingIconTexture>
+    <minMapSize>(200, 1, 200)</minMapSize>
+    <tags><li>Site44RuinResearch</li></tags>
+  </SitePartDef>
+
+  <GenStepDef>
+    <defName>Site44_RuinSite_Research</defName>
+    <linkWithSite>Site44_Ruin_Research</linkWithSite>
+    <order>800</order>
+    <genStep Class="Site44.GenStep_Facility" />
+  </GenStepDef>
+
+  <QuestScriptDef>
+    <defName>OpportunitySite_Site44_Research</defName>
+    <rootSelectionWeight>0.4</rootSelectionWeight>
+    <rootMinPoints>0</rootMinPoints>
+    <autoAccept>true</autoAccept>
+    <questNameRules>
+      <rulesStrings>
+        <li>questName->[place] of [people]</li>
+        <li>place->Laboratory</li>
+        <li>place->Institute</li>
+        <li>place->Research Wing</li>
+        <li>place->Annex</li>
+        <li>people->Sealed Doors</li>
+        <li>people->the Quiet Experiment</li>
+        <li>people->Cold Equations</li>
+        <li>people->Glass and Wire</li>
+      </rulesStrings>
+    </questNameRules>
+    <questDescriptionRules>
+      <rulesStrings>
+        <li>questDescription->Scouts report a ruined research complex not far from [map_definite]. Laboratories and server halls may hold advanced components. Several containment rooms are still sealed, and they were sealed for a reason.</li>
+      </rulesStrings>
+    </questDescriptionRules>
+    <root Class="QuestNode_Sequence">
+      <nodes>
+        <li Class="QuestNode_GetMap" />
+        <li Class="QuestNode_Root_Site">
+          <sitePartDef>Site44_Ruin_Research</sitePartDef>
+          <worldObjectDef>Site</worldObjectDef>
+          <factionDef>Ancients</factionDef>
+          <distanceFromColonyRange>5~16</distanceFromColonyRange>
+          <selectLandmarkChance>0</selectLandmarkChance>
+        </li>
+        <li Class="QuestNode_WorldObjectTimeout">
+          <worldObject>$site</worldObject>
+          <isQuestTimeout>true</isQuestTimeout>
+          <delayTicks>$(randInt(20,40)*60000)</delayTicks>
+          <inSignalDisable>site.MapGenerated</inSignalDisable>
+          <destroyOnCleanup>true</destroyOnCleanup>
+          <node Class="QuestNode_Sequence">
+            <nodes>
+              <li Class="QuestNode_Letter">
+                <label TKey="LetterLabelQuestExpired">Quest expired: [resolvedQuestName]</label>
+                <text TKey="LetterTextQuestExpired">The ruins have been scavenged by others, or buried again by the wasteland. The quest [resolvedQuestName] has expired.</text>
+              </li>
+              <li Class="QuestNode_End"><outcome>Fail</outcome></li>
+            </nodes>
+          </node>
+        </li>
+        <li Class="QuestNode_NoWorldObject">
+          <worldObject>$site</worldObject>
+          <node Class="QuestNode_End" />
+        </li>
+      </nodes>
+    </root>
+  </QuestScriptDef>
+
+  <SitePartDef>
+    <defName>Site44_Ruin_Industrial</defName>
+    <label>ruined industrial plant</label>
+    <description>A ruined industrial plant of machine halls, boiler rooms, warehouses and loading bays.</description>
+    <siteTexture>World/WorldObjects/Sites/GenericSite</siteTexture>
+    <expandingIconTexture>World/WorldObjects/Expanding/Sites/ItemStash</expandingIconTexture>
+    <minMapSize>(200, 1, 200)</minMapSize>
+    <tags><li>Site44RuinIndustrial</li></tags>
+  </SitePartDef>
+
+  <GenStepDef>
+    <defName>Site44_RuinSite_Industrial</defName>
+    <linkWithSite>Site44_Ruin_Industrial</linkWithSite>
+    <order>800</order>
+    <genStep Class="Site44.GenStep_Facility" />
+  </GenStepDef>
+
+  <QuestScriptDef>
+    <defName>OpportunitySite_Site44_Industrial</defName>
+    <rootSelectionWeight>0.4</rootSelectionWeight>
+    <rootMinPoints>0</rootMinPoints>
+    <autoAccept>true</autoAccept>
+    <questNameRules>
+      <rulesStrings>
+        <li>questName->[place] of [people]</li>
+        <li>place->Works</li>
+        <li>place->Foundry</li>
+        <li>place->Plant</li>
+        <li>place->Yard</li>
+        <li>people->Slag and Steam</li>
+        <li>people->the Old Line</li>
+        <li>people->Heavy Hands</li>
+        <li>people->Rust and Rivets</li>
+      </rulesStrings>
+    </questNameRules>
+    <questDescriptionRules>
+      <rulesStrings>
+        <li>questDescription->Scouts report a derelict industrial plant not far from [map_definite]. Warehouses and machine halls should hold raw materials, though some of the fuel stores are probably unstable.</li>
+      </rulesStrings>
+    </questDescriptionRules>
+    <root Class="QuestNode_Sequence">
+      <nodes>
+        <li Class="QuestNode_GetMap" />
+        <li Class="QuestNode_Root_Site">
+          <sitePartDef>Site44_Ruin_Industrial</sitePartDef>
+          <worldObjectDef>Site</worldObjectDef>
+          <factionDef>Ancients</factionDef>
+          <distanceFromColonyRange>5~16</distanceFromColonyRange>
+          <selectLandmarkChance>0</selectLandmarkChance>
+        </li>
+        <li Class="QuestNode_WorldObjectTimeout">
+          <worldObject>$site</worldObject>
+          <isQuestTimeout>true</isQuestTimeout>
+          <delayTicks>$(randInt(20,40)*60000)</delayTicks>
+          <inSignalDisable>site.MapGenerated</inSignalDisable>
+          <destroyOnCleanup>true</destroyOnCleanup>
+          <node Class="QuestNode_Sequence">
+            <nodes>
+              <li Class="QuestNode_Letter">
+                <label TKey="LetterLabelQuestExpired">Quest expired: [resolvedQuestName]</label>
+                <text TKey="LetterTextQuestExpired">The ruins have been scavenged by others, or buried again by the wasteland. The quest [resolvedQuestName] has expired.</text>
+              </li>
+              <li Class="QuestNode_End"><outcome>Fail</outcome></li>
+            </nodes>
+          </node>
+        </li>
+        <li Class="QuestNode_NoWorldObject">
+          <worldObject>$site</worldObject>
+          <node Class="QuestNode_End" />
+        </li>
+      </nodes>
+    </root>
+  </QuestScriptDef>
+
+  <SitePartDef>
+    <defName>Site44_Ruin_Residential</defName>
+    <label>ruined residential block</label>
+    <description>A ruined residential block of apartments, shared commons and a roof garden.</description>
+    <siteTexture>World/WorldObjects/Sites/GenericSite</siteTexture>
+    <expandingIconTexture>World/WorldObjects/Expanding/Sites/ItemStash</expandingIconTexture>
+    <minMapSize>(200, 1, 200)</minMapSize>
+    <tags><li>Site44RuinResidential</li></tags>
+  </SitePartDef>
+
+  <GenStepDef>
+    <defName>Site44_RuinSite_Residential</defName>
+    <linkWithSite>Site44_Ruin_Residential</linkWithSite>
+    <order>800</order>
+    <genStep Class="Site44.GenStep_Facility" />
+  </GenStepDef>
+
+  <QuestScriptDef>
+    <defName>OpportunitySite_Site44_Residential</defName>
+    <rootSelectionWeight>0.4</rootSelectionWeight>
+    <rootMinPoints>0</rootMinPoints>
+    <autoAccept>true</autoAccept>
+    <questNameRules>
+      <rulesStrings>
+        <li>questName->[place] of [people]</li>
+        <li>place->Tenements</li>
+        <li>place->Apartments</li>
+        <li>place->Block</li>
+        <li>place->Housing</li>
+        <li>people->Lost Neighbours</li>
+        <li>people->Quiet Rooms</li>
+        <li>people->the Last Tenants</li>
+        <li>people->Doors and Dust</li>
+      </rulesStrings>
+    </questNameRules>
+    <questDescriptionRules>
+      <rulesStrings>
+        <li>questDescription->Scouts report a large abandoned residential block not far from [map_definite]. The apartments are picked over but rarely emptied, and people's belongings are often worth the walk.</li>
+      </rulesStrings>
+    </questDescriptionRules>
+    <root Class="QuestNode_Sequence">
+      <nodes>
+        <li Class="QuestNode_GetMap" />
+        <li Class="QuestNode_Root_Site">
+          <sitePartDef>Site44_Ruin_Residential</sitePartDef>
+          <worldObjectDef>Site</worldObjectDef>
+          <factionDef>Ancients</factionDef>
+          <distanceFromColonyRange>5~16</distanceFromColonyRange>
+          <selectLandmarkChance>0</selectLandmarkChance>
+        </li>
+        <li Class="QuestNode_WorldObjectTimeout">
+          <worldObject>$site</worldObject>
+          <isQuestTimeout>true</isQuestTimeout>
+          <delayTicks>$(randInt(20,40)*60000)</delayTicks>
+          <inSignalDisable>site.MapGenerated</inSignalDisable>
+          <destroyOnCleanup>true</destroyOnCleanup>
+          <node Class="QuestNode_Sequence">
+            <nodes>
+              <li Class="QuestNode_Letter">
+                <label TKey="LetterLabelQuestExpired">Quest expired: [resolvedQuestName]</label>
+                <text TKey="LetterTextQuestExpired">The ruins have been scavenged by others, or buried again by the wasteland. The quest [resolvedQuestName] has expired.</text>
+              </li>
+              <li Class="QuestNode_End"><outcome>Fail</outcome></li>
+            </nodes>
+          </node>
+        </li>
+        <li Class="QuestNode_NoWorldObject">
+          <worldObject>$site</worldObject>
+          <node Class="QuestNode_End" />
+        </li>
+      </nodes>
+    </root>
+  </QuestScriptDef>
+
+</Defs>

@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- Office campus: the original ruined complex. -->
+  <Site44.SiteTypeDef>
+    <defName>Site44_Type_Office</defName>
+    <label>office complex</label>
+    <description>A sprawling campus of office blocks, labs, warehouses and plants.</description>
+    <sitePart>Site44_Ruin</sitePart>
+    <questScript>OpportunitySite_Site44Ruin</questScript>
+    <principalArchetype>Office</principalArchetype>
+    <style>Campus</style>
+    <props>office</props>
+    <accent>(0.35, 0.6, 0.95)</accent>
+    <steleStuff>Steel</steleStuff>
+    <questWeight>0.5</questWeight>
+  </Site44.SiteTypeDef>
+
+  <!-- Medical center: wards, operating rooms, a pharmacy and a morgue. Medicine and spacer parts. -->
+  <Site44.SiteTypeDef>
+    <defName>Site44_Type_Medical</defName>
+    <label>medical center</label>
+    <description>A hospital complex of wards, operating theaters, a pharmacy and a morgue.</description>
+    <sitePart>Site44_Ruin_Medical</sitePart>
+    <questScript>OpportunitySite_Site44_Medical</questScript>
+    <principalArchetype>Medical</principalArchetype>
+    <style>Campus</style>
+    <props>medical</props>
+    <accent>(0.6, 0.9, 0.75)</accent>
+    <steleStuff>BlocksMarble</steleStuff>
+    <archetypeWeights>
+      <li><name>Medical</name><weight>3</weight></li>
+      <li><name>Lab</name><weight>2</weight></li>
+      <li><name>Commons</name><weight>2</weight></li>
+      <li><name>Warehouse</name><weight>1</weight></li>
+      <li><name>Security</name><weight>1</weight></li>
+      <li><name>Office</name><weight>1</weight></li>
+    </archetypeWeights>
+    <questWeight>0.35</questWeight>
+    <loot>
+      <li><thingDef>MedicineIndustrial</thingDef><weight>5</weight></li>
+      <li><thingDef>MedicineHerbal</thingDef><weight>3</weight></li>
+      <li><thingDef>Neutroamine</thingDef><weight>2</weight></li>
+      <li><thingDef>Penoxycyline</thingDef><weight>2</weight></li>
+      <li><thingDef>Cloth</thingDef><weight>2</weight></li>
+      <li><thingDef>Silver</thingDef><weight>2</weight></li>
+      <li><thingDef>MealSurvivalPack</thingDef><weight>1</weight></li>
+    </loot>
+    <richLoot>
+      <li><thingDef>MedicineUltratech</thingDef><weight>4</weight></li>
+      <li><thingDef>ComponentSpacer</thingDef><weight>3</weight></li>
+      <li><thingDef>Gold</thingDef><weight>2</weight></li>
+      <li><thingDef>Plasteel</thingDef><weight>2</weight></li>
+    </richLoot>
+    <specialties>
+      <li><name>Infirmary</name><weight>1</weight></li>
+      <li><name>Library</name><weight>1</weight></li>
+      <li><name>LockerRoom</name><weight>2</weight></li>
+      <li><name>Kitchen</name><weight>2</weight></li>
+    </specialties>
+    <strayCorpseFactor>2.5</strayCorpseFactor>
+    <casketFactor>1.3</casketFactor>
+    <dustFactor>0.8</dustFactor>
+  </Site44.SiteTypeDef>
+
+  <!-- Barracks: bunk rooms, a mess, an armory. Tougher gear, more droid-guarded rooms. -->
+  <Site44.SiteTypeDef>
+    <defName>Site44_Type_Barracks</defName>
+    <label>barracks base</label>
+    <description>A military base of bunk rooms, a mess hall, an armory and a motor pool.</description>
+    <sitePart>Site44_Ruin_Barracks</sitePart>
+    <questScript>OpportunitySite_Site44_Barracks</questScript>
+    <principalArchetype>Barracks</principalArchetype>
+    <style>Scattered</style>
+    <props>barracks</props>
+    <accent>(0.55, 0.6, 0.3)</accent>
+    <steleStuff>BlocksGranite</steleStuff>
+    <sizeWeights>
+      <li><name>S</name><weight>0.2</weight></li>
+      <li><name>M</name><weight>0.3</weight></li>
+      <li><name>L</name><weight>0.3</weight></li>
+      <li><name>XL</name><weight>0.2</weight></li>
+    </sizeWeights>
+    <archetypeWeights>
+      <li><name>Barracks</name><weight>3</weight></li>
+      <li><name>Security</name><weight>2</weight></li>
+      <li><name>Warehouse</name><weight>2</weight></li>
+      <li><name>Plant</name><weight>1</weight></li>
+      <li><name>Commons</name><weight>2</weight></li>
+    </archetypeWeights>
+    <questWeight>0.35</questWeight>
+    <loot>
+      <li><thingDef>Steel</thingDef><weight>4</weight></li>
+      <li><thingDef>MealSurvivalPack</thingDef><weight>4</weight></li>
+      <li><thingDef>MedicineIndustrial</thingDef><weight>3</weight></li>
+      <li><thingDef>ComponentIndustrial</thingDef><weight>3</weight></li>
+      <li><thingDef>Chemfuel</thingDef><weight>2</weight></li>
+      <li><thingDef>Apparel_FlakVest</thingDef><weight>1</weight></li>
+      <li><thingDef>Apparel_SimpleHelmet</thingDef><weight>1</weight></li>
+      <li><thingDef>Gun_Revolver</thingDef><weight>1</weight></li>
+      <li><thingDef>Gun_Autopistol</thingDef><weight>1</weight></li>
+      <li><thingDef>MeleeWeapon_Knife</thingDef><weight>1</weight></li>
+    </loot>
+    <richLoot>
+      <li><thingDef>Plasteel</thingDef><weight>3</weight></li>
+      <li><thingDef>ComponentSpacer</thingDef><weight>2</weight></li>
+      <li><thingDef>Gun_PumpShotgun</thingDef><weight>1</weight></li>
+      <li><thingDef>Gun_BoltActionRifle</thingDef><weight>1</weight></li>
+      <li><thingDef>Apparel_FlakPants</thingDef><weight>1</weight></li>
+    </richLoot>
+    <specialties>
+      <li><name>Armory</name><weight>2</weight></li>
+      <li><name>LockerRoom</name><weight>3</weight></li>
+      <li><name>Kitchen</name><weight>2</weight></li>
+      <li><name>Classroom</name><weight>1</weight></li>
+      <li><name>Dormitory</name><weight>0</weight></li>
+    </specialties>
+    <secureRoomFactor>1.4</secureRoomFactor>
+    <casketFactor>0.8</casketFactor>
+  </Site44.SiteTypeDef>
+
+  <!-- Research complex: labs, containment rooms, server clusters. Spacer-tech loot, many vaults. -->
+  <Site44.SiteTypeDef>
+    <defName>Site44_Type_Research</defName>
+    <label>research complex</label>
+    <description>A research complex of laboratories, containment rooms, server halls and a reactor core.</description>
+    <sitePart>Site44_Ruin_Research</sitePart>
+    <questScript>OpportunitySite_Site44_Research</questScript>
+    <principalArchetype>Research</principalArchetype>
+    <style>Compound</style>
+    <props>research</props>
+    <accent>(0.7, 0.5, 0.95)</accent>
+    <steleStuff>Plasteel</steleStuff>
+    <clutterFactor>1.2</clutterFactor>
+    <sizeWeights>
+      <li><name>S</name><weight>0.1</weight></li>
+      <li><name>M</name><weight>0.3</weight></li>
+      <li><name>L</name><weight>0.35</weight></li>
+      <li><name>XL</name><weight>0.25</weight></li>
+    </sizeWeights>
+    <archetypeWeights>
+      <li><name>Research</name><weight>3</weight></li>
+      <li><name>Lab</name><weight>2</weight></li>
+      <li><name>Plant</name><weight>1</weight></li>
+      <li><name>Warehouse</name><weight>1</weight></li>
+      <li><name>Security</name><weight>1</weight></li>
+      <li><name>Office</name><weight>1</weight></li>
+    </archetypeWeights>
+    <questWeight>0.3</questWeight>
+    <loot>
+      <li><thingDef>ComponentIndustrial</thingDef><weight>5</weight></li>
+      <li><thingDef>Steel</thingDef><weight>3</weight></li>
+      <li><thingDef>Silver</thingDef><weight>2</weight></li>
+      <li><thingDef>MedicineIndustrial</thingDef><weight>2</weight></li>
+      <li><thingDef>Uranium</thingDef><weight>1</weight></li>
+    </loot>
+    <richLoot>
+      <li><thingDef>ComponentSpacer</thingDef><weight>5</weight></li>
+      <li><thingDef>Gold</thingDef><weight>3</weight></li>
+      <li><thingDef>Plasteel</thingDef><weight>3</weight></li>
+      <li><thingDef>Uranium</thingDef><weight>2</weight></li>
+      <li><thingDef>MedicineUltratech</thingDef><weight>1</weight></li>
+    </richLoot>
+    <specialties>
+      <li><name>Library</name><weight>2</weight></li>
+      <li><name>CommsRoom</name><weight>2</weight></li>
+      <li><name>Workshop</name><weight>2</weight></li>
+      <li><name>Classroom</name><weight>1</weight></li>
+    </specialties>
+    <secureRoomFactor>1.8</secureRoomFactor>
+    <crateFactor>1.2</crateFactor>
+  </Site44.SiteTypeDef>
+
+  <!-- Industrial plant: machine halls, boilers, warehouses. Raw materials; volatile caches. -->
+  <Site44.SiteTypeDef>
+    <defName>Site44_Type_Industrial</defName>
+    <label>industrial plant</label>
+    <description>An industrial plant of machine halls, boiler rooms, warehouses and loading bays.</description>
+    <sitePart>Site44_Ruin_Industrial</sitePart>
+    <questScript>OpportunitySite_Site44_Industrial</questScript>
+    <principalArchetype>Plant</principalArchetype>
+    <style>Scattered</style>
+    <props>industrial</props>
+    <accent>(0.95, 0.6, 0.2)</accent>
+    <steleStuff>Steel</steleStuff>
+    <clutterFactor>2.4</clutterFactor>
+    <archetypeWeights>
+      <li><name>Plant</name><weight>3</weight></li>
+      <li><name>Warehouse</name><weight>3</weight></li>
+      <li><name>Office</name><weight>1</weight></li>
+      <li><name>Security</name><weight>1</weight></li>
+      <li><name>Commons</name><weight>1</weight></li>
+    </archetypeWeights>
+    <questWeight>0.35</questWeight>
+    <loot>
+      <li><thingDef>Steel</thingDef><weight>6</weight></li>
+      <li><thingDef>ComponentIndustrial</thingDef><weight>4</weight></li>
+      <li><thingDef>Chemfuel</thingDef><weight>3</weight></li>
+      <li><thingDef>Plasteel</thingDef><weight>1</weight></li>
+      <li><thingDef>MealSurvivalPack</thingDef><weight>1</weight></li>
+    </loot>
+    <richLoot>
+      <li><thingDef>Plasteel</thingDef><weight>4</weight></li>
+      <li><thingDef>ComponentSpacer</thingDef><weight>2</weight></li>
+      <li><thingDef>Uranium</thingDef><weight>3</weight></li>
+      <li><thingDef>Gold</thingDef><weight>1</weight></li>
+    </richLoot>
+    <specialties>
+      <li><name>Workshop</name><weight>3</weight></li>
+      <li><name>LockerRoom</name><weight>3</weight></li>
+      <li><name>Kitchen</name><weight>1</weight></li>
+    </specialties>
+    <crateFactor>1.4</crateFactor>
+    <dustFactor>1.4</dustFactor>
+  </Site44.SiteTypeDef>
+
+  <!-- Residential block: apartments, shared commons. Personal belongings, food, cloth, silver. -->
+  <Site44.SiteTypeDef>
+    <defName>Site44_Type_Residential</defName>
+    <label>residential block</label>
+    <description>A residential block of apartments, shared commons, a mail room and a roof garden.</description>
+    <sitePart>Site44_Ruin_Residential</sitePart>
+    <questScript>OpportunitySite_Site44_Residential</questScript>
+    <principalArchetype>Residential</principalArchetype>
+    <style>Campus</style>
+    <props>residential</props>
+    <accent>(0.9, 0.8, 0.55)</accent>
+    <steleStuff>BlocksSandstone</steleStuff>
+    <archetypeWeights>
+      <li><name>Residential</name><weight>4</weight></li>
+      <li><name>Commons</name><weight>2</weight></li>
+      <li><name>Warehouse</name><weight>1</weight></li>
+      <li><name>Office</name><weight>1</weight></li>
+    </archetypeWeights>
+    <minBuildings>3</minBuildings>
+    <maxBuildings>6</maxBuildings>
+    <questWeight>0.4</questWeight>
+    <loot>
+      <li><thingDef>MealSurvivalPack</thingDef><weight>4</weight></li>
+      <li><thingDef>Silver</thingDef><weight>4</weight></li>
+      <li><thingDef>Cloth</thingDef><weight>3</weight></li>
+      <li><thingDef>MedicineHerbal</thingDef><weight>2</weight></li>
+      <li><thingDef>Steel</thingDef><weight>1</weight></li>
+      <li><thingDef>Apparel_Parka</thingDef><weight>1</weight></li>
+      <li><thingDef>Apparel_BasicShirt</thingDef><weight>1</weight></li>
+      <li><thingDef>Apparel_Pants</thingDef><weight>1</weight></li>
+    </loot>
+    <richLoot>
+      <li><thingDef>Gold</thingDef><weight>3</weight></li>
+      <li><thingDef>Silver</thingDef><weight>3</weight></li>
+      <li><thingDef>ComponentIndustrial</thingDef><weight>2</weight></li>
+      <li><thingDef>Plasteel</thingDef><weight>1</weight></li>
+    </richLoot>
+    <specialties>
+      <li><name>Kitchen</name><weight>3</weight></li>
+      <li><name>Library</name><weight>2</weight></li>
+      <li><name>Classroom</name><weight>2</weight></li>
+      <li><name>Dormitory</name><weight>1</weight></li>
+    </specialties>
+    <strayCorpseFactor>1.6</strayCorpseFactor>
+    <casketFactor>1.2</casketFactor>
+    <secureRoomFactor>0.6</secureRoomFactor>
+  </Site44.SiteTypeDef>
+
+</Defs>

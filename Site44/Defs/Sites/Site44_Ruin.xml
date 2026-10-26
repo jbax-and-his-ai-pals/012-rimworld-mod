@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- A world site holding a ruined office complex. The generation step below builds it when the map is created. -->
+  <SitePartDef>
+    <defName>Site44_Ruin</defName>
+    <label>ruined complex</label>
+    <description>The ruins of a sprawling ancient complex: office blocks, plants and warehouses, picked over but never emptied.</description>
+    <siteTexture>World/WorldObjects/Sites/GenericSite</siteTexture>
+    <expandingIconTexture>World/WorldObjects/Expanding/Sites/ItemStash</expandingIconTexture>
+    <minMapSize>(200, 1, 200)</minMapSize>
+    <tags>
+      <li>Site44Ruin</li>
+    </tags>
+  </SitePartDef>
+
+  <GenStepDef>
+    <defName>Site44_RuinSite</defName>
+    <linkWithSite>Site44_Ruin</linkWithSite>
+    <order>800</order>
+    <genStep Class="Site44.GenStep_Facility" />
+  </GenStepDef>
+
+  <!-- Offered now and then like other opportunity sites. Frequency is scaled by the mod setting. -->
+  <QuestScriptDef>
+    <defName>OpportunitySite_Site44Ruin</defName>
+    <rootSelectionWeight>1.0</rootSelectionWeight>
+    <rootMinPoints>0</rootMinPoints>
+    <autoAccept>true</autoAccept>
+    <questNameRules>
+      <rulesStrings>
+        <li>questName->[place] of [people]</li>
+        <li>place->Ruins</li>
+        <li>place->Remains</li>
+        <li>place->Complex</li>
+        <li>place->Wreck</li>
+        <li>people->the Ancients</li>
+        <li>people->Forgotten Hands</li>
+        <li>people->the Old World</li>
+        <li>people->Dust and Wire</li>
+      </rulesStrings>
+    </questNameRules>
+    <questDescriptionRules>
+      <rulesStrings>
+        <li>questDescription->Scouts report a sprawling complex of ancient buildings not far from [map_definite], half buried and picked over but never emptied. There should be crates, sealed caskets and abandoned stores to scavenge. Anyone sleeping inside is better left to find out for themselves.</li>
+      </rulesStrings>
+    </questDescriptionRules>
+    <root Class="QuestNode_Sequence">
+      <nodes>
+
+        <li Class="QuestNode_GetMap" />
+
+        <li Class="QuestNode_Root_Site">
+          <sitePartDef>Site44_Ruin</sitePartDef>
+          <worldObjectDef>Site</worldObjectDef>
+          <factionDef>Ancients</factionDef>
+          <distanceFromColonyRange>5~16</distanceFromColonyRange>
+          <selectLandmarkChance>0</selectLandmarkChance>
+        </li>
+
+        <li Class="QuestNode_WorldObjectTimeout">
+          <worldObject>$site</worldObject>
+          <isQuestTimeout>true</isQuestTimeout>
+          <delayTicks>$(randInt(20,40)*60000)</delayTicks>
+          <inSignalDisable>site.MapGenerated</inSignalDisable>
+          <destroyOnCleanup>true</destroyOnCleanup>
+          <node Class="QuestNode_Sequence">
+            <nodes>
+              <li Class="QuestNode_Letter">
+                <label TKey="LetterLabelQuestExpired">Quest expired: [resolvedQuestName]</label>
+                <text TKey="LetterTextQuestExpired">The ruins have been scavenged by others, or buried again by the wasteland. The quest [resolvedQuestName] has expired.</text>
+              </li>
+              <li Class="QuestNode_End">
+                <outcome>Fail</outcome>
+              </li>
+            </nodes>
+          </node>
+        </li>
+
+        <li Class="QuestNode_NoWorldObject">
+          <worldObject>$site</worldObject>
+          <node Class="QuestNode_End" />
+        </li>
+
+      </nodes>
+    </root>
+  </QuestScriptDef>
+
+</Defs>

@@ -1,0 +1,9 @@
+bin/
+obj/
+Site44/obj/
+Site44/Assemblies/*.dll
+Site44/Assemblies/*.pdb
+*.user
+.vs/
+.idea/
+TestResults/

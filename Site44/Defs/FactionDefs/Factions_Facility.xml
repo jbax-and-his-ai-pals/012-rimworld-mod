@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <FactionDef ParentName="FactionBase">
+    <defName>Site44_Facility</defName>
+    <label>facility security</label>
+    <description>The automated security apparatus of Site-44. It answers only to the facility itself.</description>
+    <fixedName>Site-44 Security</fixedName>
+    <pawnSingular>sentry</pawnSingular>
+    <pawnsPlural>sentries</pawnsPlural>
+    <factionIconPath>World/WorldObjects/Expanding/Mechanoids</factionIconPath>
+    <colorSpectrum>
+      <li>(0.78, 0.79, 0.71)</li>
+    </colorSpectrum>
+    <humanlikeFaction>false</humanlikeFaction>
+    <hidden>true</hidden>
+    <autoFlee>false</autoFlee>
+    <canUseAvoidGrid>false</canUseAvoidGrid>
+    <techLevel>Ultra</techLevel>
+    <permanentEnemy>false</permanentEnemy>
+  </FactionDef>
+
+</Defs>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>Site44_BlastWall</defName>
+    <label>reinforced bulkhead</label>
+    <description>A structural bulkhead of the facility. Nothing you carry will get through it.</description>
+    <thingClass>Building</thingClass>
+    <category>Building</category>
+    <noRightClickDraftAttack>true</noRightClickDraftAttack>
+    <graphicData>
+      <texPath>Things/Building/Linked/Wall</texPath>
+      <graphicClass>Graphic_Appearances</graphicClass>
+      <linkType>CornerFiller</linkType>
+      <linkFlags>
+        <li>Wall</li>
+        <li>Rock</li>
+      </linkFlags>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>1000</MaxHitPoints>
+    </statBases>
+    <useHitPoints>false</useHitPoints>
+    <stuffCategories>
+      <li>Metallic</li>
+    </stuffCategories>
+    <costStuffCount>1</costStuffCount>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Impassable</passability>
+    <blockWind>true</blockWind>
+    <castEdgeShadows>true</castEdgeShadows>
+    <fillPercent>1</fillPercent>
+    <coversFloor>true</coversFloor>
+    <drawStyleCategory>Walls</drawStyleCategory>
+    <tickerType>Never</tickerType>
+    <rotatable>false</rotatable>
+    <selectable>true</selectable>
+    <neverMultiSelect>true</neverMultiSelect>
+    <holdsRoof>true</holdsRoof>
+    <staticSunShadowHeight>1.0</staticSunShadowHeight>
+    <blockLight>true</blockLight>
+    <canOverlapZones>false</canOverlapZones>
+    <fertility>0</fertility>
+    <building>
+      <isInert>true</isInert>
+      <deconstructible>false</deconstructible>
+    </building>
+  </ThingDef>
+
+  <!-- Impassable but see-through (partial fill does not block sight or fog), used for observation windows. -->
+  <ThingDef ParentName="BuildingBase">
+    <defName>Site44_ViewportWall</defName>
+    <label>observation viewport</label>
+    <description>A thick transparent panel. You can see through it; nothing gets through it.</description>
+    <thingClass>Building</thingClass>
+    <category>Building</category>
+    <noRightClickDraftAttack>true</noRightClickDraftAttack>
+    <graphicData>
+      <texPath>Things/Building/Linked/Wall</texPath>
+      <graphicClass>Graphic_Appearances</graphicClass>
+      <color>(0.55, 0.8, 0.95)</color>
+      <linkType>CornerFiller</linkType>
+      <linkFlags>
+        <li>Wall</li>
+      </linkFlags>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>1000</MaxHitPoints>
+    </statBases>
+    <useHitPoints>false</useHitPoints>
+    <stuffCategories>
+      <li>Metallic</li>
+    </stuffCategories>
+    <costStuffCount>1</costStuffCount>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Impassable</passability>
+    <fillPercent>0.5</fillPercent>
+    <coversFloor>true</coversFloor>
+    <drawStyleCategory>Walls</drawStyleCategory>
+    <tickerType>Never</tickerType>
+    <rotatable>false</rotatable>
+    <selectable>true</selectable>
+    <neverMultiSelect>true</neverMultiSelect>
+    <holdsRoof>true</holdsRoof>
+    <canOverlapZones>false</canOverlapZones>
+    <fertility>0</fertility>
+    <building>
+      <isInert>true</isInert>
+      <deconstructible>false</deconstructible>
+    </building>
+  </ThingDef>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>Site44_SealedHatch</defName>
+    <label>sealed blast hatch</label>
+    <description>A blast hatch, welded shut by facility lockdown. It will not open until the facility says so.</description>
+    <thingClass>Site44.Building_SealedHatch</thingClass>
+    <category>Building</category>
+    <noRightClickDraftAttack>true</noRightClickDraftAttack>
+    <graphicData>
+      <texPath>Things/Building/Door/DoorSimple_MenuIcon</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <color>(0.85, 0.35, 0.3)</color>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>1000</MaxHitPoints>
+    </statBases>
+    <useHitPoints>false</useHitPoints>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Impassable</passability>
+    <blockWind>true</blockWind>
+    <fillPercent>1</fillPercent>
+    <tickerType>Never</tickerType>
+    <rotatable>false</rotatable>
+    <selectable>true</selectable>
+    <neverMultiSelect>true</neverMultiSelect>
+    <holdsRoof>true</holdsRoof>
+    <blockLight>true</blockLight>
+    <canOverlapZones>false</canOverlapZones>
+    <fertility>0</fertility>
+    <building>
+      <isInert>true</isInert>
+      <deconstructible>false</deconstructible>
+    </building>
+  </ThingDef>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>Site44_Terminal</defName>
+    <label>facility terminal</label>
+    <description>A battered terminal wired into the facility data bus. Someone with a head for systems could talk it into opening doors.</description>
+    <thingClass>Site44.Building_FacilityTerminal</thingClass>
+    <category>Building</category>
+    <noRightClickDraftAttack>true</noRightClickDraftAttack>
+    <graphicData>
+      <texPath>Things/Building/Ruins/AncientDisplayBank</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(3.5, 1.5)</drawSize>
+      <shadowData>
+        <volume>(2.9, 0.4, 0.9)</volume>
+      </shadowData>
+    </graphicData>
+    <size>(3, 1)</size>
+    <statBases>
+      <MaxHitPoints>500</MaxHitPoints>
+    </statBases>
+    <useHitPoints>false</useHitPoints>
+    <fillPercent>0.4</fillPercent>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <rotatable>false</rotatable>
+    <selectable>true</selectable>
+    <building>
+      <isInert>true</isInert>
+      <deconstructible>false</deconstructible>
+    </building>
+  </ThingDef>
+
+  <!-- A marker pillar outside a front door. Tinted per complex type at spawn time. -->
+  <ThingDef ParentName="BuildingBase">
+    <defName>Site44_Stele</defName>
+    <label>stele</label>
+    <description>A squat marker pillar that flanks the front door of a building.</description>
+    <thingClass>Building</thingClass>
+    <category>Building</category>
+    <noRightClickDraftAttack>true</noRightClickDraftAttack>
+    <graphicData>
+      <texPath>Things/Building/Linked/Wall</texPath>
+      <graphicClass>Graphic_Appearances</graphicClass>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>1000</MaxHitPoints>
+    </statBases>
+    <useHitPoints>false</useHitPoints>
+    <stuffCategories>
+      <li>Metallic</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>1</costStuffCount>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Impassable</passability>
+    <fillPercent>0.55</fillPercent>
+    <rotatable>false</rotatable>
+    <selectable>true</selectable>
+    <canOverlapZones>false</canOverlapZones>
+    <building>
+      <isInert>true</isInert>
+      <deconstructible>false</deconstructible>
+    </building>
+    <comps>
+      <li Class="CompProperties"><compClass>CompColorable</compClass></li>
+    </comps>
+  </ThingDef>
+
+</Defs>

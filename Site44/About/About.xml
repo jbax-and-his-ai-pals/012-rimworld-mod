@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Site-44</name>
+  <author>jerbtrundles</author>
+  <packageId>jerbtrundles.Site44</packageId>
+  <url>https://github.com/jbax-and-his-ai-pals/012-rimworld-mod</url>
+  <description>Procedurally generated ruined complexes to explore and loot: office campuses, hospitals, barracks bases, research compounds, industrial plants and residential blocks. Each is a believable abandoned building with real hallways, furnished and decayed rooms, loot crates, cryosleep caskets, locked secure rooms and the odd prototype droid.
+
+Offered as world-map quest sites in five sizes, or start inside one with the Site-44 Breach scenario. Needs only the base game and uses no Harmony patches.
+
+Tune everything under Options, Mod settings, Site-44.</description>
+  <supportedVersions>
+    <li>1.6</li>
+  </supportedVersions>
+  <loadAfter>
+    <li>Ludeon.RimWorld</li>
+  </loadAfter>
+</ModMetaData>

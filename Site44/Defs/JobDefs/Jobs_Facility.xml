@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <JobDef>
+    <defName>Site44_HackTerminal</defName>
+    <driverClass>Site44.JobDriver_HackTerminal</driverClass>
+    <reportString>hacking TargetA.</reportString>
+  </JobDef>
+
+</Defs>

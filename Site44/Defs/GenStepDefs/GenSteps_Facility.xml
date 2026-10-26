@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- After ruins/shrines (750), before the player start spot is chosen (850). -->
+  <GenStepDef>
+    <defName>Site44_Facility</defName>
+    <order>800</order>
+    <genStep Class="Site44.GenStep_Facility" />
+  </GenStepDef>
+
+</Defs>

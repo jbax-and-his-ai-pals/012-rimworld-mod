@@ -29,9 +29,9 @@ Legend: `[x]` done, `[~]` in progress, `[ ]` planned. Each phase builds on the o
 ## Phase 3: the living town
 
 - [x] **3.1 Town plan generator**: an ordered list of projects (houses, stalls, walls, gardens) laid out around a plaza (pure and tested)
-- [ ] **3.2 Staged builders**: villagers walk to a site and the building appears in stages
-- [ ] **3.3 Lots and reconciliation**: planned lots are revealed as the town decides; the town never builds on cells the player has claimed or used; the player can claim lots
-- [ ] **3.4 Growth driven by standing**
+- [x] **3.2 Staged builders**: villagers walk to a site and the building appears in stages
+- [x] **3.3 Lots and reconciliation**: planned lots are revealed as the town decides; the town never builds on cells the player has claimed or used; the player can claim lots
+- [x] **3.4 Growth driven by standing**
 - [ ] **3.5 Lodging ladder**: cot, room, apartment, suite, with furniture allowed inside your own lodging
 - [ ] **3.6 "Delver in Residence" scenario**: start as a lodger in the enclave, opt-in
 

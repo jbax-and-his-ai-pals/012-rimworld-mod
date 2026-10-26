@@ -119,6 +119,13 @@ namespace Site44
                         Map enclaveMap = Find.Maps.Find(m => m.GetComponent<MapComponent_Enclave>().active);
                         enclaveMap?.GetComponent<MapComponent_Enclave>().AddStanding(400); Log.Message("[Site-44] grow test: enclave map " + (enclaveMap != null) + ", maps " + Find.Maps.Count + ", speed set.");
                         Find.TickManager.CurTimeSpeed = TimeSpeed.Ultrafast;
+                        MapComponent_Enclave growing = enclaveMap?.GetComponent<MapComponent_Enclave>();
+                        for (int step = 0; step < 6000 && growing != null; step++)
+                        {
+                            growing.GrowthStep();
+                        }
+
+                        Log.Message("[Site-44] grow test done: " + growing.built.Count + " built.");
                     }
                 }
             }

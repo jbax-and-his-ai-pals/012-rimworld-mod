@@ -156,7 +156,15 @@ namespace Site44
                 Log.Message("[Site-44] enclave heartbeat tick " + Find.TickManager.TicksGame + ", standing " + standing + ", active project " + activeProject + ", built " + built.Count + ".");
             }
 
-            if (!active || Find.TickManager.TicksGame % GrowthIntervalTicks != 0)
+            if (active && Find.TickManager.TicksGame % GrowthIntervalTicks == 0)
+            {
+                GrowthStep();
+            }
+        }
+
+        public void GrowthStep()
+        {
+            if (!active)
             {
                 return;
             }

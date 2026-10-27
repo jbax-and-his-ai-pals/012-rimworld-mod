@@ -9,7 +9,7 @@
     <category>Building</category>
     <graphicData>
       <texPath>Things/Building/Ruins/AncientCryptosleepPod</texPath>
-      <graphicClass>Graphic_Single</graphicClass>
+      <graphicClass>Graphic_Multi</graphicClass>
       <drawSize>(3,3)</drawSize>
     </graphicData>
     <size>(2,2)</size>
@@ -69,6 +69,18 @@
         </li>
         <li Class="Site44.ScenPart_Site44Delve">
           <def>Site44_Delve</def>
+        </li>
+        <li Class="ScenPart_DisableIncident">
+          <def>DisableIncident</def>
+          <incident>Ambush</incident>
+        </li>
+        <li Class="ScenPart_DisableIncident">
+          <def>DisableIncident</def>
+          <incident>ManhunterAmbush</incident>
+        </li>
+        <li Class="ScenPart_DisableIncident">
+          <def>DisableIncident</def>
+          <incident>CaravanDemand</incident>
         </li>
       </parts>
     </scenario>

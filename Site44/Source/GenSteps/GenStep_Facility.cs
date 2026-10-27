@@ -83,6 +83,7 @@ namespace Site44
             graph = FacilityGraph.Build(plan, targetZones, graphSeed);
             faction = Site44Tuning.SecurityEnabled ? FacilityFaction.GetOrCreate() : null;
 
+            Reposition(width, height);
             startSpotForSafety = World(plan.Start);
             foreach (PlanRoom exec in plan.Rooms.Where(r => r.Function.ToString() == "PrivateOffice" && r.Cells.Count >= 20)
                          .OrderByDescending(r => r.Cells.Count).Take(2))
@@ -97,6 +98,7 @@ namespace Site44
 
             ClearRing();
             PrepareCells();
+            DigForecourts();
             BuildTiles();
             PaintPaths();
             foreach (Zone zone in graph.Zones)
@@ -231,6 +233,149 @@ namespace Site44
         private IntVec3 World(int x, int y)
         {
             return new IntVec3(origin.x + x, 0, origin.z + y);
+        }
+
+        // ----- placement and forecourts -----
+
+        private const int ForecourtDepth = 9;
+
+        private struct ExteriorDoor
+        {
+            public int X, Y;       // the cell just outside the door, in plan coordinates
+            public int Dx, Dy;     // outward direction
+        }
+
+        private List<ExteriorDoor> ExteriorDoors()
+        {
+            List<ExteriorDoor> doors = new List<ExteriorDoor>();
+            int[] dx = { 1, -1, 0, 0 };
+            int[] dy = { 0, 0, 1, -1 };
+            foreach (PlanLink link in plan.Links)
+            {
+                if (link.RoomB >= 0)
+                {
+                    continue;
+                }
+
+                for (int d = 0; d < 4; d++)
+                {
+                    int nx = link.Cell.X + dx[d];
+                    int ny = link.Cell.Y + dy[d];
+                    if (plan.InBounds(nx, ny) && plan.At(nx, ny) == PlanTile.Outside)
+                    {
+                        doors.Add(new ExteriorDoor { X = nx, Y = ny, Dx = dx[d], Dy = dy[d] });
+                        break;
+                    }
+                }
+            }
+
+            return doors;
+        }
+
+        private static bool IsRock(Map map, IntVec3 c)
+        {
+            if (!c.InBounds(map))
+            {
+                return true;
+            }
+
+            Building edifice = c.GetEdifice(map);
+            return edifice != null && edifice.def.building != null && edifice.def.building.isNaturalRock;
+        }
+
+        // Entrances look wrong pressed against a mountain face. When the complex has room to move, slide it to the
+        // spot whose forecourts (the ground in front of its doors) hold the least rock.
+        private void Reposition(int width, int height)
+        {
+            List<ExteriorDoor> doors = ExteriorDoors();
+            if (doors.Count == 0)
+            {
+                return;
+            }
+
+            int minX = RingMargin;
+            int maxX = map.Size.x - width - RingMargin;
+            int minZ = RingMargin;
+            int maxZ = map.Size.z - height - RingMargin;
+            if (maxX <= minX && maxZ <= minZ)
+            {
+                return;
+            }
+
+            int bestScore = int.MaxValue;
+            IntVec3 best = origin;
+            for (int ox = minX; ox <= Mathf.Max(minX, maxX); ox += 4)
+            {
+                for (int oz = minZ; oz <= Mathf.Max(minZ, maxZ); oz += 4)
+                {
+                    int score = 0;
+                    foreach (ExteriorDoor door in doors)
+                    {
+                        score += ForecourtRock(ox, oz, door);
+                        if (score >= bestScore)
+                        {
+                            break;
+                        }
+                    }
+
+                    // A little noise so equally good spots are not always the corner of the search.
+                    score = score * 4 + Rand.RangeInclusive(0, 3);
+                    if (score < bestScore)
+                    {
+                        bestScore = score;
+                        best = new IntVec3(ox, 0, oz);
+                    }
+                }
+            }
+
+            origin = best;
+            rect = new CellRect(origin.x, origin.z, width, height);
+        }
+
+        private int ForecourtRock(int ox, int oz, ExteriorDoor door)
+        {
+            int rock = 0;
+            int px = -door.Dy;   // perpendicular to the outward direction
+            int py = door.Dx;
+            for (int k = 0; k < ForecourtDepth; k++)
+            {
+                for (int w = -4; w <= 4; w++)
+                {
+                    int x = ox + door.X + door.Dx * k + px * w;
+                    int z = oz + door.Y + door.Dy * k + py * w;
+                    if (IsRock(map, new IntVec3(x, 0, z)))
+                    {
+                        rock++;
+                    }
+                }
+            }
+
+            return rock;
+        }
+
+        // Whatever rock is left in front of a door is dug back into an irregular clearing so every entrance opens onto
+        // open ground, not a rock face.
+        private void DigForecourts()
+        {
+            foreach (ExteriorDoor door in ExteriorDoors())
+            {
+                int px = -door.Dy;
+                int py = door.Dx;
+                int halfWidth = Rand.RangeInclusive(4, 5);
+                for (int k = 0; k < ForecourtDepth; k++)
+                {
+                    // The clearing narrows toward its far end and wobbles at the edge.
+                    int reach = Mathf.Max(2, halfWidth - k / 3 + Rand.RangeInclusive(-1, 1));
+                    for (int w = -reach; w <= reach; w++)
+                    {
+                        IntVec3 c = new IntVec3(origin.x + door.X + door.Dx * k + px * w, 0, origin.z + door.Y + door.Dy * k + py * w);
+                        if (c.InBounds(map) && IsRock(map, c))
+                        {
+                            ClearForBuilding(c);
+                        }
+                    }
+                }
+            }
         }
 
         // ----- preparation -----

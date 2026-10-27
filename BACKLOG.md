@@ -56,3 +56,8 @@ Loot amount, crate density, casket density, survivor casket count, hostile caske
 ## Later
 - Daily or seeded challenge: the same complex and loadout for everyone, scored on speed or loot. Revisit once the average seeded experience reaches a quality bar.
 - Survival layer: before building it, check whether an existing mod already covers the outside-world side so this mod can hook into it instead.
+
+## Principles
+- No required expansions or mods, no Harmony patches, no overriding player choices. Anything that changes another system is an off-by-default setting with a tooltip.
+- Document known interactions (Ideology demands, caravan events) in the README and in scenario text.
+- Possible opt-in setting: force the Classic ideoligion in the Delve scenario, only if play shows people keep tripping over it.

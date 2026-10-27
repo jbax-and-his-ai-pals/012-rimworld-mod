@@ -50,7 +50,9 @@
   <ScenarioDef ParentName="ScenarioBase">
     <defName>Site44_DelveRun</defName>
     <label>Site-44 Delve</label>
-    <description>A professional crew, one complex after another. Each extraction gate leads to a deeper, harder ruin. Keep the crew alive; the run ends with the last of them.</description>
+    <description>A professional crew, one complex after another. Each extraction gate leads to a deeper, harder ruin. Keep the crew alive; the run ends with the last of them.
+
+Playing with Ideology? Choose the Classic ideoligion on the ideoligion page: a delving party cannot meet altar, ritual or building demands. Caravan ambushes and demands are switched off.</description>
     <scenario>
       <summary>Descend through a chain of ruined complexes.</summary>
       <parts>

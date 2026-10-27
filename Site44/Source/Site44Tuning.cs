@@ -28,6 +28,9 @@ namespace Site44
         public static float PreservedRoomChance => S.preservedRoomChance;
 
         // Multiplier on every loot stack placed in the complex.
+        // Chance that a diagnostic or hatch node carries a bonus action.
+        public const float NodeExtraChance = 0.2f;
+
         // Chance that an ordinary room is given a beat (crate, body, casket or nest) when it is not forced to.
         public const float BeatChance = 0.6f;
 

@@ -35,6 +35,7 @@ namespace Site44
         private PlanRoom welcomeRoom;
         private readonly HashSet<int> executiveRooms = new HashSet<int>();
         private readonly HashSet<int> preservedRooms = new HashSet<int>();
+        private readonly HashSet<int> terminalRooms = new HashSet<int>();   // outer rooms already holding a big terminal
         private IntVec3 startSpotForSafety;
         private IntVec3 welcomePos = IntVec3.Invalid;
         private int recRoomCount;
@@ -1278,18 +1279,35 @@ namespace Site44
             MapComponent_Facility facility = map.GetComponent<MapComponent_Facility>();
             foreach (SecureRoom vault in secureRooms)
             {
-                // The control terminal stands in the room outside the door.
-                IntVec3 spot;
-                if (TryFindSpotInRoom(vault.outer, Site44DefOf.Site44_Terminal.size, out spot))
+                // The control point stands in the room outside the door: a big terminal, or a one-tile node by the hatch.
+                // A room that already holds a terminal gets a node, so several hatches never stack terminals.
+                IntVec3 spot = IntVec3.Invalid;
+                bool node = false;
+                if (terminalRooms.Contains(vault.outer.Id) || Rand.Chance(0.4f))
                 {
-                    Building_FacilityTerminal terminal = SpawnConsole(Site44DefOf.Site44_Terminal, spot, TerminalKind.Gate);
+                    node = TryFindNodeSpot(vault, out spot);
+                }
+
+                if (!node && !TryFindSpotInRoom(vault.outer, Site44DefOf.Site44_Terminal.size, out spot))
+                {
+                    node = TryFindNodeSpot(vault, out spot);
+                    if (!node)
+                    {
+                        // No room for any control point: never leave a room that cannot be opened.
+                        facility.UnsealSector(vault.sectorId);
+                        spot = IntVec3.Invalid;
+                    }
+                }
+
+                if (spot.IsValid)
+                {
+                    Building_FacilityTerminal terminal = SpawnConsole(node ? DefDatabase<ThingDef>.GetNamed("Site44_DiagnosticNode") : Site44DefOf.Site44_Terminal, spot, TerminalKind.Gate);
                     terminal.sectorId = vault.sectorId;
                     terminal.requiredTier = 0;
-                }
-                else
-                {
-                    // No room for a terminal: never leave a room that cannot be opened.
-                    facility.UnsealSector(vault.sectorId);
+                    if (!node)
+                    {
+                        terminalRooms.Add(vault.outer.Id);
+                    }
                 }
 
                 switch (vault.kind)
@@ -1320,6 +1338,36 @@ namespace Site44
                         break;
                 }
             }
+        }
+
+        // A cell beside the hatch in the room outside it: next to, but never on, the doorway and the cell in front of it.
+        private bool TryFindNodeSpot(SecureRoom vault, out IntVec3 spot)
+        {
+            IntVec3 door = World(plan.Links[vault.linkIndex].Cell);
+            foreach (IntVec3 dir in GenAdj.CardinalDirections.OrderBy(d => Rand.Value))
+            {
+                IntVec3 front = door + dir;
+                if (plan.RoomAt(front.x - origin.x, front.z - origin.z) != vault.outer.Id)
+                {
+                    continue;
+                }
+
+                foreach (IntVec3 around in GenAdj.AdjacentCellsAndInside.OrderBy(d => Rand.Value))
+                {
+                    IntVec3 cell = front + around;
+                    if (cell == front || cell == door || cell.DistanceToSquared(door) > 5
+                        || plan.RoomAt(cell.x - origin.x, cell.z - origin.z) != vault.outer.Id || !IsFree(cell))
+                    {
+                        continue;
+                    }
+
+                    spot = cell;
+                    return true;
+                }
+            }
+
+            spot = IntVec3.Invalid;
+            return false;
         }
 
         private void SpawnVaultDroid(PlanRoom room)
@@ -2050,6 +2098,11 @@ namespace Site44
         {
             Building_FacilityTerminal terminal = (Building_FacilityTerminal)ThingMaker.MakeThing(def);
             terminal.kind = kind;
+            if ((kind == TerminalKind.Gate || kind == TerminalKind.Diagnostic) && def.defName == "Site44_DiagnosticNode" && Rand.Chance(Site44Tuning.NodeExtraChance))
+            {
+                terminal.extra = (NodeExtra)Rand.RangeInclusive(1, 3);
+            }
+
             GenSpawn.Spawn(terminal, center, map, Rot4.North);
             return terminal;
         }

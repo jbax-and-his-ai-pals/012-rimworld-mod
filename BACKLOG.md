@@ -65,3 +65,10 @@ Loot amount, crate density, casket density, survivor casket count, hostile caske
 ## Travel between the enclave and complexes (to decide)
 - Breach keeps the world: you start on a tile you choose, and the enclave and complexes are places on the map.
 - Fast travel options to consider: realistic (an ox or horse cart takes the party there, possibly for a fee, using the caravan system) or instant (a warp), or both as a setting. Needs enclave services and standing first.
+
+## Pacing and engagement (2026-10)
+
+- Done: room beat planner (`RoomBeats`), headline loot in every beat crate, hostile creature nests, scarcity setting for medicine and meals, hatch nodes, rare node bonus actions, Delve and Breach default to Small.
+- Next: story breadcrumbs as a system of their own (terminal logs, notes, environmental scenes), hazard rooms that need protective gear, a visible per-level goal (restore power, data nodes), set-piece rooms, node Puzzle beat.
+- To watch in play: crate density with beats on, nest danger by depth, whether Small is the right default size, whether 75% scarcity is right outside Delve.
+- Rats and other non-insect critters need a hostile faction to behave as nests; only insects for now.

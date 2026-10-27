@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using RimWorld;
 using Site44.Gen;
 using UnityEngine;
@@ -17,12 +18,22 @@ namespace Site44
         Extraction
     }
 
+    // What a node may also do once its puzzle is solved. Rare: most nodes only do their one job.
+    public enum NodeExtra
+    {
+        None,
+        UnsealNearby,   // opens the nearest sealed hatches besides its own
+        SecurityDown,   // shuts down the nearest hostile security network
+        Reveal          // marks where the extraction gate is
+    }
+
     public class Building_FacilityTerminal : Building
     {
         public TerminalKind kind;
         public string sectorId;
         public int groupId = -1;
         public int requiredTier;
+        public NodeExtra extra;
         private bool used;
         private int lockedUntil;
 
@@ -71,6 +82,7 @@ namespace Site44
             Scribe_Values.Look(ref sectorId, "sectorId");
             Scribe_Values.Look(ref groupId, "groupId", -1);
             Scribe_Values.Look(ref requiredTier, "requiredTier");
+            Scribe_Values.Look(ref extra, "extra");
             Scribe_Values.Look(ref used, "used");
             Scribe_Values.Look(ref lockedUntil, "lockedUntil");
         }
@@ -239,6 +251,63 @@ namespace Site44
 
                     Messages.Message(hacker.LabelShort + " unlocks the extraction gate.", new LookTargets(Position, Map), MessageTypeDefOf.PositiveEvent);
                     break;
+            }
+
+            if (extra != NodeExtra.None && (kind == TerminalKind.Gate || kind == TerminalKind.Diagnostic))
+            {
+                ApplyExtra(hacker, facility);
+            }
+        }
+
+        // The bonus a rare node carries. It always does something: with nothing to unseal or shut down it marks the gate.
+        private void ApplyExtra(Pawn hacker, MapComponent_Facility facility)
+        {
+            NodeExtra what = extra;
+            if (what == NodeExtra.UnsealNearby)
+            {
+                List<Building_SealedHatch> hatches = Map.listerThings.ThingsOfDef(Site44DefOf.Site44_SealedHatch)
+                    .OfType<Building_SealedHatch>()
+                    .Where(h => h.sectorId != sectorId)
+                    .OrderBy(h => h.Position.DistanceTo(Position))
+                    .ToList();
+                List<string> sectors = hatches.Select(h => h.sectorId).Distinct().Take(2).ToList();
+                if (sectors.Count == 0)
+                {
+                    what = NodeExtra.Reveal;
+                }
+                else
+                {
+                    int opened = 0;
+                    foreach (string sector in sectors)
+                    {
+                        opened += facility.UnsealSector(sector);
+                    }
+
+                    Messages.Message("The node also releases " + opened + " nearby hatch(es).", new LookTargets(Position, Map), MessageTypeDefOf.PositiveEvent);
+                    return;
+                }
+            }
+
+            if (what == NodeExtra.SecurityDown)
+            {
+                SecurityGroup group = facility.securityGroups
+                    .Where(g => g.mode == SecurityMode.Hostile)
+                    .OrderBy(g => g.turrets.Where(t => t != null && t.Spawned).Select(t => t.Position.DistanceTo(Position)).Concat(g.droids.Where(d => d != null && d.Spawned).Select(d => d.Position.DistanceTo(Position))).DefaultIfEmpty(9999f).Min())
+                    .FirstOrDefault();
+                if (group != null)
+                {
+                    group.SetMode(SecurityMode.Disabled);
+                    Messages.Message("The node also shuts down a security network.", new LookTargets(Position, Map), MessageTypeDefOf.PositiveEvent);
+                    return;
+                }
+
+                what = NodeExtra.Reveal;
+            }
+
+            Thing gate = Map.listerThings.ThingsOfDef(Site44DefOf.Site44_ExtractionGate).FirstOrDefault();
+            if (gate != null)
+            {
+                Messages.Message("The node also pings the extraction gate.", new LookTargets(gate), MessageTypeDefOf.PositiveEvent);
             }
         }
     }

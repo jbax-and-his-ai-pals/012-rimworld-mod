@@ -13,6 +13,7 @@ namespace Site44
 
         // Treasure
         public float lootAmount = 1f;
+        public float scarcity = 0.75f;                        // how rarely medicine and meals turn up, and how small the stacks are
         public float crateDensity = 1f;
         public float preservedRoomChance = 0.07f;
 
@@ -53,7 +54,8 @@ namespace Site44
         public float roomVariety = 1f;
         public string scenarioSiteType = "Site44_Type_Office";
         public string siteSizeMode = "Random";
-        public string scenarioComplexSize = "XL";
+        public string scenarioComplexSize = "Small";
+        public string delveSize = "Small";                    // "Grows with depth" uses the delve difficulty ramp
         public float propDensity = 1f;
 
         // Delivery
@@ -63,6 +65,7 @@ namespace Site44
         {
             Site44Settings defaults = new Site44Settings();
             lootAmount = defaults.lootAmount;
+            scarcity = defaults.scarcity;
             skipWorldSetup = defaults.skipWorldSetup;
             biomePool = new List<string>();
             delveNoRaids = defaults.delveNoRaids;
@@ -89,6 +92,7 @@ namespace Site44
             scenarioSiteType = defaults.scenarioSiteType;
             siteSizeMode = defaults.siteSizeMode;
             scenarioComplexSize = defaults.scenarioComplexSize;
+            delveSize = defaults.delveSize;
             propDensity = defaults.propDensity;
             questFrequency = defaults.questFrequency;
         }
@@ -96,6 +100,7 @@ namespace Site44
         public override void ExposeData()
         {
             Scribe_Values.Look(ref lootAmount, "lootAmount", 1f);
+            Scribe_Values.Look(ref scarcity, "scarcity", 0.75f);
             Scribe_Values.Look(ref crateDensity, "crateDensity", 1f);
             Scribe_Values.Look(ref preservedRoomChance, "preservedRoomChance", 0.07f);
             Scribe_Values.Look(ref casketDensity, "casketDensity", 1f);
@@ -132,7 +137,8 @@ namespace Site44
             Scribe_Values.Look(ref roomVariety, "roomVariety", 1f);
             Scribe_Values.Look(ref scenarioSiteType, "scenarioSiteType", "Site44_Type_Office");
             Scribe_Values.Look(ref siteSizeMode, "siteSizeMode", "Random");
-            Scribe_Values.Look(ref scenarioComplexSize, "scenarioComplexSize", "XL");
+            Scribe_Values.Look(ref scenarioComplexSize, "scenarioSize2", "Small");
+            Scribe_Values.Look(ref delveSize, "delveSize", "Small");
             Scribe_Values.Look(ref propDensity, "propDensity", 1f);
             Scribe_Values.Look(ref questFrequency, "questFrequency", 1f);
         }
@@ -179,10 +185,21 @@ namespace Site44
             return list.Slider(value, min, max);
         }
 
-        private static void ChooseSize(System.Action<string> set, bool allowRandom)
+        private static void ChooseSize(System.Action<string> set, bool allowRandom, bool allowGrowing = false)
         {
             List<FloatMenuOption> options = new List<FloatMenuOption>();
-            foreach (string size in allowRandom ? new[] { "Random", "Extra small", "Small", "Medium", "Large", "XL" } : new[] { "Extra small", "Small", "Medium", "Large", "XL" })
+            List<string> sizes = new List<string> { "Extra small", "Small", "Medium", "Large", "XL" };
+            if (allowRandom)
+            {
+                sizes.Insert(0, "Random");
+            }
+
+            if (allowGrowing)
+            {
+                sizes.Add("Grows with depth");
+            }
+
+            foreach (string size in sizes)
             {
                 string captured = size;
                 options.Add(new FloatMenuOption(size, () => set(captured)));
@@ -204,6 +221,8 @@ namespace Site44
             GUI.color = Color.white;
 
             Section(list, "Treasure");
+            s.scarcity = Multiplier(list, "Food and medicine scarcity", s.scarcity, 0f, 1f,
+                "How rare medicine and meals are in crates, caskets and on shelves, and how small their stacks are.\n0% is generous; 100% is almost none. Packed supplies from the starting kit are unaffected.");
             s.lootAmount = Multiplier(list, "Loot amount", s.lootAmount, 0.1f, 3f,
                 "Scales the size of every loot stack in a complex: crates, caskets, storerooms and intact rooms.\nx1 is normal.");
             s.crateDensity = Multiplier(list, "Loot crate density", s.crateDensity, 0f, 3f,
@@ -310,6 +329,13 @@ namespace Site44
             if (list.ButtonText("Change scenario size"))
             {
                 ChooseSize(value => s.scenarioComplexSize = value, false);
+            }
+
+            list.Label("Size of Delve complexes:  " + s.delveSize, -1f,
+                new TipSignal("Every level of a Delve run uses this size. Grows with depth starts small and ramps up to XL."));
+            if (list.ButtonText("Change Delve size"))
+            {
+                ChooseSize(value => s.delveSize = value, false, true);
             }
 
             Section(list, "Quests");

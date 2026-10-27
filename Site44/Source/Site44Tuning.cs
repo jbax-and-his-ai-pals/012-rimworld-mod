@@ -1,4 +1,6 @@
+using RimWorld;
 using UnityEngine;
+using Verse;
 
 namespace Site44
 {
@@ -26,6 +28,22 @@ namespace Site44
         public static float PreservedRoomChance => S.preservedRoomChance;
 
         // Multiplier on every loot stack placed in the complex.
+        // Medicine and meals are scarce: most picks of them are dropped, and the stacks that remain are small.
+        public static bool IsConsumable(ThingDef def)
+        {
+            return def != null && (def.IsMedicine || (def.ingestible != null && (def.ingestible.foodType & FoodTypeFlags.Meal) != 0));
+        }
+
+        public static bool KeepSupply(ThingDef def)
+        {
+            return !IsConsumable(def) || Rand.Chance(1f - S.scarcity);
+        }
+
+        public static int ScarceCount(ThingDef def, int count)
+        {
+            return IsConsumable(def) ? Mathf.Min(count, 1 + Mathf.RoundToInt(8f * (1f - S.scarcity))) : count;
+        }
+
         public static float LootAmount => S.lootAmount * (GameComponent_Delve.Level?.LootMultiplier ?? 1f);
 
         // Share of floor cells carrying dust or debris in ruined rooms and in corridors.

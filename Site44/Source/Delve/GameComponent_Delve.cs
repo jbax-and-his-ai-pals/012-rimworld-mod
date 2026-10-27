@@ -45,6 +45,12 @@ namespace Site44
 
                 GameComponent_Delve delve = Instance;
                 DelveLevel level = DelveDifficulty.For(delve != null && delve.active ? delve.depth : 1);
+                string chosen = Site44Settings.Current.delveSize;
+                if (!string.IsNullOrEmpty(chosen) && chosen != "Grows with depth")
+                {
+                    level.SizeName = chosen;
+                }
+
                 if (QuickTest)
                 {
                     level.SizeName = "XS";

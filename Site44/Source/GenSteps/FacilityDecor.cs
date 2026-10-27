@@ -488,8 +488,13 @@ namespace Site44
                     continue;
                 }
 
+                if (!Site44Tuning.KeepSupply(def))
+                {
+                    continue;
+                }
+
                 Thing loot = ThingMaker.MakeThing(def);
-                loot.stackCount = Mathf.Clamp(Mathf.RoundToInt(Rand.RangeInclusive(def.stackLimit / 5, def.stackLimit / 2) * Site44Tuning.LootAmount), 1, def.stackLimit);
+                loot.stackCount = Mathf.Clamp(Site44Tuning.ScarceCount(def, Mathf.RoundToInt(Rand.RangeInclusive(def.stackLimit / 5, def.stackLimit / 2) * Site44Tuning.LootAmount)), 1, def.stackLimit);
                 GenPlace.TryPlaceThing(loot, cell, map, ThingPlaceMode.Near);
             }
         }
@@ -528,8 +533,13 @@ namespace Site44
                     continue;
                 }
 
+                if (!Site44Tuning.KeepSupply(def))
+                {
+                    continue;
+                }
+
                 Thing item = ThingMaker.MakeThing(def);
-                item.stackCount = Mathf.Clamp(Mathf.RoundToInt(Rand.RangeInclusive(minCount, maxCount) * Site44Tuning.LootAmount), 1, def.stackLimit);
+                item.stackCount = Mathf.Clamp(Site44Tuning.ScarceCount(def, Mathf.RoundToInt(Rand.RangeInclusive(minCount, maxCount) * Site44Tuning.LootAmount)), 1, def.stackLimit);
                 GenPlace.TryPlaceThing(item, cell, map, ThingPlaceMode.Near);
             }
         }

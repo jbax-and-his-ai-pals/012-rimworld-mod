@@ -2025,8 +2025,13 @@ namespace Site44
                 }
 
                 ThingDef def = DefDatabase<ThingDef>.GetNamed(LootTable.RandomElement());
+                if (!Site44Tuning.KeepSupply(def))
+                {
+                    continue;
+                }
+
                 Thing loot = ThingMaker.MakeThing(def);
-                loot.stackCount = Mathf.Clamp(Mathf.RoundToInt(Rand.RangeInclusive(def.stackLimit / 4, def.stackLimit) * Site44Tuning.LootAmount), 1, def.stackLimit);
+                loot.stackCount = Mathf.Clamp(Site44Tuning.ScarceCount(def, Mathf.RoundToInt(Rand.RangeInclusive(def.stackLimit / 4, def.stackLimit) * Site44Tuning.LootAmount)), 1, def.stackLimit);
                 GenPlace.TryPlaceThing(loot, cell, map, ThingPlaceMode.Near);
             }
 

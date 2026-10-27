@@ -46,6 +46,13 @@ namespace Site44
         // Loot comes from the current site type's table when it has one, else the built-in table.
         private static ThingDef PickLoot(bool rich)
         {
+            // A medicine or meal pick that fails the scarcity roll is simply a stack fewer, not swapped for something else.
+            ThingDef pick = PickLootOnce(rich);
+            return Site44Tuning.KeepSupply(pick) ? pick : null;
+        }
+
+        private static ThingDef PickLootOnce(bool rich)
+        {
             if (rich && Rand.Chance(Site44Settings.Current.delverGearChance))
             {
                 return Rand.Bool ? Site44MoraleDefOf.Site44_DelverCap : Site44MoraleDefOf.Site44_DelverVest;
@@ -106,7 +113,7 @@ namespace Site44
                 max = Mathf.Max(1, max / 4);
             }
 
-            thing.stackCount = Mathf.Clamp(Mathf.RoundToInt(Rand.RangeInclusive(Mathf.Max(1, max / 4), max) * Site44Tuning.LootAmount), 1, def.stackLimit);
+            thing.stackCount = Mathf.Clamp(Site44Tuning.ScarceCount(def, Mathf.RoundToInt(Rand.RangeInclusive(Mathf.Max(1, max / 4), max) * Site44Tuning.LootAmount)), 1, def.stackLimit);
             return thing;
         }
 
@@ -123,7 +130,7 @@ namespace Site44
 
             Thing thing = MakeLoot(def);
             int max = Mathf.Max(2, def.stackLimit / 3);
-            thing.stackCount = Mathf.Clamp(Mathf.RoundToInt(Rand.RangeInclusive(Mathf.Max(1, max / 3), max) * Site44Tuning.LootAmount), 1, def.stackLimit);
+            thing.stackCount = Mathf.Clamp(Site44Tuning.ScarceCount(def, Mathf.RoundToInt(Rand.RangeInclusive(Mathf.Max(1, max / 3), max) * Site44Tuning.LootAmount)), 1, def.stackLimit);
             return thing;
         }
 
@@ -202,8 +209,8 @@ namespace Site44
                 return null;
             }
 
-            AddSupply(crate, "MedicineIndustrial", 4);
-            AddSupply(crate, "MealSurvivalPack", 8);
+            AddSupply(crate, "MedicineIndustrial", 1);
+            AddSupply(crate, "MealSurvivalPack", 3);
             AddSupply(crate, "Bedroll", 2);
             GenSpawn.Spawn(crate, spot, map, Rot4.North);
             return crate;

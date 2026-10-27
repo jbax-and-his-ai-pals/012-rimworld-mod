@@ -17,7 +17,7 @@
     <description>The facility perimeter gave out years ago. Beyond the courtyard the bulkheads are still sealed, and something inside is still running. It has already decided what you are.
 
 Playing with Ideology? Choose the Classic ideoligion on the ideoligion page: a party inside the ruins cannot meet altar, ritual or building demands.</description>
-    <scenario>
+    <scenario Class="Site44.Site44Scenario">
       <summary>Start in the breached courtyard of a sealed megastructure.</summary>
       <parts>
 

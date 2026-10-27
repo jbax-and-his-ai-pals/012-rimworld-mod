@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -31,6 +32,8 @@ namespace Site44
         public bool securityEnabled;
         public bool hackMinigame = true;
         public int bestDelveDepth;
+        public bool skipWorldSetup = true;
+        public string startBiome = "Any";
         public bool delveNoRaids = true;
         public bool delveNoCaravanEvents = true;
         public bool delveNoOtherThreats = true;
@@ -60,6 +63,8 @@ namespace Site44
         {
             Site44Settings defaults = new Site44Settings();
             lootAmount = defaults.lootAmount;
+            skipWorldSetup = defaults.skipWorldSetup;
+            startBiome = defaults.startBiome;
             delveNoRaids = defaults.delveNoRaids;
             delveNoCaravanEvents = defaults.delveNoCaravanEvents;
             delveNoOtherThreats = defaults.delveNoOtherThreats;
@@ -104,6 +109,8 @@ namespace Site44
             Scribe_Values.Look(ref securityEnabled, "securityEnabled");
             Scribe_Values.Look(ref hackMinigame, "hackMinigame", true);
             Scribe_Values.Look(ref bestDelveDepth, "bestDelveDepth");
+            Scribe_Values.Look(ref skipWorldSetup, "skipWorldSetup", true);
+            Scribe_Values.Look(ref startBiome, "startBiome", "Any");
             Scribe_Values.Look(ref delveNoRaids, "delveNoRaids", true);
             Scribe_Values.Look(ref delveNoCaravanEvents, "delveNoCaravanEvents", true);
             Scribe_Values.Look(ref delveNoOtherThreats, "delveNoOtherThreats", true);
@@ -224,6 +231,22 @@ namespace Site44
                 "On: every door is a plain door and the whole complex can be explored in any order.\nOff: sectors are sealed behind terminal gates and clearance levels.");
             s.lockedVaultShare = Percent(list, "Locked vaults (open layout)", s.lockedVaultShare, 0f, 1f,
                 "In the open layout, the share of terminal gates that stay locked as optional vaults, opened by hacking a terminal.");
+            Section(list, "New game setup");
+            list.CheckboxLabeled("Skip world and site selection", ref s.skipWorldSetup,
+                "The Site-44 scenarios use nothing from the world except the climate and biome, so a default world and a start tile are chosen for you. Turn off to use the ordinary world and landing-site pages. Not used when the Odyssey expansion is active.");
+            string biomeLabel = s.startBiome == "Any" ? "any" : (DefDatabase<BiomeDef>.GetNamedSilentFail(s.startBiome)?.label ?? s.startBiome);
+            if (list.ButtonText("Start biome:  " + biomeLabel))
+            {
+                List<FloatMenuOption> biomes = new List<FloatMenuOption> { new FloatMenuOption("any", () => s.startBiome = "Any") };
+                foreach (BiomeDef biome in DefDatabase<BiomeDef>.AllDefsListForReading.Where(b => b.canBuildBase && b.implemented))
+                {
+                    BiomeDef captured = biome;
+                    biomes.Add(new FloatMenuOption(captured.LabelCap, () => s.startBiome = captured.defName));
+                }
+
+                Find.WindowStack.Add(new FloatMenu(biomes));
+            }
+
             Section(list, "Delve rules (applied when a Delve run starts)");
             list.Label("Delve is about the ruins, not an outside world. These switch off whole groups of random events for the Site-44 Delve scenario only; other scenarios are never touched. Best depth so far: " + s.bestDelveDepth + ".");
             list.CheckboxLabeled("No enemy raids", ref s.delveNoRaids,

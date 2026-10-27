@@ -52,3 +52,7 @@ Loot amount, crate density, casket density, survivor casket count, hostile caske
 - Mission focus levels, focus tab frequency, delver gear frequency and starting kit are all settings; tune after play.
 - Starting kit and the "ready to delve" lift only apply in the Site-44 Breach scenario, not in the -quicktest scenario.
 - Ideas: more delver gear (boots for speed, a lamp), a comfort item for rec rooms, a milder darkness penalty.
+
+## Later
+- Daily or seeded challenge: the same complex and loadout for everyone, scored on speed or loot. Revisit once the average seeded experience reaches a quality bar.
+- Survival layer: before building it, check whether an existing mod already covers the outside-world side so this mod can hook into it instead.

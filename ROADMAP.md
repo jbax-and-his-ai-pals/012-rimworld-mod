@@ -42,6 +42,21 @@ Legend: `[x]` done, `[~]` in progress, `[ ]` planned. Each phase builds on the o
 - [ ] **4.3 Danger ratings and reward scaling** by colony wealth
 - [ ] **4.4 Claim and restore**: the enclave starts at a complex's front door on the same map and settles cleared sectors (see BACKLOG)
 
+## Delve mode (next milestone)
+
+A one-shot or long-haul run where each complex tile is a level. Reach the extraction gate, step through, arrive at the next complex. The party's death ends the run.
+
+- [ ] **D.1 Difficulty by depth**: a pure, tested table from depth to complex size, type weights, security density, hostile casket share and loot richness
+- [ ] **D.2 Extraction gate**: a building placed far from the start, unlocked by a cipher-locked terminal, that carries the party and what they hold to the next level
+- [ ] **D.3 Level transition**: generate the next complex, warp the party, retire the old map
+- [ ] **D.4 Run state and scenario**: depth counter, a "Site-44 Delve" scenario, best-depth record, end-of-run summary
+- [ ] **D.5 Between levels**: a short rest or supply stop (what carries over, what does not), tuned in play
+
+## Phase 6: the world layer (after the enclave work)
+
+- [ ] **6.1 Expedition contracts** offered by the enclave: retrieve, rescue, clear, timed
+- [ ] **6.2 Survival layer** on top of delve mode: the outside world, towns, goals and progression that cater to delvers
+
 ## Morale and kit (done, to tune)
 
 - [x] Mission focus mood lift, delver tolerance for plain corpses, focus tabs, delver cap and vest, starting kit and loot frequencies as settings

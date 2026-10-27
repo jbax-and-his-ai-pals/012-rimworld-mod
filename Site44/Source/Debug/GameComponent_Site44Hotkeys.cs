@@ -55,6 +55,11 @@ namespace Site44
             if (GenCommandLine.CommandLineArgPassed("site44test"))
             {
                 ScenPart_Site44Facility.EquipUnarmedColonists();
+                foreach (Pawn colonist in PawnsFinder.AllMaps_FreeColonists)
+                {
+                    GameComponent_Site44Morale.GiveStartingKit(colonist);
+                    Log.Message("[Site-44] kit: " + colonist.LabelShort + " carries " + string.Join(", ", colonist.inventory.innerContainer.Select(t => t.stackCount + " " + t.def.defName).ToArray()) + "; wears " + string.Join(", ", colonist.apparel.WornApparel.Select(w => w.def.defName).ToArray()) + ".");
+                }
             }
 
             // -site44hero: put the first colonist in hero mode a few seconds in, to check it from the log.

@@ -82,8 +82,30 @@ namespace Site44
                 return;
             }
 
-            AddToInventory(pawn, ThingDef.Named("MealSurvivalPack"), 3);
+            AddToInventory(pawn, ThingDef.Named("MealSurvivalPack"), 4);
             AddToInventory(pawn, Site44MoraleDefOf.Site44_FocusTab, 3);
+            AddToInventory(pawn, ThingDef.Named("MedicineIndustrial"), 2);
+            WearIfFree(pawn, Site44MoraleDefOf.Site44_DelverCap);
+            WearIfFree(pawn, Site44MoraleDefOf.Site44_DelverVest);
+        }
+
+        private static void WearIfFree(Pawn pawn, ThingDef def)
+        {
+            if (def == null || pawn.apparel == null || !ApparelUtility.HasPartsToWear(pawn, def))
+            {
+                return;
+            }
+
+            foreach (Apparel worn in pawn.apparel.WornApparel)
+            {
+                if (worn.def == def || !ApparelUtility.CanWearTogether(def, worn.def, pawn.RaceProps.body))
+                {
+                    return;
+                }
+            }
+
+            Apparel item = (Apparel)ThingMaker.MakeThing(def, def.MadeFromStuff ? GenStuff.DefaultStuffFor(def) : null);
+            pawn.apparel.Wear(item, false);
         }
 
         private static void AddToInventory(Pawn pawn, ThingDef def, int count)

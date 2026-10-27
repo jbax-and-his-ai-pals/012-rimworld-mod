@@ -15,7 +15,6 @@ namespace Site44
         private readonly Queue<SiteTypeDef> questQueue = new Queue<SiteTypeDef>();
         private float nextQuestAt = -1f;
         private float enclaveAt = -1f;
-        private float cleanupAt = -1f;
         private float heroAt = -1f;
         private List<Pawn> heroList = new List<Pawn>();
 
@@ -61,12 +60,6 @@ namespace Site44
                     GameComponent_Site44Morale.GiveStartingKit(colonist);
                     Log.Message("[Site-44] kit: " + colonist.LabelShort + " carries " + string.Join(", ", colonist.inventory.innerContainer.Select(t => t.stackCount + " " + t.def.defName).ToArray()) + "; wears " + string.Join(", ", colonist.apparel.WornApparel.Select(w => w.def.defName).ToArray()) + ".");
                 }
-            }
-
-            // The test scenario hands out ordinary crash-landing gear and pets; the Breach scenario does not, so match it.
-            if (GenCommandLine.CommandLineArgPassed("site44test"))
-            {
-                cleanupAt = Time.realtimeSinceStartup + 3f;
             }
 
             // -site44hero: put the first colonist in hero mode a few seconds in, to check it from the log.
@@ -119,12 +112,6 @@ namespace Site44
                 }
             }
 
-            if (cleanupAt > 0f && Time.realtimeSinceStartup >= cleanupAt)
-            {
-                cleanupAt = -1f;
-                RemoveCrashLandingExtras();
-            }
-
             if (enclaveAt > 0f && Time.realtimeSinceStartup >= enclaveAt)
             {
                 enclaveAt = -1f;
@@ -160,22 +147,19 @@ namespace Site44
             }
         }
 
-        private static readonly string[] StartingPileDefs = { "Silver", "MealSurvivalPack", "MedicineIndustrial", "Steel", "WoodLog", "ComponentIndustrial", "Chemfuel" };
+        private static readonly string[] StartingPileDefs = { "Silver", "MealSurvivalPack", "MedicineIndustrial", "Steel", "WoodLog", "ComponentIndustrial", "Chemfuel",
+            "Gun_BoltActionRifle", "Gun_Revolver", "MeleeWeapon_Knife", "Apparel_FlakPants", "Apparel_FlakVest", "Apparel_AdvancedHelmet" };
+        private static readonly string[] ScatteredAnywhereDefs = { "ShipChunk", "Steel", "MealSurvivalPack" };
 
-        private static void RemoveCrashLandingExtras()
+        // Run before the first frame (from the generation step's PostMapInitialized), so nothing visibly pops out.
+        public static void RemoveCrashLandingExtras(Map map, IntVec3 center)
         {
-            Map map = Find.AnyPlayerHomeMap;
-            if (map == null)
-            {
-                return;
-            }
-
             int items = 0;
             int animals = 0;
-            IntVec3 center = map.mapPawns.FreeColonistsSpawned.Select(p => p.Position).FirstOrDefault();
             foreach (Thing thing in map.listerThings.AllThings.ToList())
             {
-                if (thing.def.category == ThingCategory.Item && thing.Position.DistanceTo(center) <= 20f && System.Array.IndexOf(StartingPileDefs, thing.def.defName) >= 0)
+                bool nearPile = thing.def.category == ThingCategory.Item && thing.Position.DistanceTo(center) <= 20f && System.Array.IndexOf(StartingPileDefs, thing.def.defName) >= 0;
+                if (nearPile || System.Array.IndexOf(ScatteredAnywhereDefs, thing.def.defName) >= 0)
                 {
                     thing.Destroy();
                     items++;

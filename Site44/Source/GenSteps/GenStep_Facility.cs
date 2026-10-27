@@ -163,6 +163,12 @@ namespace Site44
                 }
             }
 
+            // Test runs use the crash-landing scenario: drop its gear pile and pets so they match the Breach scenario.
+            if (Find.GameInitData != null && GenCommandLine.CommandLineArgPassed("site44test"))
+            {
+                GameComponent_Site44Hotkeys.RemoveCrashLandingExtras(map, startSpot);
+            }
+
             Log.Message("[Site-44] start sweep: removed " + removed.Count + " stray hostile(s)"
                         + (removed.Count > 0 ? ": " + string.Join(", ", removed.Take(12).ToArray()) : "") + ".");
         }

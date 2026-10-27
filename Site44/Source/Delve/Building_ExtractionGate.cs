@@ -81,9 +81,20 @@ namespace Site44
     // Marks a scenario as a delve run: starts the depth counter once the game begins.
     public class ScenPart_Site44Delve : ScenPart
     {
+        // Testing aid: tiny complexes with the extraction gate near the start and already unlocked.
+        public bool quickTest;
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Values.Look(ref quickTest, "quickTest");
+        }
+
         public override string Summary(Scenario scen)
         {
-            return "Delve: each complex is a level; reach the extraction gate to go deeper. Losing the whole party ends the run.";
+            return quickTest
+                ? "Delve (quick test): tiny complexes, the extraction gate is next to the start and already open."
+                : "Delve: each complex is a level; reach the extraction gate to go deeper. Losing the whole party ends the run.";
         }
 
         public override void PostGameStart()

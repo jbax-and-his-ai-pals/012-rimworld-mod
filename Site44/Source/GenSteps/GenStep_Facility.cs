@@ -1988,9 +1988,12 @@ namespace Site44
                 return;
             }
 
-            PlanRoom target = plan.Rooms
-                .Where(r => !r.IsCorridor && r.Cells.Count >= 12)
-                .OrderByDescending(r => Mathf.Abs(r.Anchor.X - plan.Start.X) + Mathf.Abs(r.Anchor.Y - plan.Start.Y))
+            // Quick test: the nearest suitable room instead of the farthest, and the gate starts unlocked.
+            bool quick = GameComponent_Delve.QuickTest;
+            IEnumerable<PlanRoom> candidates = plan.Rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 12);
+            PlanRoom target = (quick
+                    ? candidates.OrderBy(r => Mathf.Abs(r.Anchor.X - plan.Start.X) + Mathf.Abs(r.Anchor.Y - plan.Start.Y))
+                    : candidates.OrderByDescending(r => Mathf.Abs(r.Anchor.X - plan.Start.X) + Mathf.Abs(r.Anchor.Y - plan.Start.Y)))
                 .FirstOrDefault(r => TryFindSpotInRoom(r, Site44DefOf.Site44_ExtractionGate.size, out IntVec3 probe));
             IntVec3 gateSpot;
             if (target == null || !TryFindSpotInRoom(target, Site44DefOf.Site44_ExtractionGate.size, out gateSpot))
@@ -1999,7 +2002,9 @@ namespace Site44
                 return;
             }
 
-            GenSpawn.Spawn(ThingMaker.MakeThing(Site44DefOf.Site44_ExtractionGate), gateSpot, map, Rot4.North);
+            Building_ExtractionGate gate = (Building_ExtractionGate)ThingMaker.MakeThing(Site44DefOf.Site44_ExtractionGate);
+            gate.unlocked = quick;
+            GenSpawn.Spawn(gate, gateSpot, map, Rot4.North);
             IntVec3 terminalSpot;
             if (TryFindSpotInRoom(target, Site44DefOf.Site44_Terminal.size, out terminalSpot))
             {

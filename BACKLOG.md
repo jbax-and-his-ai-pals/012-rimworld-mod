@@ -61,3 +61,7 @@ Loot amount, crate density, casket density, survivor casket count, hostile caske
 - No required expansions or mods, no Harmony patches, no overriding player choices. Anything that changes another system is an off-by-default setting with a tooltip.
 - Document known interactions (Ideology demands, caravan events) in the README and in scenario text.
 - Possible opt-in setting: force the Classic ideoligion in the Delve scenario, only if play shows people keep tripping over it.
+
+## Travel between the enclave and complexes (to decide)
+- Breach keeps the world: you start on a tile you choose, and the enclave and complexes are places on the map.
+- Fast travel options to consider: realistic (an ox or horse cart takes the party there, possibly for a fee, using the caravan system) or instant (a warp), or both as a setting. Needs enclave services and standing first.

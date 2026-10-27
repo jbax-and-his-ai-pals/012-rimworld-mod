@@ -27,7 +27,12 @@ namespace Site44
 
         // Delve mode is on once a run has started, and also in test runs launched with -site44delve (level 1 is generated
         // before the run formally starts).
-        public static bool IsDelve => (Instance != null && Instance.active) || GenCommandLine.CommandLineArgPassed("site44delve");
+        public static bool IsDelve => (Instance != null && Instance.active) || GenCommandLine.CommandLineArgPassed("site44delve") || GenCommandLine.CommandLineArgPassed("site44quickdelve");
+
+        // Quick test: the scenario part asks for it, or the -site44quickdelve launch flag.
+        public static bool QuickTest =>
+            GenCommandLine.CommandLineArgPassed("site44quickdelve")
+            || (Find.Scenario != null && Find.Scenario.AllParts.OfType<ScenPart_Site44Delve>().Any(p => p.quickTest));
 
         public static DelveLevel Level
         {
@@ -39,7 +44,13 @@ namespace Site44
                 }
 
                 GameComponent_Delve delve = Instance;
-                return DelveDifficulty.For(delve != null && delve.active ? delve.depth : 1);
+                DelveLevel level = DelveDifficulty.For(delve != null && delve.active ? delve.depth : 1);
+                if (QuickTest)
+                {
+                    level.SizeName = "XS";
+                }
+
+                return level;
             }
         }
 

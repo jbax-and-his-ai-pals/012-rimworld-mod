@@ -76,4 +76,32 @@ Playing with Ideology? Choose the Classic ideoligion on the ideoligion page: a d
     </scenario>
   </ScenarioDef>
 
+  <ScenarioDef ParentName="ScenarioBase">
+    <defName>Site44_DelveQuickTest</defName>
+    <label>Site-44 Delve (quick test)</label>
+    <description>For testing the level chain: tiny complexes, with the extraction gate beside the start and already open. Otherwise the same as Site-44 Delve.</description>
+    <scenario Class="Site44.Site44Scenario">
+      <summary>Test the delve level chain quickly.</summary>
+      <parts>
+        <li Class="ScenPart_ConfigPage_ConfigureStartingPawns">
+          <def>ConfigPage_ConfigureStartingPawns</def>
+          <pawnCount>3</pawnCount>
+          <pawnChoiceCount>8</pawnChoiceCount>
+        </li>
+        <li Class="ScenPart_PlayerPawnsArriveMethod">
+          <def>PlayerPawnsArriveMethod</def>
+          <method>Standing</method>
+          <visible>false</visible>
+        </li>
+        <li Class="Site44.ScenPart_Site44Facility">
+          <def>Site44_Facility</def>
+        </li>
+        <li Class="Site44.ScenPart_Site44Delve">
+          <def>Site44_Delve</def>
+          <quickTest>true</quickTest>
+        </li>
+      </parts>
+    </scenario>
+  </ScenarioDef>
+
 </Defs>

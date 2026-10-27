@@ -15,7 +15,8 @@ namespace Site44
     {
         public override Page GetFirstConfigPage()
         {
-            if (!Site44Settings.Current.skipWorldSetup || ModsConfig.OdysseyActive)
+            bool delve = AllParts.Any(p => p is ScenPart_Site44Delve);
+            if (!delve || !Site44Settings.Current.skipWorldSetup || ModsConfig.OdysseyActive)
             {
                 return base.GetFirstConfigPage();
             }

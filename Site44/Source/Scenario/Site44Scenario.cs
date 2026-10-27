@@ -47,10 +47,12 @@ namespace Site44
         }
     }
 
-    // The one page we add: which climates this run may start in. Everything is ticked by default, so Next is a fine answer.
+    // The one page we add: the starting biome, and the biomes later complexes of the run may come from.
+    // Everything is preselected, so Next is a fine answer.
     public class Page_Site44Biomes : Page
     {
-        private Vector2 scroll;
+        private Vector2 scrollStart;
+        private Vector2 scrollPool;
 
         public override string PageTitle => "Where do you start?";
 
@@ -58,9 +60,21 @@ namespace Site44
         {
             DrawPageTitle(inRect);
             Rect main = GetMainRect(inRect);
-            Widgets.Label(new Rect(main.x, main.y, main.width, 44f), "Only the climate and biome of your start matter. Tick the biomes this run may start in; leave everything ticked if you do not mind. At least one must stay ticked.");
-            Rect list = new Rect(main.x, main.y + 52f, main.width, main.height - 52f);
-            BiomeChoice.DrawList(list, ref scroll);
+            bool delve = Find.Scenario != null && Find.Scenario.AllParts.Any(p => p is ScenPart_Site44Delve);
+            float gap = 16f;
+            float colWidth = delve ? (main.width - gap) / 2f : main.width;
+
+            Rect left = new Rect(main.x, main.y, colWidth, main.height);
+            Widgets.Label(new Rect(left.x, left.y, left.width, 44f), "Starting biome. Only the climate and biome of your start matter.");
+            BiomeChoice.DrawStartList(new Rect(left.x, left.y + 48f, left.width, left.height - 48f), ref scrollStart);
+
+            if (delve)
+            {
+                Rect right = new Rect(main.x + colWidth + gap, main.y, colWidth, main.height);
+                Widgets.Label(new Rect(right.x, right.y, right.width, 44f), "Biomes for later complexes in this run. At least one must stay ticked.");
+                BiomeChoice.DrawList(new Rect(right.x, right.y + 48f, right.width, right.height - 48f), ref scrollPool);
+            }
+
             DoBottomButtons(inRect, "Next");
         }
     }
@@ -110,24 +124,30 @@ namespace Site44
         private static PlanetTile ChooseTile()
         {
             Site44Settings settings = Site44Settings.Current;
-            PlanetTile tile = TileFinder.RandomStartingTile();
-            if (settings.startBiomes.Count == 0)
+            PlanetTile fallback = TileFinder.RandomStartingTile();
+            bool explicitStart = !string.IsNullOrEmpty(settings.startBiome);
+            if (!explicitStart && settings.biomePool.Count == 0)
             {
-                return tile;
+                return fallback;
             }
 
             for (int i = 0; i < 600; i++)
             {
                 PlanetTile candidate = TileFinder.RandomStartingTile();
                 BiomeDef biome = Find.WorldGrid[candidate].PrimaryBiome;
-                if (biome != null && settings.startBiomes.Contains(biome.defName))
+                if (biome == null)
+                {
+                    continue;
+                }
+
+                if (explicitStart ? biome.defName == settings.startBiome : settings.biomePool.Contains(biome.defName))
                 {
                     return candidate;
                 }
             }
 
-            Log.Message("[Site-44] no start tile found in the chosen biomes; using a random one.");
-            return tile;
+            Log.Message("[Site-44] no start tile found in the chosen biome(s); using a random one.");
+            return fallback;
         }
     }
 }

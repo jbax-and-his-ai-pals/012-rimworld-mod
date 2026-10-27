@@ -16,12 +16,12 @@ namespace Site44
 
         public static bool IsAllowed(Site44Settings s, BiomeDef biome)
         {
-            return s.startBiomes.Count == 0 || s.startBiomes.Contains(biome.defName);
+            return s.biomePool.Count == 0 || s.biomePool.Contains(biome.defName);
         }
 
         public static void Toggle(Site44Settings s, List<BiomeDef> all, BiomeDef biome, bool on)
         {
-            List<string> selected = s.startBiomes.Count == 0 ? all.Select(b => b.defName).ToList() : new List<string>(s.startBiomes);
+            List<string> selected = s.biomePool.Count == 0 ? all.Select(b => b.defName).ToList() : new List<string>(s.biomePool);
             if (on)
             {
                 if (!selected.Contains(biome.defName))
@@ -40,8 +40,39 @@ namespace Site44
                 selected.Remove(biome.defName);
             }
 
-            s.startBiomes = selected.Count >= all.Count ? new List<string>() : selected;
+            s.biomePool = selected.Count >= all.Count ? new List<string>() : selected;
             s.Write();
+        }
+
+        public static bool IsInPool(string biomeDefName)
+        {
+            Site44Settings s = Site44Settings.Current;
+            return s.biomePool.Count == 0 || s.biomePool.Contains(biomeDefName);
+        }
+
+        // The starting biome: radio buttons, with "random from the pool" first.
+        public static void DrawStartList(Rect outer, ref Vector2 scroll)
+        {
+            Site44Settings s = Site44Settings.Current;
+            List<BiomeDef> biomes = Candidates();
+            Rect view = new Rect(0f, 0f, outer.width - 16f, (biomes.Count + 1) * 28f);
+            Widgets.BeginScrollView(outer, ref scroll, view);
+            if (Widgets.RadioButtonLabeled(new Rect(0f, 0f, view.width, 26f), "Random from the pool", string.IsNullOrEmpty(s.startBiome)))
+            {
+                s.startBiome = "";
+                s.Write();
+            }
+
+            for (int i = 0; i < biomes.Count; i++)
+            {
+                if (Widgets.RadioButtonLabeled(new Rect(0f, (i + 1) * 28f, view.width, 26f), biomes[i].LabelCap, s.startBiome == biomes[i].defName))
+                {
+                    s.startBiome = biomes[i].defName;
+                    s.Write();
+                }
+            }
+
+            Widgets.EndScrollView();
         }
 
         public static void DrawList(Rect outer, ref Vector2 scroll)

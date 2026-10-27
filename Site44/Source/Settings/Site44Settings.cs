@@ -33,7 +33,8 @@ namespace Site44
         public bool hackMinigame = true;
         public int bestDelveDepth;
         public bool skipWorldSetup = true;
-        public List<string> startBiomes = new List<string>();   // empty = every biome
+        public List<string> biomePool = new List<string>();   // biomes for later complexes in a run; empty = every biome
+        public string startBiome = "";                        // explicit starting biome; empty = random from the pool
         public bool delveNoRaids = true;
         public bool delveNoCaravanEvents = true;
         public bool delveNoOtherThreats = true;
@@ -64,7 +65,8 @@ namespace Site44
             Site44Settings defaults = new Site44Settings();
             lootAmount = defaults.lootAmount;
             skipWorldSetup = defaults.skipWorldSetup;
-            startBiomes = new List<string>();
+            biomePool = new List<string>();
+            startBiome = "";
             delveNoRaids = defaults.delveNoRaids;
             delveNoCaravanEvents = defaults.delveNoCaravanEvents;
             delveNoOtherThreats = defaults.delveNoOtherThreats;
@@ -110,10 +112,11 @@ namespace Site44
             Scribe_Values.Look(ref hackMinigame, "hackMinigame", true);
             Scribe_Values.Look(ref bestDelveDepth, "bestDelveDepth");
             Scribe_Values.Look(ref skipWorldSetup, "skipWorldSetup", true);
-            Scribe_Collections.Look(ref startBiomes, "startBiomes", LookMode.Value);
+            Scribe_Values.Look(ref startBiome, "startBiome", "");
+            Scribe_Collections.Look(ref biomePool, "biomePool", LookMode.Value);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                startBiomes = startBiomes ?? new List<string>();
+                biomePool = biomePool ?? new List<string>();
             }
             Scribe_Values.Look(ref delveNoRaids, "delveNoRaids", true);
             Scribe_Values.Look(ref delveNoCaravanEvents, "delveNoCaravanEvents", true);
@@ -238,7 +241,7 @@ namespace Site44
             Section(list, "New game setup");
             list.CheckboxLabeled("Skip world and site selection", ref s.skipWorldSetup,
                 "The Site-44 scenarios use nothing from the world except the climate and biome, so a default world and a start tile are chosen for you. Turn off to use the ordinary world and landing-site pages. Not used when the Odyssey expansion is active.");
-            list.Label("The start biomes are chosen on the new game screen, right after the storyteller.");
+            list.Label("The starting biome and the biomes for later complexes are chosen on the new game screen, right after the storyteller.");
 
             Section(list, "Delve rules (applied when a Delve run starts)");
             list.Label("Delve is about the ruins, not an outside world. These switch off whole groups of random events for the Site-44 Delve scenario only; other scenarios are never touched. Best depth so far: " + s.bestDelveDepth + ".");

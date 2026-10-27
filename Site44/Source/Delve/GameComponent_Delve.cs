@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -15,6 +16,7 @@ namespace Site44
 
         public bool active;
         public int depth = 1;
+        public List<string> biomePool = new List<string>();   // fixed when the run starts; empty = every biome
         private int lastCheckTick;
 
         public GameComponent_Delve(Game game)
@@ -51,6 +53,7 @@ namespace Site44
 
             delve.active = true;
             delve.depth = 1;
+            delve.biomePool = new List<string>(Site44Settings.Current.biomePool);
             DelveRules.Apply();
             Log.Message("[Site-44] delve run started.");
         }
@@ -59,6 +62,11 @@ namespace Site44
         {
             Scribe_Values.Look(ref active, "active");
             Scribe_Values.Look(ref depth, "depth", 1);
+            Scribe_Collections.Look(ref biomePool, "biomePool", LookMode.Value);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                biomePool = biomePool ?? new List<string>();
+            }
         }
 
         public override void GameComponentTick()
@@ -105,7 +113,14 @@ namespace Site44
 
             SiteTypeDef type = SiteTypes.All.Where(t => t.questWeight > 0f).RandomElementByWeight(t => t.questWeight);
             PlanetTile tile;
-            if (!TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false))
+            Predicate<PlanetTile> inPool = t =>
+            {
+                BiomeDef biome = Find.WorldGrid[t].PrimaryBiome;
+                return biomePool.Count == 0 || (biome != null && biomePool.Contains(biome.defName));
+            };
+            if (!TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false, validator: inPool)
+                && !TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 24, false, validator: inPool)
+                && !TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false))
             {
                 Log.Error("[Site-44] delve: no tile found for the next level.");
                 return;

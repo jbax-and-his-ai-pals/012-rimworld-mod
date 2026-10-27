@@ -49,8 +49,7 @@ namespace Site44
                 if (site != null)
                 {
                     Map map = Site44Quests.OpenMap(site);
-                    Current.Game.CurrentMap = map;
-                    CameraJumper.TryJump(map.Center, map);
+                    Site44Quests.WarpColoniesTo(map);
                 }
             });
         }
@@ -73,8 +72,7 @@ namespace Site44
                             if (site != null)
                             {
                                 Map map = Site44Quests.OpenMap(site);
-                                Current.Game.CurrentMap = map;
-                                CameraJumper.TryJump(map.Center, map);
+                                Site44Quests.WarpColoniesTo(map);
                             }
                         }
                         finally

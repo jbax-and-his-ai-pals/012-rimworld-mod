@@ -39,6 +39,26 @@ namespace Site44
             return site;
         }
 
+        // Debug: move the whole colony to a freshly generated complex, as if it were the starting tile of an excursion.
+        public static void WarpColoniesTo(Map target)
+        {
+            MapComponent_Facility facility = target.GetComponent<MapComponent_Facility>();
+            IntVec3 spot = facility != null && facility.startCell.IsValid ? facility.startCell : target.Center;
+            int moved = 0;
+            foreach (Pawn pawn in Find.Maps.Where(m => m != target).SelectMany(m => m.mapPawns.FreeColonistsSpawned).ToList())
+            {
+                pawn.jobs?.StopAll();
+                pawn.DeSpawn();
+                IntVec3 cell = CellFinder.RandomClosewalkCellNear(spot, target, 6, c => c.Standable(target));
+                GenSpawn.Spawn(pawn, cell, target);
+                moved++;
+            }
+
+            Current.Game.CurrentMap = target;
+            CameraJumper.TryJump(spot, target);
+            Log.Message("[Site-44] warped " + moved + " colonist(s) to " + spot + ".");
+        }
+
         public static Map OpenMap(Site site)
         {
             Map map = GetOrGenerateMapUtility.GetOrGenerateMap(site.Tile, site.PreferredMapSize, null);

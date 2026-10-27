@@ -15,6 +15,7 @@ namespace Site44
         private const float AlarmChance = 0.35f;
 
         public int points;
+        public IntVec3 startCell = IntVec3.Invalid;
         public bool coolantLoopDiverted;
         public bool mainReactorOnline;
         public float facilityAiIntegrity = 1f;
@@ -228,6 +229,7 @@ namespace Site44
         {
             base.ExposeData();
             Scribe_Values.Look(ref points, "points");
+            Scribe_Values.Look(ref startCell, "startCell", IntVec3.Invalid);
             Scribe_Values.Look(ref announcedTier, "announcedTier");
             Scribe_Values.Look(ref coolantLoopDiverted, "coolantLoopDiverted");
             Scribe_Values.Look(ref mainReactorOnline, "mainReactorOnline");

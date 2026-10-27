@@ -123,6 +123,7 @@ namespace Site44
 
             MapComponent_Facility facility = map.GetComponent<MapComponent_Facility>();
             facility.Initialize(width, height, planSeed, graphSeed, targetZones, hotAnchors);
+            facility.startCell = startSpot;
 
             FacilityFaction.ApplyTier(0);
 
@@ -249,24 +250,8 @@ namespace Site44
                     continue;
                 }
 
-                // Remove every vanilla structure (natural rock and generated ruins) so nothing half-overlaps the facility.
-                List<Thing> things = c.GetThingList(map);
-                for (int i = things.Count - 1; i >= 0; i--)
-                {
-                    ThingCategory category = things[i].def.category;
-                    if (category == ThingCategory.Building || category == ThingCategory.Filth || category == ThingCategory.Item)
-                    {
-                        things[i].Destroy();
-                    }
-                }
-
-                if (map.roofGrid.RoofAt(c) != null)
-                {
-                    map.roofGrid.SetRoof(c, null);
-                }
-
-                MapGenerator.Elevation[c] = 0f;
-                MapGenerator.Caves[c] = 0f;
+                // Beyond the complex the land stays natural (rock, trees, water); only generated ruins and clutter go.
+                ClearClutter(c);
             }
         }
 
@@ -278,27 +263,18 @@ namespace Site44
                 for (int x = 0; x < plan.Width; x++)
                 {
                     IntVec3 c = World(x, y);
-                    List<Thing> things = c.GetThingList(map);
-                    for (int i = things.Count - 1; i >= 0; i--)
-                    {
-                        if (things[i].def.category != ThingCategory.Pawn)
-                        {
-                            things[i].Destroy();
-                        }
-                    }
-
-                    MapGenerator.Elevation[c] = 0f;
-                    MapGenerator.Caves[c] = 0f;
-
-                    // Rivers, lakes and marsh inside the facility area become dry ground, so nothing is built on water.
-                    TerrainDef existing = c.GetTerrain(map);
-                    if (existing != null && (existing.IsWater || existing.IsRiver))
-                    {
-                        map.terrainGrid.SetTerrain(c, TerrainDefOf.Soil);
-                        waterFlattened++;
-                    }
-
                     bool outside = plan.At(x, y) == PlanTile.Outside;
+
+                    // Yards away from the buildings keep their natural look: mountains, trees and water stay where they are.
+                    bool needed = !outside || NearBuilding(x, y, 2) || Mathf.Max(Mathf.Abs(x - plan.Start.X), Mathf.Abs(y - plan.Start.Y)) <= 3;
+                    if (!needed)
+                    {
+                        ClearClutter(c);
+                        continue;
+                    }
+
+                    // Rivers, lakes and marsh under the buildings and their apron become dry ground, so nothing is built on water.
+                    ClearForBuilding(c);
                     map.roofGrid.SetRoof(c, outside ? null : RoofDefOf.RoofRockThick);
                     if (outside)
                     {
@@ -577,7 +553,52 @@ namespace Site44
         {
             if (plan.InBounds(x, y) && plan.At(x, y) == PlanTile.Outside)
             {
-                map.terrainGrid.SetTerrain(World(x, y), path);
+                IntVec3 c = World(x, y);
+                ClearForBuilding(c);
+                map.terrainGrid.SetTerrain(c, path);
+            }
+        }
+
+        // Digs out a cell that the complex needs (natural rock, ruins, rubble, water); cells it leaves alone stay natural.
+        private void ClearForBuilding(IntVec3 c)
+        {
+            List<Thing> things = c.GetThingList(map);
+            for (int i = things.Count - 1; i >= 0; i--)
+            {
+                if (things[i].def.category != ThingCategory.Pawn)
+                {
+                    things[i].Destroy();
+                }
+            }
+
+            if (map.roofGrid.RoofAt(c) != null)
+            {
+                map.roofGrid.SetRoof(c, null);
+            }
+
+            MapGenerator.Elevation[c] = 0f;
+            MapGenerator.Caves[c] = 0f;
+            TerrainDef existing = c.GetTerrain(map);
+            if (existing != null && (existing.IsWater || existing.IsRiver))
+            {
+                map.terrainGrid.SetTerrain(c, TerrainDefOf.Soil);
+                waterFlattened++;
+            }
+        }
+
+        // Clears loose man-made clutter (ruins, rubble, items) but leaves natural rock and terrain alone.
+        private void ClearClutter(IntVec3 c)
+        {
+            List<Thing> things = c.GetThingList(map);
+            for (int i = things.Count - 1; i >= 0; i--)
+            {
+                Thing t = things[i];
+                ThingCategory category = t.def.category;
+                bool rock = t.def.building != null && t.def.building.isNaturalRock;
+                if ((category == ThingCategory.Building && !rock) || category == ThingCategory.Filth || category == ThingCategory.Item)
+                {
+                    t.Destroy();
+                }
             }
         }
         // ----- door markers -----

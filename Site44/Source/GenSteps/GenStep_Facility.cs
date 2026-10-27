@@ -430,12 +430,57 @@ namespace Site44
                         {
                             map.terrainGrid.SetTerrain(c, apron);
                         }
+
+                        WeatherEnclosedSky(x, y, c);
                     }
                     else
                     {
                         map.terrainGrid.SetTerrain(c, TerrainDefOf.Concrete);
                     }
                 }
+            }
+        }
+
+        // Open sky ringed by walls reads as a roof that fell in long ago: bare earth, rubble and fallen debris, thickest
+        // where the surrounding walls are closest.
+        private void WeatherEnclosedSky(int x, int y, IntVec3 c)
+        {
+            int walled = 0;
+            int nearest = 99;
+            foreach (IntVec2 dir in new[] { new IntVec2(1, 0), new IntVec2(-1, 0), new IntVec2(0, 1), new IntVec2(0, -1) })
+            {
+                for (int step = 1; step <= 8; step++)
+                {
+                    int nx = x + dir.x * step;
+                    int ny = y + dir.z * step;
+                    if (!plan.InBounds(nx, ny))
+                    {
+                        break;
+                    }
+
+                    if (plan.At(nx, ny) != PlanTile.Outside)
+                    {
+                        walled++;
+                        nearest = Mathf.Min(nearest, step);
+                        break;
+                    }
+                }
+            }
+
+            if (walled < 3)
+            {
+                return;
+            }
+
+            float weight = nearest <= 2 ? 0.45f : 0.2f;
+            if (Rand.Chance(weight * 0.6f))
+            {
+                map.terrainGrid.SetTerrain(c, TerrainDefOf.Soil);
+            }
+
+            if (Rand.Chance(weight))
+            {
+                FilthMaker.TryMakeFilth(c, map, ThingDef.Named(Rand.Chance(0.6f) ? "Filth_RubbleBuilding" : "Filth_Dirt"), 1);
             }
         }
 

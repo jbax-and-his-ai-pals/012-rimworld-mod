@@ -20,11 +20,11 @@ Legend: `[x]` done, `[~]` in progress, `[ ]` planned. Each phase builds on the o
 
 ## Phase 2: the enclave
 
-- [ ] **2.1 Enclave site type**: a small walled compound profile, friendly, with a safe approach
-- [ ] **2.2 Residents**: a hidden allied faction, villagers and guards under permanent lords
+- [x] **2.1 Enclave site type**: a friendly settlement laid out from the town plan, with a safe approach (walls come from the plan's wall projects)
+- [~] **2.2 Residents**: a hidden faction, neutral then allied by standing, villagers under a lord (guards and daily routines still to do)
 - [ ] **2.3 Services**: trader, canteen, clinic, notice board that offers the ruin quests
-- [ ] **2.4 Standing system**: points earned from deliveries and cleared sites, ranks, a readout
-- [ ] **2.5 Visitable enclave quest or tile** on the world map
+- [~] **2.4 Standing system**: standing rises daily while present and gates growth (deliveries, cleared sites, ranks and a readout still to do)
+- [x] **2.5 Visitable enclave quest** on the world map
 
 ## Phase 3: the living town
 
@@ -40,7 +40,11 @@ Legend: `[x]` done, `[~]` in progress, `[ ]` planned. Each phase builds on the o
 - [ ] **4.1 Data cores and clues** as loot that feed research and point to other sites
 - [ ] **4.2 Questline** chaining several complex types, with the enclave as quest giver
 - [ ] **4.3 Danger ratings and reward scaling** by colony wealth
-- [ ] **4.4 Claim and restore** a cleared complex as a home
+- [ ] **4.4 Claim and restore**: the enclave starts at a complex's front door on the same map and settles cleared sectors (see BACKLOG)
+
+## Morale and kit (done, to tune)
+
+- [x] Mission focus mood lift, delver tolerance for plain corpses, focus tabs, delver cap and vest, starting kit and loot frequencies as settings
 
 ## Phase 5: depth and polish
 

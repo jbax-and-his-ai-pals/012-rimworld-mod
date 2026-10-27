@@ -238,12 +238,7 @@ namespace Site44
             Section(list, "New game setup");
             list.CheckboxLabeled("Skip world and site selection", ref s.skipWorldSetup,
                 "The Site-44 scenarios use nothing from the world except the climate and biome, so a default world and a start tile are chosen for you. Turn off to use the ordinary world and landing-site pages. Not used when the Odyssey expansion is active.");
-            int biomeCount = Dialog_BiomeChoice.Candidates().Count;
-            string biomeLabel = s.startBiomes.Count == 0 ? "all biomes" : s.startBiomes.Count + " of " + biomeCount + " biomes";
-            if (list.ButtonText("Start biomes:  " + biomeLabel))
-            {
-                Find.WindowStack.Add(new Dialog_BiomeChoice());
-            }
+            list.Label("The start biomes are chosen on the new game screen, right after the storyteller.");
 
             Section(list, "Delve rules (applied when a Delve run starts)");
             list.Label("Delve is about the ruins, not an outside world. These switch off whole groups of random events for the Site-44 Delve scenario only; other scenarios are never touched. Best depth so far: " + s.bestDelveDepth + ".");

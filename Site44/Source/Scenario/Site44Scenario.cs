@@ -20,7 +20,7 @@ namespace Site44
                 return base.GetFirstConfigPage();
             }
 
-            List<Page> pages = new List<Page> { new Page_SelectStoryteller(), new Page_Site44World(), new Page_Site44StartTile() };
+            List<Page> pages = new List<Page> { new Page_SelectStoryteller(), new Page_Site44Biomes(), new Page_Site44World(), new Page_Site44StartTile() };
             if (ModsConfig.IdeologyActive)
             {
                 pages.Add(new Page_ChooseIdeoPreset());
@@ -44,6 +44,24 @@ namespace Site44
             }
 
             return first;
+        }
+    }
+
+    // The one page we add: which climates this run may start in. Everything is ticked by default, so Next is a fine answer.
+    public class Page_Site44Biomes : Page
+    {
+        private Vector2 scroll;
+
+        public override string PageTitle => "Where do you start?";
+
+        public override void DoWindowContents(Rect inRect)
+        {
+            DrawPageTitle(inRect);
+            Rect main = GetMainRect(inRect);
+            Widgets.Label(new Rect(main.x, main.y, main.width, 44f), "Only the climate and biome of your start matter. Tick the biomes this run may start in; leave everything ticked if you do not mind. At least one must stay ticked.");
+            Rect list = new Rect(main.x, main.y + 52f, main.width, main.height - 52f);
+            BiomeChoice.DrawList(list, ref scroll);
+            DoBottomButtons(inRect, "Next");
         }
     }
 

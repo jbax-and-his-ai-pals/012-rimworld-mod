@@ -48,6 +48,7 @@ namespace Site44
             {
                 EquipWeapon(pawn, false);
                 EquipRareArmor(pawn);
+                GameComponent_Site44Morale.GiveStartingKit(pawn);
             }
         }
 
@@ -55,6 +56,10 @@ namespace Site44
         public override void PostGameStart()
         {
             EquipUnarmedColonists();
+            foreach (Pawn colonist in PawnsFinder.AllMaps_FreeColonists)
+            {
+                GameComponent_Site44Morale.GiveStartingKit(colonist);
+            }
         }
 
         public static void EquipUnarmedColonists()

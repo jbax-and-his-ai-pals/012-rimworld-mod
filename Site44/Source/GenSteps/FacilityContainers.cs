@@ -46,6 +46,16 @@ namespace Site44
         // Loot comes from the current site type's table when it has one, else the built-in table.
         private static ThingDef PickLoot(bool rich)
         {
+            if (rich && Rand.Chance(Site44Settings.Current.delverGearChance))
+            {
+                return Rand.Bool ? Site44MoraleDefOf.Site44_DelverCap : Site44MoraleDefOf.Site44_DelverVest;
+            }
+
+            if (!rich && Rand.Chance(Site44Settings.Current.drugFindChance))
+            {
+                return Site44MoraleDefOf.Site44_FocusTab;
+            }
+
             List<LootWeight> table = rich ? SiteTypes.Current?.richLoot : SiteTypes.Current?.loot;
             LootWeight pick;
             if (table != null && table.Count > 0 && table.TryRandomElementByWeight(l => l.weight, out pick) && pick.thingDef != null)
@@ -83,6 +93,12 @@ namespace Site44
             }
 
             Thing thing = MakeLoot(def);
+            if (def == Site44MoraleDefOf.Site44_FocusTab)
+            {
+                thing.stackCount = Rand.RangeInclusive(2, 6);
+                return thing;
+            }
+
             int max = def.stackLimit;
             // Rarer things come in small amounts.
             if (def.BaseMarketValue > 8f)

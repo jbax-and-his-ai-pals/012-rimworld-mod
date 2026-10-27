@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- Mission focus: a steady lift for colonists working a ruined complex. The size is a mod setting (low, normal, high). -->
+  <ThoughtDef>
+    <defName>Site44_MissionFocus</defName>
+    <workerClass>Site44.ThoughtWorker_MissionFocus</workerClass>
+    <validWhileDespawned>false</validWhileDespawned>
+    <developmentalStageFilter>Adult</developmentalStageFilter>
+    <stages>
+      <li>
+        <label>mission focus (low)</label>
+        <description>There is a job to do in here, and that keeps the mind steady.</description>
+        <baseMoodEffect>3</baseMoodEffect>
+      </li>
+      <li>
+        <label>mission focus</label>
+        <description>There is a job to do in here, and that keeps the mind steady.</description>
+        <baseMoodEffect>6</baseMoodEffect>
+      </li>
+      <li>
+        <label>mission focus (high)</label>
+        <description>There is a job to do in here, and that keeps the mind steady.</description>
+        <baseMoodEffect>10</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+  <!-- Given to the starting colonists so the first expedition begins on solid ground. -->
+  <ThoughtDef>
+    <defName>Site44_ReadyToDelve</defName>
+    <durationDays>3</durationDays>
+    <stackLimit>1</stackLimit>
+    <stages>
+      <li>
+        <label>ready to delve</label>
+        <description>Rested, fed and kitted out. Let's go.</description>
+        <baseMoodEffect>12</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+  <!-- Focus tab: a non-addictive stimulant tuned for long expeditions. -->
+  <ThingDef ParentName="DrugPillBase">
+    <defName>Site44_FocusTab</defName>
+    <label>focus tab</label>
+    <description>A small tablet that steadies the mind and slows hunger and fatigue for about a day. It is not habit forming, which is why delvers swear by it. Taking more than one at a time does nothing extra.</description>
+    <descriptionHyperlinks>
+      <HediffDef>Site44_FocusBuzz</HediffDef>
+    </descriptionHyperlinks>
+    <graphicData>
+      <texPath>Things/Item/Drug/Yayo</texPath>
+      <graphicClass>Graphic_StackCount</graphicClass>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <statBases>
+      <MarketValue>18</MarketValue>
+      <Mass>0.01</Mass>
+    </statBases>
+    <techLevel>Industrial</techLevel>
+    <ingestible>
+      <outcomeDoers>
+        <li Class="IngestionOutcomeDoer_GiveHediff">
+          <hediffDef>Site44_FocusBuzz</hediffDef>
+          <severity>1.0</severity>
+        </li>
+      </outcomeDoers>
+    </ingestible>
+  </ThingDef>
+
+  <HediffDef>
+    <defName>Site44_FocusBuzz</defName>
+    <label>focused</label>
+    <labelNoun>a focus tab's effect</labelNoun>
+    <description>A steady, clear-headed calm. Hunger and fatigue come on more slowly.</description>
+    <hediffClass>Hediff_High</hediffClass>
+    <defaultLabelColor>(0.7,0.9,1)</defaultLabelColor>
+    <scenarioCanAdd>true</scenarioCanAdd>
+    <maxSeverity>1.0</maxSeverity>
+    <isBad>false</isBad>
+    <comps>
+      <li Class="HediffCompProperties_SeverityPerDay">
+        <severityPerDay>-1.0</severityPerDay>
+        <showHoursToRecover>true</showHoursToRecover>
+      </li>
+    </comps>
+    <stages>
+      <li>
+        <hungerRateFactor>0.7</hungerRateFactor>
+        <restFallFactor>0.6</restFallFactor>
+        <painFactor>0.85</painFactor>
+      </li>
+    </stages>
+  </HediffDef>
+
+  <ThoughtDef>
+    <defName>Site44_FocusBuzz</defName>
+    <workerClass>ThoughtWorker_Hediff</workerClass>
+    <hediff>Site44_FocusBuzz</hediff>
+    <validWhileDespawned>true</validWhileDespawned>
+    <developmentalStageFilter>Adult</developmentalStageFilter>
+    <stages>
+      <li>
+        <label>focused</label>
+        <description>Everything is clear and steady.</description>
+        <baseMoodEffect>10</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+  <!-- Delver gear: worn to keep a long expedition steady. -->
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_DelverCap</defName>
+    <smeltProducts>
+      <Steel>4</Steel>
+    </smeltProducts>
+    <label>delver's lamp cap</label>
+    <description>A padded cap with a small lamp and a lucky charm stitched inside. Delvers say it keeps the dark from getting in.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <Mass>0.4</Mass>
+      <Flammability>0.8</Flammability>
+      <ArmorRating_Sharp>0.08</ArmorRating_Sharp>
+      <ArmorRating_Blunt>0.05</ArmorRating_Blunt>
+      <Insulation_Cold>4</Insulation_Cold>
+      <EquipDelay>1</EquipDelay>
+    </statBases>
+    <equippedStatOffsets>
+      <MentalBreakThreshold>-0.04</MentalBreakThreshold>
+    </equippedStatOffsets>
+    <thingCategories>
+      <li>Headgear</li>
+    </thingCategories>
+    <apparel>
+      <countsAsClothingForNudity>false</countsAsClothingForNudity>
+      <bodyPartGroups>
+        <li>UpperHead</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</wornGraphicPath>
+      <layers>
+        <li>Overhead</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.55,0.45,0.25)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_DelverVest</defName>
+    <smeltProducts>
+      <Steel>8</Steel>
+    </smeltProducts>
+    <label>delver's vest</label>
+    <description>A patched utility vest with deep pockets, a ration tin and a small comfort kit. It makes a long expedition feel shorter.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/FlakVest/FlakVest</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>110</MaxHitPoints>
+      <Mass>1.5</Mass>
+      <Flammability>0.8</Flammability>
+      <ArmorRating_Sharp>0.12</ArmorRating_Sharp>
+      <ArmorRating_Blunt>0.06</ArmorRating_Blunt>
+      <EquipDelay>2</EquipDelay>
+    </statBases>
+    <equippedStatOffsets>
+      <MentalBreakThreshold>-0.03</MentalBreakThreshold>
+      <CarryingCapacity>15</CarryingCapacity>
+      <RestFallRateFactor>-0.1</RestFallRateFactor>
+    </equippedStatOffsets>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Torso</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/FlakVest/FlakVest</wornGraphicPath>
+      <layers>
+        <li>Middle</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.5,0.42,0.3)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+</Defs>

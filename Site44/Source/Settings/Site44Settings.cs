@@ -30,6 +30,11 @@ namespace Site44
         public float lockedVaultShare = 0.25f;
         public bool securityEnabled;
         public bool hackMinigame = true;
+        public int missionFocusLevel = 2;
+        public bool hardenedToBodies = true;
+        public bool startingKit = true;
+        public float drugFindChance = 0.15f;
+        public float delverGearChance = 0.12f;
         public bool hotZonesEnabled = true;
 
         // Special rooms
@@ -87,6 +92,11 @@ namespace Site44
             Scribe_Values.Look(ref lockedVaultShare, "lockedVaultShare", 0.25f);
             Scribe_Values.Look(ref securityEnabled, "securityEnabled");
             Scribe_Values.Look(ref hackMinigame, "hackMinigame", true);
+            Scribe_Values.Look(ref missionFocusLevel, "missionFocusLevel", 2);
+            Scribe_Values.Look(ref hardenedToBodies, "hardenedToBodies", true);
+            Scribe_Values.Look(ref startingKit, "startingKit", true);
+            Scribe_Values.Look(ref drugFindChance, "drugFindChance", 0.15f);
+            Scribe_Values.Look(ref delverGearChance, "delverGearChance", 0.12f);
             Scribe_Values.Look(ref hotZonesEnabled, "hotZonesEnabled", true);
             Scribe_Values.Look(ref recRoomFrequency, "recRoomFrequency", 1f);
             Scribe_Values.Look(ref secureRoomDensity, "secureRoomDensity", 1f);
@@ -197,6 +207,19 @@ namespace Site44
                 "On: every door is a plain door and the whole complex can be explored in any order.\nOff: sectors are sealed behind terminal gates and clearance levels.");
             s.lockedVaultShare = Percent(list, "Locked vaults (open layout)", s.lockedVaultShare, 0f, 1f,
                 "In the open layout, the share of terminal gates that stay locked as optional vaults, opened by hacking a terminal.");
+            Section(list, "Morale");
+            list.Label("Mission focus (mood bonus inside a complex):  " + new[] { "off", "low (+3)", "normal (+6)", "high (+10)" }[Mathf.Clamp(s.missionFocusLevel, 0, 3)], -1f, new TipSignal(
+                "A steady mood lift for colonists working inside a ruined complex. Raise it if breaks are too frequent."));
+            s.missionFocusLevel = Mathf.RoundToInt(list.Slider(s.missionFocusLevel, 0f, 3f));
+            list.CheckboxLabeled("Delvers ignore plain corpses", ref s.hardenedToBodies,
+                "Colonists inside a complex stop being upset by ordinary corpses. Rotting corpses still bother them.");
+            list.CheckboxLabeled("Starting kit (Breach scenario)", ref s.startingKit,
+                "Starting colonists begin fed and rested, in good spirits, with survival meals and focus tabs.");
+            s.drugFindChance = Percent(list, "Focus tabs in loot", s.drugFindChance, 0f, 0.5f,
+                "Chance that an ordinary loot item is a stack of focus tabs, a non-addictive stimulant that slows hunger and fatigue.");
+            s.delverGearChance = Percent(list, "Delver gear in rich loot", s.delverGearChance, 0f, 0.5f,
+                "Chance that a rich loot item is a delver's cap or vest, which lower the chance of mental breaks.");
+            Section(list, "Hacking and security");
             list.CheckboxLabeled("Cipher-lock hacking", ref s.hackMinigame,
                 "On: gate and diagnostic terminals open a code-guessing puzzle; skill gives more attempts and fewer decoys. A failed attempt locks the terminal for two hours.\nOff: terminals are hacked with a plain timed job.");
             list.CheckboxLabeled("Facility security (experimental)", ref s.securityEnabled,

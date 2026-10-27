@@ -47,3 +47,8 @@ Loot amount, crate density, casket density, survivor casket count, hostile caske
 - Half-settled look: claimed rooms are cleaned and refurbished in stages; unclaimed ones stay dusty, unmaintained and unexplored. The camp cannot afford to maintain them.
 - Keep the generic town generator usable by itself, and provide a way for existing settlements from other mods to know about and interact with Site-44.
 - Open: whether the player must be present when an organic expansion or raid happens (see conversation).
+
+## Morale tuning (to balance in play)
+- Mission focus levels, focus tab frequency, delver gear frequency and starting kit are all settings; tune after play.
+- Starting kit and the "ready to delve" lift only apply in the Site-44 Breach scenario, not in the -quicktest scenario.
+- Ideas: more delver gear (boots for speed, a lamp), a comfort item for rec rooms, a milder darkness penalty.

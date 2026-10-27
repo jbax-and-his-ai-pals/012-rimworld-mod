@@ -15,7 +15,7 @@ namespace Site44
         private Vector2 scroll;
         private bool reported;
 
-        public override Vector2 InitialSize => new Vector2(560f, 520f);
+        public override Vector2 InitialSize => new Vector2(560f, 560f);
 
         public Dialog_CipherLock(CipherPuzzle puzzle, string title, Action<CipherOutcome> onFinished)
         {
@@ -53,9 +53,9 @@ namespace Site44
 
             string status = "Select the access code. Each wrong code reports how many characters sit in the correct position.\n"
                 + "Attempts left: " + puzzle.AttemptsLeft + "    Purges left: " + puzzle.PurgesLeft;
-            Widgets.Label(new Rect(0f, 36f, inRect.width, 44f), status);
+            Widgets.Label(new Rect(0f, 38f, inRect.width, 62f), status);
 
-            float top = 86f;
+            float top = 106f;
             float bottom = inRect.height - 44f;
             float halfW = inRect.width * 0.58f;
 

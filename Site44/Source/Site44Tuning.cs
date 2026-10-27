@@ -26,7 +26,7 @@ namespace Site44
         public static float PreservedRoomChance => S.preservedRoomChance;
 
         // Multiplier on every loot stack placed in the complex.
-        public static float LootAmount => S.lootAmount;
+        public static float LootAmount => S.lootAmount * (GameComponent_Delve.Level?.LootMultiplier ?? 1f);
 
         // Share of floor cells carrying dust or debris in ruined rooms and in corridors.
         public static float DustChanceRoom => Mathf.Clamp01(0.30f * S.dustAmount * (T != null ? T.dustFactor : 1f));
@@ -40,14 +40,15 @@ namespace Site44
         public static float CasketDensity => S.casketDensity * (T != null ? T.casketFactor : 1f);
         public const int RoomsPerCasket = 35;
         public static int SurvivorCaskets => S.survivorCaskets;
-        public static float HostileCasketShare => S.hostileCasketShare;
+        public static float HostileCasketShare => Mathf.Clamp01(S.hostileCasketShare + (GameComponent_Delve.Level?.HostileCasketBonus ?? 0f));
 
         // Share of rooms holding a dried-out corpse (with loot half the time).
         public static float StrayCorpseChance => Mathf.Clamp01(S.strayCorpseChance * (T != null ? T.strayCorpseFactor : 1f));
 
         // Special rooms: rec rooms are uncommon; secure rooms are locked dead ends with one surprise each.
         public static float RecRoomFrequency => S.recRoomFrequency;
-        public static float SecureRoomDensity => S.secureRoomDensity * (T != null ? T.secureRoomFactor : 1f);
+        public static float SecureRoomDensity => S.secureRoomDensity * (T != null ? T.secureRoomFactor : 1f) * (GameComponent_Delve.Level?.SecureRoomFactor ?? 1f);
+        public static float DroidGuardChance => GameComponent_Delve.Level?.DroidGuardChance ?? 0.35f;
         public static bool DroidGuards => S.droidGuards;
         public static float PropDensity => S.propDensity;
         public static float ClutterFactor => T != null ? T.clutterFactor : 1f;

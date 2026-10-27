@@ -46,10 +46,10 @@ Legend: `[x]` done, `[~]` in progress, `[ ]` planned. Each phase builds on the o
 
 A one-shot or long-haul run where each complex tile is a level. Reach the extraction gate, step through, arrive at the next complex. The party's death ends the run.
 
-- [ ] **D.1 Difficulty by depth**: a pure, tested table from depth to complex size, type weights, security density, hostile casket share and loot richness
-- [ ] **D.2 Extraction gate**: a building placed far from the start, unlocked by a cipher-locked terminal, that carries the party and what they hold to the next level
-- [ ] **D.3 Level transition**: generate the next complex, warp the party, retire the old map
-- [ ] **D.4 Run state and scenario**: depth counter, a "Site-44 Delve" scenario, best-depth record, end-of-run summary
+- [x] **D.1 Difficulty by depth**: a pure, tested table from depth to complex size, type weights, security density, hostile casket share and loot richness
+- [x] **D.2 Extraction gate**: a building placed far from the start, unlocked by a cipher-locked terminal, that carries the party and what they hold to the next level
+- [x] **D.3 Level transition**: generate the next complex, warp the party, retire the old map
+- [x] **D.4 Run state and scenario**: depth counter, a "Site-44 Delve" scenario, best-depth record, end-of-run summary
 - [ ] **D.5 Between levels**: a short rest or supply stop (what carries over, what does not), tuned in play
 
 ## Phase 6: the world layer (after the enclave work)

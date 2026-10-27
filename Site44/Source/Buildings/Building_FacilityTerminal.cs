@@ -13,7 +13,8 @@ namespace Site44
         Diagnostic,
         Valve,
         Reactor,
-        Security
+        Security,
+        Extraction
     }
 
     public class Building_FacilityTerminal : Building
@@ -27,11 +28,11 @@ namespace Site44
 
         public bool Hacked => used;
 
-        public bool UsesCipherLock => Site44Settings.Current.hackMinigame && (kind == TerminalKind.Gate || kind == TerminalKind.Diagnostic || kind == TerminalKind.Security);
+        public bool UsesCipherLock => Site44Settings.Current.hackMinigame && (kind == TerminalKind.Gate || kind == TerminalKind.Diagnostic || kind == TerminalKind.Security || kind == TerminalKind.Extraction);
 
         public bool LockedOut => Find.TickManager.TicksGame < lockedUntil;
 
-        public int PuzzleTier => kind == TerminalKind.Gate ? Mathf.Clamp(requiredTier, 0, 3) : (kind == TerminalKind.Security ? 2 : 1);
+        public int PuzzleTier => kind == TerminalKind.Gate ? Mathf.Clamp(requiredTier, 0, 3) : (kind == TerminalKind.Security ? 2 : (kind == TerminalKind.Extraction ? 3 : 1));
 
         public void LockOut(Pawn hacker)
         {
@@ -82,6 +83,7 @@ namespace Site44
                 case TerminalKind.Valve: return "coolant valve";
                 case TerminalKind.Reactor: return "reactor";
                 case TerminalKind.Security: return "security console";
+                case TerminalKind.Extraction: return "extraction terminal";
                 default: return sectorId != null && sectorId.StartsWith("vault") ? "secure room" : "sector gate " + sectorId;
             }
         }
@@ -114,6 +116,7 @@ namespace Site44
                 case TerminalKind.Valve: return "Divert coolant";
                 case TerminalKind.Reactor: return "Restart reactor";
                 case TerminalKind.Security: return "Access security console";
+                case TerminalKind.Extraction: return "Unlock extraction gate";
                 default: return "Hack terminal";
             }
         }
@@ -227,6 +230,14 @@ namespace Site44
                     break;
                 case TerminalKind.Reactor:
                     facility.BringReactorOnline();
+                    break;
+                case TerminalKind.Extraction:
+                    foreach (Thing gateThing in Map.listerThings.ThingsOfDef(Site44DefOf.Site44_ExtractionGate))
+                    {
+                        ((Building_ExtractionGate)gateThing).unlocked = true;
+                    }
+
+                    Messages.Message(hacker.LabelShort + " unlocks the extraction gate.", new LookTargets(Position, Map), MessageTypeDefOf.PositiveEvent);
                     break;
             }
         }

@@ -105,6 +105,7 @@ namespace Site44
             }
 
             PlaceContainers();
+            PlaceExtraction();
             PopulateSecureRooms();
             MarkEntrances();
             PlaceDoorMarkers();
@@ -179,6 +180,7 @@ namespace Site44
         {
             string mode = Site44Quests.SizeOverride
                           ?? SiteTypes.CommandLineValue("site44size")
+                          ?? GameComponent_Delve.Level?.SizeName
                           ?? (map.Parent is Site ? Site44Settings.Current.siteSizeMode : Site44Settings.Current.scenarioComplexSize);
             if (mode == null || mode == "Random")
             {
@@ -962,6 +964,7 @@ namespace Site44
             int count = Mathf.Clamp(Mathf.RoundToInt(options.Count / 30f * density), 0, 6);
             HashSet<int> used = new HashSet<int>();
             bool droidOk = Site44Tuning.DroidGuards && Faction.OfMechanoids != null;
+            int droidCut = 45 + Mathf.RoundToInt(30f * Site44Tuning.DroidGuardChance / 0.35f);
             foreach (SecureRoom option in options)
             {
                 if (secureRooms.Count >= count)
@@ -980,7 +983,7 @@ namespace Site44
                 int roll = Rand.RangeInclusive(0, 99);
                 bool far = World(option.room.Anchor).DistanceTo(startSpotForSafety) >= 80f
                            && graph.Zones[graph.ZoneOfRoom(option.room.Id)].Depth >= 2;
-                option.kind = roll < 45 ? 0 : (roll < 75 && droidOk && far) ? 1 : 2;
+                option.kind = roll < 45 ? 0 : (roll < droidCut && droidOk && far) ? 1 : 2;
                 secureRooms.Add(option);
             }
         }
@@ -1830,6 +1833,35 @@ namespace Site44
             {
                 SpawnConsole(Site44DefOf.Site44_Terminal, consoleSpot, TerminalKind.Security).groupId = group.id;
             }
+        }
+
+        // Delve mode: an extraction gate and its terminal in the room farthest from the start.
+        private void PlaceExtraction()
+        {
+            if (!GameComponent_Delve.IsDelve)
+            {
+                return;
+            }
+
+            PlanRoom target = plan.Rooms
+                .Where(r => !r.IsCorridor && r.Cells.Count >= 12)
+                .OrderByDescending(r => Mathf.Abs(r.Anchor.X - plan.Start.X) + Mathf.Abs(r.Anchor.Y - plan.Start.Y))
+                .FirstOrDefault(r => TryFindSpotInRoom(r, Site44DefOf.Site44_ExtractionGate.size, out IntVec3 probe));
+            IntVec3 gateSpot;
+            if (target == null || !TryFindSpotInRoom(target, Site44DefOf.Site44_ExtractionGate.size, out gateSpot))
+            {
+                Log.Warning("[Site-44] delve: no room found for the extraction gate.");
+                return;
+            }
+
+            GenSpawn.Spawn(ThingMaker.MakeThing(Site44DefOf.Site44_ExtractionGate), gateSpot, map, Rot4.North);
+            IntVec3 terminalSpot;
+            if (TryFindSpotInRoom(target, Site44DefOf.Site44_Terminal.size, out terminalSpot))
+            {
+                SpawnConsole(Site44DefOf.Site44_Terminal, terminalSpot, TerminalKind.Extraction);
+            }
+
+            Log.Message("[Site-44] delve: extraction gate at " + gateSpot + ".");
         }
 
         // ----- validation -----

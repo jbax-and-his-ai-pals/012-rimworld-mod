@@ -21,6 +21,8 @@ namespace Site44
         public static ThingDef Site44_EVASuit;
         public static ThingDef Site44_EVAHelmet;
         public static JobDef Site44_HackTerminal;
+        public static JobDef Site44_UseGate;
+        public static ThingDef Site44_ExtractionGate;
         public static SitePartDef Site44_Ruin;
         public static QuestScriptDef OpportunitySite_Site44Ruin;
         public static FactionDef Site44_Facility;

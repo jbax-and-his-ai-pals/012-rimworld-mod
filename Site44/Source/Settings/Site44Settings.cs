@@ -30,6 +30,7 @@ namespace Site44
         public float lockedVaultShare = 0.25f;
         public bool securityEnabled;
         public bool hackMinigame = true;
+        public int bestDelveDepth;
         public int missionFocusLevel = 2;
         public bool hardenedToBodies = true;
         public bool startingKit = true;
@@ -92,6 +93,7 @@ namespace Site44
             Scribe_Values.Look(ref lockedVaultShare, "lockedVaultShare", 0.25f);
             Scribe_Values.Look(ref securityEnabled, "securityEnabled");
             Scribe_Values.Look(ref hackMinigame, "hackMinigame", true);
+            Scribe_Values.Look(ref bestDelveDepth, "bestDelveDepth");
             Scribe_Values.Look(ref missionFocusLevel, "missionFocusLevel", 2);
             Scribe_Values.Look(ref hardenedToBodies, "hardenedToBodies", true);
             Scribe_Values.Look(ref startingKit, "startingKit", true);

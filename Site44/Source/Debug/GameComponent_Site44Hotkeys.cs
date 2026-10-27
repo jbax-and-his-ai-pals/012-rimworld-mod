@@ -15,6 +15,8 @@ namespace Site44
         private readonly Queue<SiteTypeDef> questQueue = new Queue<SiteTypeDef>();
         private float nextQuestAt = -1f;
         private float enclaveAt = -1f;
+        private float descendAt = -1f;
+        private int descendLeft;
         private float heroAt = -1f;
         private List<Pawn> heroList = new List<Pawn>();
 
@@ -52,6 +54,19 @@ namespace Site44
         // Dev test runs (-quicktest -site44test) use another scenario, so hand out the Site-44 starting weapons here.
         public override void StartedNewGame()
         {
+            if (GenCommandLine.CommandLineArgPassed("site44delve"))
+            {
+                GameComponent_Delve.StartRun();
+            }
+
+            // -site44descend[=N]: take the extraction gate N times (default 1), to check the level chain from the log.
+            if (GenCommandLine.CommandLineArgPassed("site44delve") && (GenCommandLine.CommandLineArgPassed("site44descend") || SiteTypes.CommandLineValue("site44descend") != null))
+            {
+                int.TryParse(SiteTypes.CommandLineValue("site44descend"), out descendLeft);
+                descendLeft = System.Math.Max(1, descendLeft);
+                descendAt = Time.realtimeSinceStartup + 8f;
+            }
+
             if (GenCommandLine.CommandLineArgPassed("site44test"))
             {
                 ScenPart_Site44Facility.EquipUnarmedColonists();
@@ -109,6 +124,27 @@ namespace Site44
                 {
                     HeroMode.Toggle(first);
                     Log.Message("[Site-44] hero mode on for " + first.LabelShort + ": " + (first.equipment?.Primary?.LabelCap.ToString() ?? "unarmed") + ", " + first.apparel.WornApparel.Count + " apparel.");
+                }
+            }
+
+            if (descendAt > 0f && Time.realtimeSinceStartup >= descendAt)
+            {
+                descendAt = -1f;
+                Map current = Find.CurrentMap;
+                Building_ExtractionGate gate = current?.listerThings.ThingsOfDef(Site44DefOf.Site44_ExtractionGate).OfType<Building_ExtractionGate>().FirstOrDefault();
+                if (gate == null)
+                {
+                    Log.Warning("[Site-44] delve test: no extraction gate on the current map.");
+                }
+                else
+                {
+                    gate.unlocked = true;
+                    GameComponent_Delve.Instance.Descend(current, gate.Position);
+                    descendLeft--;
+                    if (descendLeft > 0)
+                    {
+                        descendAt = Time.realtimeSinceStartup + 6f;
+                    }
                 }
             }
 

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>Site44_ExtractionGate</defName>
+    <label>extraction gate</label>
+    <description>A heavy lift-gate at the far end of the complex. It carries whoever stands in it, and whatever is stacked beside it, down to the next level.</description>
+    <thingClass>Site44.Building_ExtractionGate</thingClass>
+    <category>Building</category>
+    <graphicData>
+      <texPath>Things/Building/Ruins/AncientCryptosleepPod</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(3,3)</drawSize>
+    </graphicData>
+    <size>(2,2)</size>
+    <statBases>
+      <MaxHitPoints>1000</MaxHitPoints>
+    </statBases>
+    <useHitPoints>false</useHitPoints>
+    <fillPercent>0.5</fillPercent>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <rotatable>false</rotatable>
+    <selectable>true</selectable>
+    <hasInteractionCell>true</hasInteractionCell>
+    <interactionCellOffset>(0,0,-1)</interactionCellOffset>
+    <building>
+      <isInert>true</isInert>
+      <deconstructible>false</deconstructible>
+    </building>
+  </ThingDef>
+
+  <JobDef>
+    <defName>Site44_UseGate</defName>
+    <driverClass>Site44.JobDriver_UseGate</driverClass>
+    <reportString>using the extraction gate.</reportString>
+  </JobDef>
+
+  <ScenPartDef>
+    <defName>Site44_Delve</defName>
+    <label>delve run</label>
+    <category>Fixed</category>
+    <scenPartClass>Site44.ScenPart_Site44Delve</scenPartClass>
+    <summaryPriority>391</summaryPriority>
+    <canBeRandomlyAdded>false</canBeRandomlyAdded>
+    <canBePlayerAddedRemoved>false</canBePlayerAddedRemoved>
+  </ScenPartDef>
+
+  <ScenarioDef ParentName="ScenarioBase">
+    <defName>Site44_DelveRun</defName>
+    <label>Site-44 Delve</label>
+    <description>A professional crew, one complex after another. Each extraction gate leads to a deeper, harder ruin. Keep the crew alive; the run ends with the last of them.</description>
+    <scenario>
+      <summary>Descend through a chain of ruined complexes.</summary>
+      <parts>
+        <li Class="ScenPart_ConfigPage_ConfigureStartingPawns">
+          <def>ConfigPage_ConfigureStartingPawns</def>
+          <pawnCount>3</pawnCount>
+          <pawnChoiceCount>8</pawnChoiceCount>
+        </li>
+        <li Class="ScenPart_PlayerPawnsArriveMethod">
+          <def>PlayerPawnsArriveMethod</def>
+          <method>Standing</method>
+          <visible>false</visible>
+        </li>
+        <li Class="Site44.ScenPart_Site44Facility">
+          <def>Site44_Facility</def>
+        </li>
+        <li Class="Site44.ScenPart_Site44Delve">
+          <def>Site44_Delve</def>
+        </li>
+      </parts>
+    </scenario>
+  </ScenarioDef>
+
+</Defs>

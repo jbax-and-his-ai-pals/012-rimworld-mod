@@ -50,36 +50,6 @@ namespace Site44
             return s.biomePool.Count == 0 || s.biomePool.Contains(biomeDefName);
         }
 
-        // The starting biome: radio buttons, with "random from the pool" first.
-        public static void DrawStartList(Rect outer, ref Vector2 scroll, bool onlyPool)
-        {
-            Site44Settings s = Site44Settings.Current;
-            List<BiomeDef> biomes = Candidates().Where(b => !onlyPool || IsAllowed(s, b)).ToList();
-            if (onlyPool && !string.IsNullOrEmpty(s.startBiome) && !biomes.Any(b => b.defName == s.startBiome))
-            {
-                s.startBiome = "";
-            }
-
-            Rect view = new Rect(0f, 0f, outer.width - 16f, (biomes.Count + 1) * 28f);
-            Widgets.BeginScrollView(outer, ref scroll, view);
-            if (Widgets.RadioButtonLabeled(new Rect(0f, 0f, view.width, 26f), onlyPool ? "Random from the pool" : "Random", string.IsNullOrEmpty(s.startBiome)))
-            {
-                s.startBiome = "";
-                s.Write();
-            }
-
-            for (int i = 0; i < biomes.Count; i++)
-            {
-                if (Widgets.RadioButtonLabeled(new Rect(0f, (i + 1) * 28f, view.width, 26f), biomes[i].LabelCap, s.startBiome == biomes[i].defName))
-                {
-                    s.startBiome = biomes[i].defName;
-                    s.Write();
-                }
-            }
-
-            Widgets.EndScrollView();
-        }
-
         public static void DrawList(Rect outer, ref Vector2 scroll)
         {
             Site44Settings s = Site44Settings.Current;

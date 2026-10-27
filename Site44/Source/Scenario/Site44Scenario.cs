@@ -48,34 +48,20 @@ namespace Site44
         }
     }
 
-    // The one page we add: the starting biome, and the biomes later complexes of the run may come from.
+    // The one page we add: the biomes the run's complexes are drawn from (the start included).
     // Everything is preselected, so Next is a fine answer.
     public class Page_Site44Biomes : Page
     {
-        private Vector2 scrollStart;
         private Vector2 scrollPool;
 
-        public override string PageTitle => "Where do you start?";
+        public override string PageTitle => "Biomes";
 
         public override void DoWindowContents(Rect inRect)
         {
             DrawPageTitle(inRect);
             Rect main = GetMainRect(inRect);
-            bool delve = Find.Scenario != null && Find.Scenario.AllParts.Any(p => p is ScenPart_Site44Delve);
-            float gap = 16f;
-            float colWidth = delve ? (main.width - gap) / 2f : main.width;
-            float x = main.x;
-
-            if (delve)
-            {
-                Widgets.Label(new Rect(x, main.y, colWidth, 44f), "Biomes for this run: your start and every later complex come from these. At least one must stay ticked.");
-                BiomeChoice.DrawList(new Rect(x, main.y + 48f, colWidth, main.height - 48f), ref scrollPool);
-                x += colWidth + gap;
-            }
-
-            Widgets.Label(new Rect(x, main.y, colWidth, 44f), delve ? "Starting biome, from the ticked ones. Only its climate and biome matter." : "Starting biome. Only its climate and biome matter.");
-            BiomeChoice.DrawStartList(new Rect(x, main.y + 48f, colWidth, main.height - 48f), ref scrollStart, delve);
-
+            Widgets.Label(new Rect(main.x, main.y, main.width, 44f), "Complex biomes are chosen at random from the ones you tick. At least one must stay ticked.");
+            BiomeChoice.DrawList(new Rect(main.x, main.y + 48f, main.width, main.height - 48f), ref scrollPool);
             DoBottomButtons(inRect, "Next");
         }
     }
@@ -126,9 +112,7 @@ namespace Site44
         {
             Site44Settings settings = Site44Settings.Current;
             PlanetTile fallback = TileFinder.RandomStartingTile();
-            bool delve = Find.Scenario != null && Find.Scenario.AllParts.Any(p => p is ScenPart_Site44Delve);
-            bool explicitStart = !string.IsNullOrEmpty(settings.startBiome) && (!delve || BiomeChoice.IsInPool(settings.startBiome));
-            if (!explicitStart && (!delve || settings.biomePool.Count == 0))
+            if (settings.biomePool.Count == 0)
             {
                 return fallback;
             }
@@ -142,7 +126,7 @@ namespace Site44
                     continue;
                 }
 
-                if (explicitStart ? biome.defName == settings.startBiome : BiomeChoice.IsInPool(biome.defName))
+                if (BiomeChoice.IsInPool(biome.defName))
                 {
                     return candidate;
                 }

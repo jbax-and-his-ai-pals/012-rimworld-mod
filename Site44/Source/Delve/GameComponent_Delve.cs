@@ -51,6 +51,7 @@ namespace Site44
 
             delve.active = true;
             delve.depth = 1;
+            DelveRules.Apply();
             Log.Message("[Site-44] delve run started.");
         }
 

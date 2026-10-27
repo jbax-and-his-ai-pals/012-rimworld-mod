@@ -31,6 +31,11 @@ namespace Site44
         public bool securityEnabled;
         public bool hackMinigame = true;
         public int bestDelveDepth;
+        public bool delveNoRaids = true;
+        public bool delveNoCaravanEvents = true;
+        public bool delveNoOtherThreats = true;
+        public bool delveNoOutsideVisitors = true;
+        public bool delveNoWeather = true;
         public int missionFocusLevel = 2;
         public bool hardenedToBodies = true;
         public bool startingKit = true;
@@ -55,6 +60,11 @@ namespace Site44
         {
             Site44Settings defaults = new Site44Settings();
             lootAmount = defaults.lootAmount;
+            delveNoRaids = defaults.delveNoRaids;
+            delveNoCaravanEvents = defaults.delveNoCaravanEvents;
+            delveNoOtherThreats = defaults.delveNoOtherThreats;
+            delveNoOutsideVisitors = defaults.delveNoOutsideVisitors;
+            delveNoWeather = defaults.delveNoWeather;
             crateDensity = defaults.crateDensity;
             preservedRoomChance = defaults.preservedRoomChance;
             casketDensity = defaults.casketDensity;
@@ -94,6 +104,11 @@ namespace Site44
             Scribe_Values.Look(ref securityEnabled, "securityEnabled");
             Scribe_Values.Look(ref hackMinigame, "hackMinigame", true);
             Scribe_Values.Look(ref bestDelveDepth, "bestDelveDepth");
+            Scribe_Values.Look(ref delveNoRaids, "delveNoRaids", true);
+            Scribe_Values.Look(ref delveNoCaravanEvents, "delveNoCaravanEvents", true);
+            Scribe_Values.Look(ref delveNoOtherThreats, "delveNoOtherThreats", true);
+            Scribe_Values.Look(ref delveNoOutsideVisitors, "delveNoOutsideVisitors", true);
+            Scribe_Values.Look(ref delveNoWeather, "delveNoWeather", true);
             Scribe_Values.Look(ref missionFocusLevel, "missionFocusLevel", 2);
             Scribe_Values.Look(ref hardenedToBodies, "hardenedToBodies", true);
             Scribe_Values.Look(ref startingKit, "startingKit", true);
@@ -209,6 +224,18 @@ namespace Site44
                 "On: every door is a plain door and the whole complex can be explored in any order.\nOff: sectors are sealed behind terminal gates and clearance levels.");
             s.lockedVaultShare = Percent(list, "Locked vaults (open layout)", s.lockedVaultShare, 0f, 1f,
                 "In the open layout, the share of terminal gates that stay locked as optional vaults, opened by hacking a terminal.");
+            Section(list, "Delve rules (applied when a Delve run starts)");
+            list.Label("Delve is about the ruins, not an outside world. These switch off whole groups of random events for the Site-44 Delve scenario only; other scenarios are never touched. Best depth so far: " + s.bestDelveDepth + ".");
+            list.CheckboxLabeled("No enemy raids", ref s.delveNoRaids,
+                "Switches off ordinary enemy raids for the run.");
+            list.CheckboxLabeled("No caravan events", ref s.delveNoCaravanEvents,
+                "Switches off caravan ambushes, manhunter ambushes, caravan demands and caravan meetings.");
+            list.CheckboxLabeled("No other threats", ref s.delveNoOtherThreats,
+                "Switches off infestations, manhunter packs, animal insanity and crashed threat ship parts. The danger should come from the ruins.");
+            list.CheckboxLabeled("No visitors or outside arrivals", ref s.delveNoOutsideVisitors,
+                "Switches off traders, visitors, travelers, wanderers, refugee and resource pods, migrating herds and similar arrivals.");
+            list.CheckboxLabeled("No weather disasters", ref s.delveNoWeather,
+                "Switches off toxic fallout, volcanic winter, heat waves, cold snaps, flash storms, solar flares and eclipses.");
             Section(list, "Morale");
             list.Label("Mission focus (mood bonus inside a complex):  " + new[] { "off", "low (+3)", "normal (+6)", "high (+10)" }[Mathf.Clamp(s.missionFocusLevel, 0, 3)], -1f, new TipSignal(
                 "A steady mood lift for colonists working inside a ruined complex. Raise it if breaks are too frequent."));

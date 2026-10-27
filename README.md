@@ -27,7 +27,7 @@ The mod aims to sit quietly beside everything else:
 
 - No expansion is required, nothing is patched with Harmony, and no player choice is overridden. Anything that would change another system is a setting, off by default, and explained in its tooltip.
 - **Ideology:** the game asks for an ideoligion on every new game, and its precepts can demand altars, rituals or buildings that a delving party cannot provide (mood penalties and alerts such as "altar desired"). If you play the Delve or Breach scenarios with Ideology, choosing the **Classic** ideoligion on that page avoids nearly all of these.
-- **Random threats:** the Delve scenario switches off enemy raids, caravan ambushes, manhunter ambushes and caravan demands, since the party is always inside a complex and the danger belongs to the ruins. Every other random event is left alone. These are scenario rules, so you can also build your own scenario without them.
+- **Delve rules:** the Delve scenario is about the ruins, not an outside world, so when a run starts it switches off groups of random events: enemy raids, caravan events, other threats (infestations, manhunters), visitors and outside arrivals, and weather disasters. Each group is a switch under Options, Mod settings, Site-44, Delve rules, and the choice is saved with the run. Only the Delve scenario is affected; other scenarios are never touched.
 - **Focus tabs** are a real drug and appear in drug policies (added to the social drugs policy by default).
 - Quick-test launches (developer flags below) use the vanilla crash-landing scenario, so scenario-only behavior such as the starting kit needs a real new game.
 - If another mod misbehaves with this one, please open an issue with the load order and the debug log.

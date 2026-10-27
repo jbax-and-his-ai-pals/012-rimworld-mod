@@ -173,8 +173,78 @@ namespace Site44
                 GameComponent_Site44Hotkeys.RemoveCrashLandingExtras(map, startSpot);
             }
 
+            WeatherOpenRoof();
+
             Log.Message("[Site-44] start sweep: removed " + removed.Count + " stray hostile(s)"
                         + (removed.Count > 0 ? ": " + string.Join(", ", removed.Take(12).ToArray()) : "") + ".");
+        }
+
+        // A building that has lost most of its roof says so: the open floor gets bare earth, rubble and fallen
+        // slag, heavier the closer it lies to a standing wall, as if the ceiling came down there.
+        private void WeatherOpenRoof()
+        {
+            List<IntVec3> open = new List<IntVec3>();
+            int floor = 0;
+            for (int y = 0; y < plan.Height; y++)
+            {
+                for (int x = 0; x < plan.Width; x++)
+                {
+                    PlanTile tile = plan.At(x, y);
+                    if (tile != PlanTile.Floor && tile != PlanTile.Door)
+                    {
+                        continue;
+                    }
+
+                    floor++;
+                    IntVec3 c = World(x, y);
+                    if (!c.Roofed(map))
+                    {
+                        open.Add(c);
+                    }
+                }
+            }
+
+            float share = floor == 0 ? 0f : open.Count / (float)floor;
+            Log.Message("[Site-44] roof: " + open.Count + " of " + floor + " floor cells open (" + Mathf.RoundToInt(share * 100f) + "%)"
+                        + (share > Site44Tuning.OpenRoofShare ? ", weathering." : "."));
+            if (share <= Site44Tuning.OpenRoofShare)
+            {
+                return;
+            }
+
+            ThingDef rubble = ThingDef.Named("Filth_RubbleBuilding");
+            ThingDef dirt = ThingDef.Named("Filth_Dirt");
+            ThingDef slag = ThingDef.Named("ChunkSlagSteel");
+            foreach (IntVec3 c in open)
+            {
+                bool nearWall = false;
+                foreach (IntVec3 d in GenAdj.AdjacentCellsAndInside)
+                {
+                    IntVec3 n = c + d;
+                    if (n.InBounds(map) && n.GetEdifice(map) != null)
+                    {
+                        nearWall = true;
+                        break;
+                    }
+                }
+
+                float weight = nearWall ? 0.5f : 0.22f;
+                if (Rand.Chance(weight * 0.5f))
+                {
+                    map.terrainGrid.SetTerrain(c, TerrainDefOf.Soil);
+                }
+
+                if (Rand.Chance(weight))
+                {
+                    FilthMaker.TryMakeFilth(c, map, Rand.Chance(0.6f) ? rubble : dirt, 1);
+                }
+
+                if (Rand.Chance(weight * 0.12f) && c.GetEdifice(map) == null && c.GetFirstItem(map) == null)
+                {
+                    Thing chunk = ThingMaker.MakeThing(slag);
+                    GenSpawn.Spawn(chunk, c, map);
+                }
+            }
         }
 
         // Complex size classes: extra small, small, medium and large cover part of the map; XL covers it all.

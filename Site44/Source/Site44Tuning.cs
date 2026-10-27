@@ -54,6 +54,9 @@ namespace Site44
         public static float ClutterFactor => T != null ? T.clutterFactor : 1f;
         public static float RoomVariety => S.roomVariety;
 
+        // When more than this share of a building's floor has lost its roof, the open floor is weathered.
+        public const float OpenRoofShare = 0.3f;
+
         // Furniture hit points as a fraction of maximum in ruined rooms: ruin 0 is pristine, 1 is wrecked.
         public static float RuinedFurnitureMinHealth => Mathf.Lerp(0.8f, 0.05f, S.ruinLevel);
         public static float RuinedFurnitureMaxHealth => Mathf.Lerp(1.0f, 0.45f, S.ruinLevel);

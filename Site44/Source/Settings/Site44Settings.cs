@@ -33,7 +33,7 @@ namespace Site44
         public bool hackMinigame = true;
         public int bestDelveDepth;
         public bool skipWorldSetup = true;
-        public string startBiome = "Any";
+        public List<string> startBiomes = new List<string>();   // empty = every biome
         public bool delveNoRaids = true;
         public bool delveNoCaravanEvents = true;
         public bool delveNoOtherThreats = true;
@@ -64,7 +64,7 @@ namespace Site44
             Site44Settings defaults = new Site44Settings();
             lootAmount = defaults.lootAmount;
             skipWorldSetup = defaults.skipWorldSetup;
-            startBiome = defaults.startBiome;
+            startBiomes = new List<string>();
             delveNoRaids = defaults.delveNoRaids;
             delveNoCaravanEvents = defaults.delveNoCaravanEvents;
             delveNoOtherThreats = defaults.delveNoOtherThreats;
@@ -110,7 +110,11 @@ namespace Site44
             Scribe_Values.Look(ref hackMinigame, "hackMinigame", true);
             Scribe_Values.Look(ref bestDelveDepth, "bestDelveDepth");
             Scribe_Values.Look(ref skipWorldSetup, "skipWorldSetup", true);
-            Scribe_Values.Look(ref startBiome, "startBiome", "Any");
+            Scribe_Collections.Look(ref startBiomes, "startBiomes", LookMode.Value);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                startBiomes = startBiomes ?? new List<string>();
+            }
             Scribe_Values.Look(ref delveNoRaids, "delveNoRaids", true);
             Scribe_Values.Look(ref delveNoCaravanEvents, "delveNoCaravanEvents", true);
             Scribe_Values.Look(ref delveNoOtherThreats, "delveNoOtherThreats", true);
@@ -234,17 +238,11 @@ namespace Site44
             Section(list, "New game setup");
             list.CheckboxLabeled("Skip world and site selection", ref s.skipWorldSetup,
                 "The Site-44 scenarios use nothing from the world except the climate and biome, so a default world and a start tile are chosen for you. Turn off to use the ordinary world and landing-site pages. Not used when the Odyssey expansion is active.");
-            string biomeLabel = s.startBiome == "Any" ? "any" : (DefDatabase<BiomeDef>.GetNamedSilentFail(s.startBiome)?.label ?? s.startBiome);
-            if (list.ButtonText("Start biome:  " + biomeLabel))
+            int biomeCount = Dialog_BiomeChoice.Candidates().Count;
+            string biomeLabel = s.startBiomes.Count == 0 ? "all biomes" : s.startBiomes.Count + " of " + biomeCount + " biomes";
+            if (list.ButtonText("Start biomes:  " + biomeLabel))
             {
-                List<FloatMenuOption> biomes = new List<FloatMenuOption> { new FloatMenuOption("any", () => s.startBiome = "Any") };
-                foreach (BiomeDef biome in DefDatabase<BiomeDef>.AllDefsListForReading.Where(b => b.canBuildBase && b.implemented))
-                {
-                    BiomeDef captured = biome;
-                    biomes.Add(new FloatMenuOption(captured.LabelCap, () => s.startBiome = captured.defName));
-                }
-
-                Find.WindowStack.Add(new FloatMenu(biomes));
+                Find.WindowStack.Add(new Dialog_BiomeChoice());
             }
 
             Section(list, "Delve rules (applied when a Delve run starts)");

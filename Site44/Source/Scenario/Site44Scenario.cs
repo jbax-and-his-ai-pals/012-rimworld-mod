@@ -91,24 +91,24 @@ namespace Site44
 
         private static PlanetTile ChooseTile()
         {
-            string wanted = Site44Settings.Current.startBiome;
+            Site44Settings settings = Site44Settings.Current;
             PlanetTile tile = TileFinder.RandomStartingTile();
-            if (string.IsNullOrEmpty(wanted) || wanted == "Any")
+            if (settings.startBiomes.Count == 0)
             {
                 return tile;
             }
 
-            for (int i = 0; i < 400; i++)
+            for (int i = 0; i < 600; i++)
             {
                 PlanetTile candidate = TileFinder.RandomStartingTile();
                 BiomeDef biome = Find.WorldGrid[candidate].PrimaryBiome;
-                if (biome != null && biome.defName == wanted)
+                if (biome != null && settings.startBiomes.Contains(biome.defName))
                 {
                     return candidate;
                 }
             }
 
-            Log.Message("[Site-44] no start tile found in biome " + wanted + "; using a random one.");
+            Log.Message("[Site-44] no start tile found in the chosen biomes; using a random one.");
             return tile;
         }
     }

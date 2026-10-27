@@ -35,26 +35,6 @@
           <def>Site44_Facility</def>
         </li>
 
-        <li Class="ScenPart_StartingThing_Defined">
-          <def>StartingThing_Defined</def>
-          <thingDef>MealSurvivalPack</thingDef>
-          <count>40</count>
-        </li>
-        <li Class="ScenPart_StartingThing_Defined">
-          <def>StartingThing_Defined</def>
-          <thingDef>MedicineIndustrial</thingDef>
-          <count>10</count>
-        </li>
-        <li Class="ScenPart_ScatterThingsNearPlayerStart">
-          <def>ScatterThingsNearPlayerStart</def>
-          <thingDef>Steel</thingDef>
-          <count>200</count>
-        </li>
-        <li Class="ScenPart_ScatterThingsNearPlayerStart">
-          <def>ScatterThingsNearPlayerStart</def>
-          <thingDef>WoodLog</thingDef>
-          <count>200</count>
-        </li>
 
       </parts>
     </scenario>

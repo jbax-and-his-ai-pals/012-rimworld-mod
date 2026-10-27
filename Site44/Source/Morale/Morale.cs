@@ -82,7 +82,7 @@ namespace Site44
                 return;
             }
 
-            AddToInventory(pawn, ThingDef.Named("MealSurvivalPack"), 4);
+            AddToInventory(pawn, ThingDef.Named("MealSurvivalPack"), 6);
             AddToInventory(pawn, Site44MoraleDefOf.Site44_FocusTab, 3);
             AddToInventory(pawn, ThingDef.Named("MedicineIndustrial"), 2);
             WearIfFree(pawn, Site44MoraleDefOf.Site44_DelverCap);

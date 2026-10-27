@@ -59,6 +59,7 @@
     </statBases>
     <techLevel>Industrial</techLevel>
     <ingestible>
+      <drugCategory>Social</drugCategory>
       <outcomeDoers>
         <li Class="IngestionOutcomeDoer_GiveHediff">
           <hediffDef>Site44_FocusBuzz</hediffDef>
@@ -66,6 +67,11 @@
         </li>
       </outcomeDoers>
     </ingestible>
+    <comps>
+      <li Class="CompProperties_Drug">
+        <listOrder>45</listOrder>
+      </li>
+    </comps>
   </ThingDef>
 
   <HediffDef>

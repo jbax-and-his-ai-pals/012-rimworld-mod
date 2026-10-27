@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+
+  <!-- Focus tabs: carried by colonists and taken when mood runs low, by default under the social drugs policy. -->
+  <Operation Class="PatchOperationAdd">
+    <xpath>/Defs/DrugPolicyDef[defName="SocialDrugs"]/entries</xpath>
+    <value>
+      <li>
+        <drug>Site44_FocusTab</drug>
+        <allowedForJoy>false</allowedForJoy>
+        <allowScheduled>true</allowScheduled>
+        <daysFrequency>1</daysFrequency>
+        <onlyIfMoodBelow>0.35</onlyIfMoodBelow>
+        <takeToInventory>2</takeToInventory>
+      </li>
+    </value>
+  </Operation>
+
+</Patch>

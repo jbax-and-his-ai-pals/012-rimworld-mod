@@ -63,17 +63,17 @@ namespace Site44
             bool delve = Find.Scenario != null && Find.Scenario.AllParts.Any(p => p is ScenPart_Site44Delve);
             float gap = 16f;
             float colWidth = delve ? (main.width - gap) / 2f : main.width;
-
-            Rect left = new Rect(main.x, main.y, colWidth, main.height);
-            Widgets.Label(new Rect(left.x, left.y, left.width, 44f), "Starting biome. Only the climate and biome of your start matter.");
-            BiomeChoice.DrawStartList(new Rect(left.x, left.y + 48f, left.width, left.height - 48f), ref scrollStart);
+            float x = main.x;
 
             if (delve)
             {
-                Rect right = new Rect(main.x + colWidth + gap, main.y, colWidth, main.height);
-                Widgets.Label(new Rect(right.x, right.y, right.width, 44f), "Biomes for later complexes in this run. At least one must stay ticked.");
-                BiomeChoice.DrawList(new Rect(right.x, right.y + 48f, right.width, right.height - 48f), ref scrollPool);
+                Widgets.Label(new Rect(x, main.y, colWidth, 44f), "Biomes for this run: your start and every later complex come from these. At least one must stay ticked.");
+                BiomeChoice.DrawList(new Rect(x, main.y + 48f, colWidth, main.height - 48f), ref scrollPool);
+                x += colWidth + gap;
             }
+
+            Widgets.Label(new Rect(x, main.y, colWidth, 44f), delve ? "Starting biome, from the ticked ones. Only its climate and biome matter." : "Starting biome. Only its climate and biome matter.");
+            BiomeChoice.DrawStartList(new Rect(x, main.y + 48f, colWidth, main.height - 48f), ref scrollStart, delve);
 
             DoBottomButtons(inRect, "Next");
         }
@@ -125,8 +125,9 @@ namespace Site44
         {
             Site44Settings settings = Site44Settings.Current;
             PlanetTile fallback = TileFinder.RandomStartingTile();
-            bool explicitStart = !string.IsNullOrEmpty(settings.startBiome);
-            if (!explicitStart && settings.biomePool.Count == 0)
+            bool delve = Find.Scenario != null && Find.Scenario.AllParts.Any(p => p is ScenPart_Site44Delve);
+            bool explicitStart = !string.IsNullOrEmpty(settings.startBiome) && (!delve || BiomeChoice.IsInPool(settings.startBiome));
+            if (!explicitStart && (!delve || settings.biomePool.Count == 0))
             {
                 return fallback;
             }
@@ -140,7 +141,7 @@ namespace Site44
                     continue;
                 }
 
-                if (explicitStart ? biome.defName == settings.startBiome : settings.biomePool.Contains(biome.defName))
+                if (explicitStart ? biome.defName == settings.startBiome : BiomeChoice.IsInPool(biome.defName))
                 {
                     return candidate;
                 }

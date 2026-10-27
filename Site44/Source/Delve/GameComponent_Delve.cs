@@ -70,6 +70,7 @@ namespace Site44
 
             delve.active = true;
             delve.depth = 1;
+            BiomeChoice.EnsureDefault(Site44Settings.Current);
             delve.biomePool = new List<string>(Site44Settings.Current.biomePool);
             DelveRules.Apply();
             Log.Message("[Site-44] delve run started.");
@@ -135,7 +136,12 @@ namespace Site44
                 BiomeDef biome = Find.WorldGrid[t].PrimaryBiome;
                 return biomePool.Count == 0 || (biome != null && biomePool.Contains(biome.defName));
             };
-            if (!TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false, validator: inPool)
+            // The first few levels stay out of the extreme climates (when the pool has anything milder), so the party
+            // has a chance to find protection before it needs it.
+            bool early = depth <= Site44Tuning.MildLevels && BiomeChoice.PoolHasMild(Site44Settings.Current);
+            Predicate<PlanetTile> mildPool = t => inPool(t) && !BiomeChoice.IsExtreme(Find.WorldGrid[t].PrimaryBiome);
+            if (!(early && TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false, validator: mildPool))
+                && !TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false, validator: inPool)
                 && !TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 24, false, validator: inPool)
                 && !TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false))
             {

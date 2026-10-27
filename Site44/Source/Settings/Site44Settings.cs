@@ -34,6 +34,7 @@ namespace Site44
         public bool hackMinigame = true;
         public int bestDelveDepth;
         public bool skipWorldSetup = true;
+        public bool biomePoolV2;                              // false until the default pool (everything but the extremes) has been applied
         public List<string> biomePool = new List<string>();   // biomes for later complexes in a run; empty = every biome
         public bool delveNoRaids = true;
         public bool delveNoCaravanEvents = true;
@@ -68,6 +69,7 @@ namespace Site44
             scarcity = defaults.scarcity;
             skipWorldSetup = defaults.skipWorldSetup;
             biomePool = new List<string>();
+            biomePoolV2 = false;
             delveNoRaids = defaults.delveNoRaids;
             delveNoCaravanEvents = defaults.delveNoCaravanEvents;
             delveNoOtherThreats = defaults.delveNoOtherThreats;
@@ -115,6 +117,7 @@ namespace Site44
             Scribe_Values.Look(ref hackMinigame, "hackMinigame", true);
             Scribe_Values.Look(ref bestDelveDepth, "bestDelveDepth");
             Scribe_Values.Look(ref skipWorldSetup, "skipWorldSetup", true);
+            Scribe_Values.Look(ref biomePoolV2, "biomePoolV2");
             Scribe_Collections.Look(ref biomePool, "biomePool", LookMode.Value);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {

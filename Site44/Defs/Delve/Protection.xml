@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- Cold protection, found as loot rather than issued. Basic pieces first, a heavy shell deeper down. -->
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_ThermalWrap</defName>
+    <label>thermal wrap</label>
+    <description>A quilted insulating wrap, patched and a little threadbare. It keeps the worst of the cold off the chest and arms.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Parka/Parka</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>4</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>90</MaxHitPoints>
+      <Mass>1.2</Mass>
+      <Flammability>1.0</Flammability>
+      <Insulation_Cold>22</Insulation_Cold>
+      <EquipDelay>3</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Torso</li>
+        <li>Arms</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Parka/Parka</wornGraphicPath>
+      <layers>
+        <li>Shell</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.45,0.5,0.55)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_ThermalLeggings</defName>
+    <label>thermal leggings</label>
+    <description>Padded insulating leggings, worn over ordinary trousers.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Pants/Pants</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>3</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <Mass>0.9</Mass>
+      <Flammability>1.0</Flammability>
+      <Insulation_Cold>15</Insulation_Cold>
+      <EquipDelay>2</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Legs</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Pants/Pants</wornGraphicPath>
+      <layers>
+        <li>Middle</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.4,0.43,0.48)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_PolarShell</defName>
+    <label>polar shell</label>
+    <description>A heavy, well-sealed outer shell built for the deep cold. Warm enough to stand in an ice field, and stiff enough to feel it.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Parka/Parka</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>8</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>140</MaxHitPoints>
+      <Mass>2.8</Mass>
+      <Flammability>0.8</Flammability>
+      <Insulation_Cold>52</Insulation_Cold>
+      <EquipDelay>5</EquipDelay>
+    </statBases>
+    <equippedStatOffsets>
+      <MoveSpeed>-0.2</MoveSpeed>
+    </equippedStatOffsets>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Torso</li>
+        <li>Arms</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Parka/Parka</wornGraphicPath>
+      <layers>
+        <li>Shell</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.85,0.87,0.9)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+</Defs>

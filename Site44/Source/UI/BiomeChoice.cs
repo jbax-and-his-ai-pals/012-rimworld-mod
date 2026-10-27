@@ -9,6 +9,50 @@ namespace Site44
     // The list of biomes a new game may start in. At least one must stay selected; an empty stored list means all.
     public static class BiomeChoice
     {
+        // Climates that kill an unprepared party. They start unticked and ticking one warns.
+        private static readonly string[] Extreme = { "IceSheet", "SeaIce", "ExtremeDesert" };
+        private static readonly string[] Cold = { "IceSheet", "SeaIce", "Tundra", "BorealForest", "ColdBog" };
+
+        public static bool IsExtreme(BiomeDef biome)
+        {
+            return biome != null && System.Array.IndexOf(Extreme, biome.defName) >= 0;
+        }
+
+        public static bool IsCold(BiomeDef biome)
+        {
+            return biome != null && System.Array.IndexOf(Cold, biome.defName) >= 0;
+        }
+
+        // The first time through, the pool is every biome except the extremes.
+        public static void EnsureDefault(Site44Settings s)
+        {
+            if (s.biomePoolV2)
+            {
+                return;
+            }
+
+            s.biomePoolV2 = true;
+            List<BiomeDef> all = Candidates();
+            List<string> mild = all.Where(b => !IsExtreme(b)).Select(b => b.defName).ToList();
+            s.biomePool = mild.Count >= all.Count ? new List<string>() : mild;
+            s.Write();
+        }
+
+        public static bool PoolHasMild(Site44Settings s)
+        {
+            return Candidates().Any(b => IsAllowed(s, b) && !IsExtreme(b));
+        }
+
+        public static bool PoolHasCold(Site44Settings s)
+        {
+            return Candidates().Any(b => IsAllowed(s, b) && IsCold(b));
+        }
+
+        public static string ExtremeTicked(Site44Settings s)
+        {
+            return string.Join(", ", Candidates().Where(b => IsAllowed(s, b) && IsExtreme(b)).Select(b => b.LabelCap.ToString()).ToArray());
+        }
+
         public static List<BiomeDef> Candidates()
         {
             return DefDatabase<BiomeDef>.AllDefsListForReading.Where(b => b.canBuildBase && b.implemented).OrderBy(b => b.label).ToList();
@@ -42,6 +86,10 @@ namespace Site44
 
             s.biomePool = selected.Count >= all.Count ? new List<string>() : selected;
             s.Write();
+            if (on && IsExtreme(biome))
+            {
+                Messages.Message(biome.LabelCap + " is an extreme climate. An unprepared party can die of exposure there.", MessageTypeDefOf.NegativeEvent, false);
+            }
         }
 
         public static bool IsInPool(string biomeDefName)

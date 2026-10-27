@@ -63,8 +63,20 @@ namespace Site44
             // A narrow centred column: on an ultrawide screen a full-width row is too far from its tick box.
             float width = Mathf.Min(main.width, 520f);
             float x = main.x + (main.width - width) / 2f;
+            Site44Settings settings = Site44Settings.Current;
+            BiomeChoice.EnsureDefault(settings);
             Widgets.Label(new Rect(x, main.y, width, 44f), "Complex biomes are chosen at random from the ones you tick. At least one must stay ticked.");
-            BiomeChoice.DrawList(new Rect(x, main.y + 48f, width, main.height - 48f), ref scrollPool);
+            string extreme = BiomeChoice.ExtremeTicked(settings);
+            float listTop = main.y + 48f;
+            if (extreme.Length > 0)
+            {
+                GUI.color = new Color(1f, 0.45f, 0.35f);
+                Widgets.Label(new Rect(x, listTop, width, 44f), "Warning: extreme climates ticked (" + extreme + "). An unprepared party can die of exposure there.");
+                GUI.color = Color.white;
+                listTop += 48f;
+            }
+
+            BiomeChoice.DrawList(new Rect(x, listTop, width, main.y + main.height - listTop), ref scrollPool);
             DoBottomButtons(inRect, "Next");
         }
     }
@@ -114,6 +126,8 @@ namespace Site44
         private static PlanetTile ChooseTile()
         {
             Site44Settings settings = Site44Settings.Current;
+            BiomeChoice.EnsureDefault(settings);
+            bool preferMild = BiomeChoice.PoolHasMild(settings);
             PlanetTile fallback = TileFinder.RandomStartingTile();
             if (settings.biomePool.Count == 0)
             {
@@ -129,7 +143,7 @@ namespace Site44
                     continue;
                 }
 
-                if (BiomeChoice.IsInPool(biome.defName))
+                if (BiomeChoice.IsInPool(biome.defName) && !(preferMild && BiomeChoice.IsExtreme(biome)))
                 {
                     return candidate;
                 }

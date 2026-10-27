@@ -120,12 +120,26 @@ namespace Site44
         private static readonly string[] HeadlineWeapons = { "Gun_Revolver", "Gun_Autopistol", "Gun_PumpShotgun", "Gun_BoltActionRifle", "MeleeWeapon_Knife", "MeleeWeapon_Club" };
         private static readonly string[] HeadlineApparel = { "Apparel_FlakVest", "Apparel_Duster", "Apparel_Parka", "Apparel_Pants" };
 
+        // Protection against the cold comes in tiers, basic pieces first; the heavy shell only turns up deeper down.
+        private static ThingDef ColdGear()
+        {
+            int depth = GameComponent_Delve.IsDelve ? (GameComponent_Delve.Instance?.depth ?? 1) : 1;
+            string[] pool = depth >= 3
+                ? new[] { "Site44_ThermalWrap", "Site44_ThermalLeggings", "Site44_PolarShell" }
+                : new[] { "Site44_ThermalWrap", "Site44_ThermalLeggings" };
+            return Def(pool.RandomElement());
+        }
+
         // One thing a delver would want: gear, a stim, a weapon, parts. Medicine is only an occasional headline.
         public Thing HeadlineLoot()
         {
             ThingDef def;
             int roll = Rand.RangeInclusive(0, 99);
-            if (roll < 20)
+            if (BiomeChoice.PoolHasCold(Site44Settings.Current) && Rand.Chance(0.16f))
+            {
+                def = ColdGear();
+            }
+            else if (roll < 20)
             {
                 def = Rand.Bool ? Site44MoraleDefOf.Site44_DelverCap : Site44MoraleDefOf.Site44_DelverVest;
             }

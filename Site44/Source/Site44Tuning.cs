@@ -28,6 +28,9 @@ namespace Site44
         public static float PreservedRoomChance => S.preservedRoomChance;
 
         // Multiplier on every loot stack placed in the complex.
+        // Delve levels up to this depth avoid extreme climates when the biome pool allows.
+        public const int MildLevels = 3;
+
         // Chance that a diagnostic or hatch node carries a bonus action.
         public const float NodeExtraChance = 0.2f;
 

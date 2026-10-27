@@ -34,6 +34,7 @@ namespace Site44
         private int waterFlattened;
         private PlanRoom welcomeRoom;
         private readonly HashSet<int> executiveRooms = new HashSet<int>();
+        private readonly HashSet<int> preservedRooms = new HashSet<int>();
         private IntVec3 startSpotForSafety;
         private IntVec3 welcomePos = IntVec3.Invalid;
         private int recRoomCount;
@@ -1473,6 +1474,7 @@ namespace Site44
 
             HashSet<int> preserved = ChoosePreservedRooms(zone, rooms);
             preservedTotal += preserved.Count;
+            preservedRooms.UnionWith(preserved);
             ApplyFloors(zone, rooms, preserved);
             PlaceGateTerminals(zone, rooms);
 
@@ -1543,40 +1545,106 @@ namespace Site44
             return zone.Kind == SectorKind.Courtyard && (function == "Lobby" || function == "Reception" || function == "Atrium");
         }
 
-        // Crates, caskets and stray corpses go in after every room is furnished, so quotas are map-wide.
+        // Every room gets a pacing beat (see RoomBeats), decided after every room is furnished so quotas are map-wide:
+        // crates with a headline item, bodies with a stash, cryosleep caskets and creature nests.
         private void PlaceContainers()
         {
             FacilityContainers containers = new FacilityContainers(map, plan, origin, IsFree);
-            int crates = 0;
+            Dictionary<int, Zone> eligible = containerRooms.ToDictionary(p => p.Key.Id, p => p.Value);
+            HashSet<int> vaultRooms = new HashSet<int>(secureRooms.Select(v => v.room.Id));
+
+            List<BeatRoom> beatRooms = new List<BeatRoom>();
+            foreach (PlanRoom room in plan.Rooms)
+            {
+                Zone zone = graph.Zones[graph.ZoneOfRoom(room.Id)];
+                string function = room.Function.ToString();
+                BeatRoom beatRoom = new BeatRoom
+                {
+                    Id = room.Id,
+                    IsCorridor = room.IsCorridor,
+                    Eligible = eligible.ContainsKey(room.Id),
+                    ZoneDepth = zone.Depth,
+                    Stock = function == "Storeroom" || function == "Archive" || function == "Warehouse" || function == "ServerRoom"
+                            || function == "Lab" || function == "Mailroom" || zone.Kind == SectorKind.Storage,
+                    Fixed = executiveRooms.Contains(room.Id) || vaultRooms.Contains(room.Id) || preservedRooms.Contains(room.Id) ? RoomBeat.Loot : RoomBeat.None
+                };
+                beatRooms.Add(beatRoom);
+            }
+
+            foreach (PlanLink link in plan.Links)
+            {
+                if (link.RoomA >= 0 && link.RoomB >= 0)
+                {
+                    beatRooms[link.RoomA].Neighbours.Add(link.RoomB);
+                    beatRooms[link.RoomB].Neighbours.Add(link.RoomA);
+                }
+            }
+
+            int startRoom = 0;
+            foreach (PlanLink link in plan.Links)
+            {
+                if (link.Cell.X == plan.MainEntrance.X && link.Cell.Y == plan.MainEntrance.Y)
+                {
+                    startRoom = link.RoomA >= 0 ? link.RoomA : Mathf.Max(0, link.RoomB);
+                    break;
+                }
+            }
+
+            BeatSettings settings = new BeatSettings
+            {
+                BeatChance = Site44Tuning.BeatChance,
+                CasketWeight = 14f * Mathf.Max(0f, Site44Tuning.CasketDensity),
+                StashWeight = 15f * Mathf.Max(0f, Site44Tuning.StrayCorpseChance / 0.15f)
+            };
+            RoomBeat[] beats = RoomBeats.Plan(Rand.Int, beatRooms, startRoom, settings);
 
             // Every executive office keeps a sealed crate.
+            int crates = 0;
             foreach (int roomId in executiveRooms)
             {
-                if (containers.TrySpawnCrate(plan.Rooms[roomId]))
+                if (containers.TrySpawnCrate(plan.Rooms[roomId], false, true))
                 {
                     crates++;
                 }
             }
-            int strays = 0;
-            foreach (KeyValuePair<PlanRoom, Zone> pair in containerRooms)
+
+            int stashes = 0, nests = 0, empties = 0;
+            List<PlanRoom> casketRooms = new List<PlanRoom>();
+            for (int i = 0; i < beats.Length; i++)
             {
-                string function = pair.Key.Function.ToString();
-                bool stock = function == "Storeroom" || function == "Archive" || function == "Warehouse" || function == "ServerRoom"
-                             || function == "Lab" || function == "Mailroom" || pair.Value.Kind == SectorKind.Storage;
-                if (Rand.Chance(stock ? Site44Tuning.CrateChanceStock : Site44Tuning.CrateChanceOther) && containers.TrySpawnCrate(pair.Key))
+                PlanRoom room = plan.Rooms[i];
+                switch (beats[i])
                 {
-                    crates++;
-                }
-
-                if (Rand.Chance(Site44Tuning.StrayCorpseChance) && containers.TrySpawnStrayCorpse(pair.Key))
-                {
-                    strays++;
+                    case RoomBeat.Empty:
+                        empties++;
+                        break;
+                    case RoomBeat.Loot:
+                        if (!executiveRooms.Contains(i) && !vaultRooms.Contains(i) && !preservedRooms.Contains(i) && containers.TrySpawnCrate(room, false, true))
+                        {
+                            crates++;
+                        }
+                        break;
+                    case RoomBeat.Stash:
+                        if (containers.TrySpawnStrayCorpse(room, true))
+                        {
+                            stashes++;
+                        }
+                        break;
+                    case RoomBeat.Casket:
+                        casketRooms.Add(room);
+                        break;
+                    case RoomBeat.Nest:
+                        if (SpawnNest(room, eligible[i].Depth))
+                        {
+                            nests++;
+                        }
+                        break;
                 }
             }
 
-            int total = Site44Tuning.CasketDensity <= 0f
-                ? 0
-                : Mathf.Clamp(Mathf.RoundToInt(containerRooms.Count / (float)Site44Tuning.RoomsPerCasket * Site44Tuning.CasketDensity), 1, 40);
+            // Caskets: survivors first, then hostile sleepers and remains by share, the rest just loot. Hostile sleepers
+            // keep their old rules: deep inside, and well away from the start.
+            int total = casketRooms.Count;
             List<CasketKind> kinds = new List<CasketKind>();
             for (int i = 0; i < Mathf.Min(Site44Tuning.SurvivorCaskets, total); i++)
             {
@@ -1602,26 +1670,81 @@ namespace Site44
             }
 
             int placed = 0;
-            foreach (CasketKind kind in kinds)
+            casketRooms.Shuffle();
+            foreach (CasketKind kind in kinds.OrderByDescending(k => k == CasketKind.Hostile ? 1 : 0))
             {
-                // Hostile sleepers lie deep inside and well away from the start; the entrance area is never trapped.
                 int minDepth = kind == CasketKind.Hostile ? 3 : kind == CasketKind.Survivor ? 1 : kind == CasketKind.Dead ? 1 : 0;
-                List<KeyValuePair<PlanRoom, Zone>> options = containerRooms
-                    .Where(p => p.Value.Depth >= minDepth
-                                && (kind != CasketKind.Hostile || World(p.Key.Anchor).DistanceTo(startSpotForSafety) >= 70f))
-                    .ToList();
-                options.Shuffle();
-                foreach (KeyValuePair<PlanRoom, Zone> option in options.Take(30))
+                PlanRoom chosen = casketRooms.FirstOrDefault(r => eligible[r.Id].Depth >= minDepth
+                                                                  && (kind != CasketKind.Hostile || World(r.Anchor).DistanceTo(startSpotForSafety) >= 70f));
+                CasketKind use = kind;
+                if (chosen == null)
                 {
-                    if (containers.TrySpawnCasket(option.Key, kind))
-                    {
-                        placed++;
-                        break;
-                    }
+                    // No room fits a hostile sleeper or survivor: an ordinary loot casket instead.
+                    chosen = casketRooms.FirstOrDefault();
+                    use = CasketKind.Loot;
+                }
+
+                if (chosen == null)
+                {
+                    break;
+                }
+
+                casketRooms.Remove(chosen);
+                if (containers.TrySpawnCasket(chosen, use))
+                {
+                    placed++;
                 }
             }
 
-            containerSummary = "crates=" + crates + " caskets=" + placed + "/" + total + " strayCorpses=" + strays;
+            containerSummary = "beats: rooms=" + beats.Length + " empty=" + empties + " crates=" + crates + " stashes=" + stashes
+                               + " caskets=" + placed + "/" + total + " nests=" + nests;
+        }
+
+        private static readonly string[] SmallCritters = { "Megascarab" };
+
+        // A pack of hostile creatures that attack what they see. They are ours, so the start sweep leaves them alone.
+        private bool SpawnNest(PlanRoom room, int zoneDepth)
+        {
+            if (Faction.OfInsects == null)
+            {
+                return false;
+            }
+
+            int delveDepth = GameComponent_Delve.IsDelve ? (GameComponent_Delve.Instance?.depth ?? 1) : 1;
+            List<string> kinds = new List<string>();
+            int count = Rand.RangeInclusive(2, 3);
+            for (int i = 0; i < count; i++)
+            {
+                kinds.Add(delveDepth >= 2 && Rand.Chance(0.4f) ? "Spelopede" : "Megascarab");
+            }
+
+            if (delveDepth >= 3 && Rand.Chance(0.3f))
+            {
+                kinds.Add("Megaspider");
+            }
+
+            List<Pawn> pack = new List<Pawn>();
+            foreach (string kind in kinds)
+            {
+                Pawn critter = FacilityMechs.Make(kind, Faction.OfInsects);
+                IntVec3 cell;
+                if (critter == null || !TryFindFreeCell(room, out cell))
+                {
+                    continue;
+                }
+
+                GenSpawn.Spawn(critter, cell, map);
+                ownedHostiles.Add(critter);
+                pack.Add(critter);
+            }
+
+            if (pack.Count == 0)
+            {
+                return false;
+            }
+
+            LordMaker.MakeNewLord(Faction.OfInsects, new LordJob_DefendPoint(World(room.Anchor), null, 12f), map, pack);
+            return true;
         }
 
         // A few rooms survived intact. Storage, diagnostic and reactor zones always hold at least one.

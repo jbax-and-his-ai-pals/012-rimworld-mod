@@ -28,6 +28,9 @@ namespace Site44
         public static float PreservedRoomChance => S.preservedRoomChance;
 
         // Multiplier on every loot stack placed in the complex.
+        // Chance that an ordinary room is given a beat (crate, body, casket or nest) when it is not forced to.
+        public const float BeatChance = 0.6f;
+
         // Medicine and meals are scarce: most picks of them are dropped, and the stacks that remain are small.
         public static bool IsConsumable(ThingDef def)
         {

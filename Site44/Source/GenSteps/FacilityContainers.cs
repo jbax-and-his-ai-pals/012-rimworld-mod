@@ -117,6 +117,57 @@ namespace Site44
             return thing;
         }
 
+        private static readonly string[] HeadlineWeapons = { "Gun_Revolver", "Gun_Autopistol", "Gun_PumpShotgun", "Gun_BoltActionRifle", "MeleeWeapon_Knife", "MeleeWeapon_Club" };
+        private static readonly string[] HeadlineApparel = { "Apparel_FlakVest", "Apparel_Duster", "Apparel_Parka", "Apparel_Pants" };
+
+        // One thing a delver would want: gear, a stim, a weapon, parts. Medicine is only an occasional headline.
+        public Thing HeadlineLoot()
+        {
+            ThingDef def;
+            int roll = Rand.RangeInclusive(0, 99);
+            if (roll < 20)
+            {
+                def = Rand.Bool ? Site44MoraleDefOf.Site44_DelverCap : Site44MoraleDefOf.Site44_DelverVest;
+            }
+            else if (roll < 40)
+            {
+                def = Site44MoraleDefOf.Site44_FocusTab;
+            }
+            else if (roll < 60)
+            {
+                def = Def(HeadlineWeapons.RandomElement());
+            }
+            else if (roll < 78)
+            {
+                def = Def(HeadlineApparel.RandomElement());
+            }
+            else if (roll < 92)
+            {
+                def = Def("ComponentIndustrial");
+            }
+            else
+            {
+                def = Def("MedicineIndustrial");
+            }
+
+            if (def == null)
+            {
+                return null;
+            }
+
+            Thing thing = MakeLoot(def);
+            if (def == Site44MoraleDefOf.Site44_FocusTab)
+            {
+                thing.stackCount = Rand.RangeInclusive(2, 5);
+            }
+            else if (def.stackLimit > 1)
+            {
+                thing.stackCount = Mathf.Clamp(Rand.RangeInclusive(def == Def("MedicineIndustrial") ? 1 : 2, def == Def("MedicineIndustrial") ? 2 : 4), 1, def.stackLimit);
+            }
+
+            return thing;
+        }
+
         private static readonly string[] RichTable = { "ComponentSpacer", "Gold", "Plasteel", "MedicineUltratech", "Uranium", "Silver", "ComponentSpacer" };
 
         // The good stuff kept in secure rooms.
@@ -164,7 +215,7 @@ namespace Site44
 
         // ----- crates -----
 
-        public bool TrySpawnCrate(PlanRoom room, bool rich = false)
+        public bool TrySpawnCrate(PlanRoom room, bool rich = false, bool headline = false)
         {
             ThingDef crateDef = Def("AncientHermeticCrate");
             IntVec3 spot;
@@ -180,6 +231,18 @@ namespace Site44
             }
 
             int stacks = rich ? Rand.RangeInclusive(2, 4) : Rand.RangeInclusive(1, 3);
+            if (headline)
+            {
+                // Every beat crate holds something worth the walk; the rest of its stacks come from the ordinary table.
+                Thing headliner = HeadlineLoot();
+                if (headliner != null && !crate.TryAcceptThing(headliner, false))
+                {
+                    headliner.Destroy();
+                }
+
+                stacks = Mathf.Max(0, stacks - 1);
+            }
+
             for (int i = 0; i < stacks; i++)
             {
                 Thing loot = rich ? RichLoot() : RandomLoot();
@@ -337,7 +400,7 @@ namespace Site44
         }
 
         // A dried-out corpse on the floor with whatever it carried.
-        public bool TrySpawnStrayCorpse(PlanRoom room)
+        public bool TrySpawnStrayCorpse(PlanRoom room, bool stash = false)
         {
             LayoutCell pick = room.Cells.RandomElement();
             IntVec3 cell = new IntVec3(origin.x + pick.X, 0, origin.z + pick.Y);
@@ -353,9 +416,9 @@ namespace Site44
             }
 
             GenSpawn.Spawn(corpse, cell, map);
-            if (Rand.Chance(0.5f))
+            if (stash || Rand.Chance(0.5f))
             {
-                Thing loot = RandomLoot();
+                Thing loot = stash ? HeadlineLoot() : RandomLoot();
                 if (loot != null)
                 {
                     GenPlace.TryPlaceThing(loot, cell, map, ThingPlaceMode.Near);

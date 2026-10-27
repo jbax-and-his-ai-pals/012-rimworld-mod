@@ -50,17 +50,38 @@ namespace Site44
             return s.biomePool.Count == 0 || s.biomePool.Contains(biomeDefName);
         }
 
+        // Banded rows with the tick box at the left next to the name; the whole row toggles, so a wide screen is no obstacle.
         public static void DrawList(Rect outer, ref Vector2 scroll)
         {
             Site44Settings s = Site44Settings.Current;
             List<BiomeDef> biomes = Candidates();
-            Rect view = new Rect(0f, 0f, outer.width - 16f, biomes.Count * 28f);
+            const float rowHeight = 30f;
+            Rect view = new Rect(0f, 0f, outer.width - 16f, biomes.Count * rowHeight);
             Widgets.BeginScrollView(outer, ref scroll, view);
             for (int i = 0; i < biomes.Count; i++)
             {
+                Rect row = new Rect(0f, i * rowHeight, view.width, rowHeight);
+                if (i % 2 == 1)
+                {
+                    Widgets.DrawLightHighlight(row);
+                }
+
+                if (Mouse.IsOver(row))
+                {
+                    Widgets.DrawHighlight(row);
+                }
+
                 bool on = IsAllowed(s, biomes[i]);
                 bool before = on;
-                Widgets.CheckboxLabeled(new Rect(0f, i * 28f, view.width, 26f), biomes[i].LabelCap, ref on);
+                Widgets.Checkbox(new Vector2(row.x + 6f, row.y + 3f), ref on, 24f);
+                Text.Anchor = TextAnchor.MiddleLeft;
+                Widgets.Label(new Rect(row.x + 40f, row.y, row.width - 40f, row.height), biomes[i].LabelCap);
+                Text.Anchor = TextAnchor.UpperLeft;
+                if (Widgets.ButtonInvisible(row))
+                {
+                    on = !on;
+                }
+
                 if (on != before)
                 {
                     Toggle(s, biomes, biomes[i], on);

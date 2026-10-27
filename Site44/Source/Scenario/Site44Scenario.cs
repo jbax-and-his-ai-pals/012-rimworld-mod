@@ -60,8 +60,11 @@ namespace Site44
         {
             DrawPageTitle(inRect);
             Rect main = GetMainRect(inRect);
-            Widgets.Label(new Rect(main.x, main.y, main.width, 44f), "Complex biomes are chosen at random from the ones you tick. At least one must stay ticked.");
-            BiomeChoice.DrawList(new Rect(main.x, main.y + 48f, main.width, main.height - 48f), ref scrollPool);
+            // A narrow centred column: on an ultrawide screen a full-width row is too far from its tick box.
+            float width = Mathf.Min(main.width, 520f);
+            float x = main.x + (main.width - width) / 2f;
+            Widgets.Label(new Rect(x, main.y, width, 44f), "Complex biomes are chosen at random from the ones you tick. At least one must stay ticked.");
+            BiomeChoice.DrawList(new Rect(x, main.y + 48f, width, main.height - 48f), ref scrollPool);
             DoBottomButtons(inRect, "Next");
         }
     }

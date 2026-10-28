@@ -314,8 +314,7 @@ namespace Site44
             s.crateDensity = Multiplier(list, "Loot crate density", s.crateDensity, 0f, 3f,
                 "How many sealed hermetic crates are scattered through the ruins. They hold a few stacks of loot each.\nx0 = none, x1 = normal.");
             s.preservedRoomX = Multiplier(list, "Intact rooms", s.preservedRoomX, 0f, 7f,
-                "Chance that an ordinary room survived intact: clean sterile floor, undamaged furniture and better loot.\nStorage, server and reactor wings always have at least one.
-x1 is normal.");
+                "Chance that an ordinary room survived intact: clean sterile floor, undamaged furniture and better loot.\nStorage, server and reactor wings always have at least one.\nx1 is normal.");
 
             Section(list, "People and containers");
             s.casketDensity = Multiplier(list, "Cryosleep caskets", s.casketDensity, 0f, 3f,
@@ -324,11 +323,9 @@ x1 is normal.");
                 "Caskets holding a friendly sleeper who joins you when opened. One stranded delver per complex keeps it believable."));
             s.survivorCaskets = Mathf.RoundToInt(list.Slider(s.survivorCaskets, 0, 3));
             s.hostileCasketX = Multiplier(list, "Hostile caskets", s.hostileCasketX, 0f, 3f,
-                "Share of the remaining caskets that hold a hostile sleeper. They only appear deep inside, never near the entrance.
-x1 is normal.");
+                "Share of the remaining caskets that hold a hostile sleeper. They only appear deep inside, never near the entrance.\nx1 is normal.");
             s.strayCorpseX = Multiplier(list, "Dried-out corpses", s.strayCorpseX, 0f, 6f,
-                "Chance that a room holds the remains of an earlier scavenger, sometimes with their loot.
-x1 is normal.");
+                "Chance that a room holds the remains of an earlier scavenger, sometimes with their loot.\nx1 is normal.");
 
             Section(list, "Look");
             s.dustAmount = Multiplier(list, "Dust and debris", s.dustAmount, 0f, 2f,
@@ -342,8 +339,7 @@ x1 is normal.");
             list.CheckboxLabeled("Open layout (explore freely)", ref s.openLayout,
                 "On: every door is a plain door and the whole complex can be explored in any order.\nOff: sectors are sealed behind terminal gates and clearance levels.");
             s.lockedVaultX = Multiplier(list, "Locked vaults (open layout)", s.lockedVaultX, 0f, 4f,
-                "In the open layout, the share of terminal gates that stay locked as optional vaults, opened by hacking a terminal.
-x1 is normal.");
+                "In the open layout, the share of terminal gates that stay locked as optional vaults, opened by hacking a terminal.\nx1 is normal.");
             Section(list, "New game setup");
             list.CheckboxLabeled("Skip world and site selection", ref s.skipWorldSetup,
                 "The Site-44 scenarios use nothing from the world except the climate and biome, so a default world and a start tile are chosen for you. Turn off to use the ordinary world and landing-site pages. Not used when the Odyssey expansion is active.");
@@ -382,11 +378,9 @@ x1 is normal.");
             list.CheckboxLabeled("Starting kit (Breach scenario)", ref s.startingKit,
                 "Starting colonists begin fed and rested, in good spirits, with survival meals and focus tabs.");
             s.drugFindX = Multiplier(list, "Focus tabs in loot", s.drugFindX, 0f, 3f,
-                "Chance that an ordinary loot item is a stack of focus tabs, a non-addictive stimulant that slows hunger and fatigue.
-x1 is normal.");
+                "Chance that an ordinary loot item is a stack of focus tabs, a non-addictive stimulant that slows hunger and fatigue.\nx1 is normal.");
             s.delverGearX = Multiplier(list, "Delver gear in rich loot", s.delverGearX, 0f, 4f,
-                "Chance that a rich loot item is a delver's cap or vest, which lower the chance of mental breaks.
-x1 is normal.");
+                "Chance that a rich loot item is a delver's cap or vest, which lower the chance of mental breaks.\nx1 is normal.");
             Section(list, "Hacking and security");
             list.Label("Puzzle difficulty:  " + new[] { "easy", "normal", "hard" }[Mathf.Clamp(s.puzzleDifficulty, 0, 2)], -1f, new TipSignal(
                 "Easy: two extra attempts and fewer decoys. Normal: four attempts, plus one per five skill levels. Hard: four attempts at most, more decoys and more look-alike words."));
@@ -399,11 +393,9 @@ x1 is normal.");
                 "Some sectors in the gated layout are dangerously hot until the coolant valve is turned.");
 
             s.keycardX = Multiplier(list, "Keycards for locked gates", s.keycardX, 0f, 2f,
-                "Chance that a terminal-locked gate also has a keycard on the near side, usually guarded by a nest. A second way past the gate besides hacking.
-x1 is normal.");
+                "Chance that a terminal-locked gate also has a keycard on the near side, usually guarded by a nest. A second way past the gate besides hacking.\nx1 is normal.");
             s.restrictedWingX = Multiplier(list, "Clearance-gated wings", s.restrictedWingX, 0f, 1.3f,
-                "Chance that a complex holds an advanced wing with better loot, behind a terminal that wants clearance. A badge or a granting node on the near side raises your clearance.
-x1 is normal.");
+                "Chance that a complex holds an advanced wing with better loot, behind a terminal that wants clearance. A badge or a granting node on the near side raises your clearance.\nx1 is normal.");
             s.nestDensity = Multiplier(list, "Creature nests", s.nestDensity, 0f, 3f,
                 "How many rooms are guarded by a hostile nest. x0 = none, x1 = normal.");
 

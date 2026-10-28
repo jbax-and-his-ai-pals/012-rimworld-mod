@@ -43,11 +43,11 @@ namespace Site44
         public bool skipWorldSetup = true;
         public bool biomePoolV2;                              // false until the default pool (everything but the extremes) has been applied
         public List<string> biomePool = new List<string>();   // biomes for later complexes in a run; empty = every biome
-        public bool delveNoRaids = true;
-        public bool delveNoCaravanEvents = true;
-        public bool delveNoOtherThreats = true;
-        public bool delveNoOutsideVisitors = true;
-        public bool delveNoWeather = true;
+        public bool delveAllowRaids = false;
+        public bool delveAllowCaravanEvents = false;
+        public bool delveAllowOtherThreats = false;
+        public bool delveAllowOutsideVisitors = false;
+        public bool delveAllowWeather = false;
         public int missionFocusLevel = 2;
         public bool hardenedToBodies = true;
         public bool startingKit = true;
@@ -102,7 +102,7 @@ namespace Site44
         // themselves. Events, infection, moods, supplies and hacking all behave as in the base game.
         public void ApplyVanillaRules()
         {
-            delveNoRaids = false; delveNoCaravanEvents = false; delveNoOtherThreats = false; delveNoOutsideVisitors = false; delveNoWeather = false;
+            delveAllowRaids = true; delveAllowCaravanEvents = true; delveAllowOtherThreats = true; delveAllowOutsideVisitors = true; delveAllowWeather = true;
             delveInfection = 0; delveDressWounds = false;
             missionFocusLevel = 0; hardenedToBodies = false; startingKit = false;
             supplyX = 4f; drugFindX = 0f; delverGearX = 0f;
@@ -124,11 +124,11 @@ namespace Site44
             skipWorldSetup = defaults.skipWorldSetup;
             biomePool = new List<string>();
             biomePoolV2 = false;
-            delveNoRaids = defaults.delveNoRaids;
-            delveNoCaravanEvents = defaults.delveNoCaravanEvents;
-            delveNoOtherThreats = defaults.delveNoOtherThreats;
-            delveNoOutsideVisitors = defaults.delveNoOutsideVisitors;
-            delveNoWeather = defaults.delveNoWeather;
+            delveAllowRaids = defaults.delveAllowRaids;
+            delveAllowCaravanEvents = defaults.delveAllowCaravanEvents;
+            delveAllowOtherThreats = defaults.delveAllowOtherThreats;
+            delveAllowOutsideVisitors = defaults.delveAllowOutsideVisitors;
+            delveAllowWeather = defaults.delveAllowWeather;
             crateDensity = defaults.crateDensity;
             preservedRoomX = defaults.preservedRoomX;
             casketDensity = defaults.casketDensity;
@@ -184,11 +184,11 @@ namespace Site44
             {
                 biomePool = biomePool ?? new List<string>();
             }
-            Scribe_Values.Look(ref delveNoRaids, "delveNoRaids", true);
-            Scribe_Values.Look(ref delveNoCaravanEvents, "delveNoCaravanEvents", true);
-            Scribe_Values.Look(ref delveNoOtherThreats, "delveNoOtherThreats", true);
-            Scribe_Values.Look(ref delveNoOutsideVisitors, "delveNoOutsideVisitors", true);
-            Scribe_Values.Look(ref delveNoWeather, "delveNoWeather", true);
+            Scribe_Values.Look(ref delveAllowRaids, "delveAllowRaids", false);
+            Scribe_Values.Look(ref delveAllowCaravanEvents, "delveAllowCaravanEvents", false);
+            Scribe_Values.Look(ref delveAllowOtherThreats, "delveAllowOtherThreats", false);
+            Scribe_Values.Look(ref delveAllowOutsideVisitors, "delveAllowOutsideVisitors", false);
+            Scribe_Values.Look(ref delveAllowWeather, "delveAllowWeather", false);
             Scribe_Values.Look(ref missionFocusLevel, "missionFocusLevel", 2);
             Scribe_Values.Look(ref hardenedToBodies, "hardenedToBodies", true);
             Scribe_Values.Look(ref startingKit, "startingKit", true);
@@ -372,17 +372,17 @@ namespace Site44
             list.Label("The biomes complexes are drawn from are chosen on the new game screen, right after the storyteller.");
 
             Section(list, "Delve rules (applied when a Delve run starts)");
-            list.Label("Delve is about the ruins, not an outside world. These switch off whole groups of random events for the Site-44 Delve scenario only; other scenarios are never touched. Best depth so far: " + s.bestDelveDepth + ".");
-            list.CheckboxLabeled("No enemy raids", ref s.delveNoRaids,
-                "Switches off ordinary enemy raids for the run.");
-            list.CheckboxLabeled("No caravan events", ref s.delveNoCaravanEvents,
-                "Switches off caravan ambushes, manhunter ambushes, caravan demands and caravan meetings.");
-            list.CheckboxLabeled("No other threats", ref s.delveNoOtherThreats,
-                "Switches off infestations, manhunter packs, animal insanity and crashed threat ship parts. The danger should come from the ruins.");
-            list.CheckboxLabeled("No visitors or outside arrivals", ref s.delveNoOutsideVisitors,
-                "Switches off traders, visitors, travelers, wanderers, refugee and resource pods, migrating herds and similar arrivals.");
-            list.CheckboxLabeled("No weather disasters", ref s.delveNoWeather,
-                "Switches off toxic fallout, volcanic winter, heat waves, cold snaps, flash storms, solar flares and eclipses.");
+            list.Label("Delve mode disables raids, threats, and disasters by default. You can reenable them here. Best depth so far: " + s.bestDelveDepth + "."); unticked groups are switched off. This is for the Site-44 Delve scenario only; other scenarios are never touched. Best depth so far: " + s.bestDelveDepth + ".");
+            list.CheckboxLabeled("Enemy raids", ref s.delveAllowRaids,
+                "Ticked: ordinary enemy raids can happen during a run. Unticked (the default): none do.");
+            list.CheckboxLabeled("Caravan events", ref s.delveAllowCaravanEvents,
+                "Ticked: caravan ambushes, manhunter ambushes, caravan demands and caravan meetings can happen. Unticked (the default): none do.");
+            list.CheckboxLabeled("Other threats", ref s.delveAllowOtherThreats,
+                "Ticked: infestations, manhunter packs, animal insanity and crashed threat ship parts. The danger should come from the ruins. Unticked (the default): none happen.");
+            list.CheckboxLabeled("Visitors and outside arrivals", ref s.delveAllowOutsideVisitors,
+                "Ticked: traders, visitors, travelers, wanderers, refugee and resource pods, migrating herds and similar arrivals can happen. Unticked (the default): none do.");
+            list.CheckboxLabeled("Weather disasters", ref s.delveAllowWeather,
+                "Ticked: toxic fallout, volcanic winter, heat waves, cold snaps, flash storms, solar flares and eclipses can happen. Unticked (the default): none do.");
             Section(list, "Party");
             s.startingColonists = Count(list, "Starting colonists", s.startingColonists, 1, 5,
                 "How many colonists a new Site-44 game starts with, chosen from a larger pool on the character page. A larger party survives longer; a smaller one makes every loss count.");

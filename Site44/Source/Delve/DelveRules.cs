@@ -52,11 +52,11 @@ namespace Site44
             }
 
             int added = 0;
-            if (s.delveNoRaids) added += Disable(parts, already, Raids);
-            if (s.delveNoCaravanEvents) added += Disable(parts, already, CaravanEvents);
-            if (s.delveNoOtherThreats) added += Disable(parts, already, OtherThreats);
-            if (s.delveNoOutsideVisitors) added += Disable(parts, already, OutsideVisitors);
-            if (s.delveNoWeather) added += Disable(parts, already, Weather);
+            if (!s.delveAllowRaids) added += Disable(parts, already, Raids);
+            if (!s.delveAllowCaravanEvents) added += Disable(parts, already, CaravanEvents);
+            if (!s.delveAllowOtherThreats) added += Disable(parts, already, OtherThreats);
+            if (!s.delveAllowOutsideVisitors) added += Disable(parts, already, OutsideVisitors);
+            if (!s.delveAllowWeather) added += Disable(parts, already, Weather);
             Log.Message("[Site-44] delve rules: " + added + " incident(s) disabled for this run.");
         }
 

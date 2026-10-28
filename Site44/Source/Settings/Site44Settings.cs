@@ -69,7 +69,7 @@ namespace Site44
         // Delivery
         public float questFrequency = 1f;
 
-        public static readonly string[] PresetNames = { "Easier", "Standard", "Harder", "Brutal" };
+        public static readonly string[] PresetNames = { "Easier", "Default", "Harder", "Brutal" };
 
         // Balance presets: only the difficulty settings change. Sizes, biomes, scenario choices and the event switches are kept.
         public void ApplyPreset(int preset)
@@ -109,48 +109,17 @@ namespace Site44
             hackMinigame = false; securityEnabled = false; hotZonesEnabled = false;
         }
 
+        // Every setting back to its default, whatever has been added since (the best Delve depth is a record, so it stays).
         public void Reset()
         {
             Site44Settings defaults = new Site44Settings();
-            lootAmount = defaults.lootAmount;
-            supplyX = defaults.supplyX;
-            delveInfection = defaults.delveInfection;
-            delveDressWounds = defaults.delveDressWounds;
-            startingColonists = defaults.startingColonists;
-            puzzleDifficulty = defaults.puzzleDifficulty;
-            keycardX = defaults.keycardX;
-            restrictedWingX = defaults.restrictedWingX;
-            nestDensity = defaults.nestDensity;
-            skipWorldSetup = defaults.skipWorldSetup;
-            biomePool = new List<string>();
-            biomePoolV2 = false;
-            delveAllowRaids = defaults.delveAllowRaids;
-            delveAllowCaravanEvents = defaults.delveAllowCaravanEvents;
-            delveAllowOtherThreats = defaults.delveAllowOtherThreats;
-            delveAllowOutsideVisitors = defaults.delveAllowOutsideVisitors;
-            delveAllowWeather = defaults.delveAllowWeather;
-            crateDensity = defaults.crateDensity;
-            preservedRoomX = defaults.preservedRoomX;
-            casketDensity = defaults.casketDensity;
-            survivorCaskets = defaults.survivorCaskets;
-            hostileCasketX = defaults.hostileCasketX;
-            strayCorpseX = defaults.strayCorpseX;
-            dustAmount = defaults.dustAmount;
-            ruinX = defaults.ruinX;
-            openLayout = defaults.openLayout;
-            lockedVaultX = defaults.lockedVaultX;
-            securityEnabled = defaults.securityEnabled;
-            hotZonesEnabled = defaults.hotZonesEnabled;
-            recRoomFrequency = defaults.recRoomFrequency;
-            secureRoomDensity = defaults.secureRoomDensity;
-            droidGuards = defaults.droidGuards;
-            roomVariety = defaults.roomVariety;
-            scenarioSiteType = defaults.scenarioSiteType;
-            siteSizeMode = defaults.siteSizeMode;
-            scenarioComplexSize = defaults.scenarioComplexSize;
-            delveSize = defaults.delveSize;
-            propDensity = defaults.propDensity;
-            questFrequency = defaults.questFrequency;
+            foreach (System.Reflection.FieldInfo field in typeof(Site44Settings).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            {
+                if (field.Name != "bestDelveDepth")
+                {
+                    field.SetValue(this, field.GetValue(defaults));
+                }
+            }
         }
 
         public override void ExposeData()

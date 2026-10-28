@@ -51,12 +51,6 @@ namespace Site44
             GUI.color = Color.white;
 
             string note = !enabled ? DisabledNote : (Effect != null ? Effect() : null);
-            if (enabled && this is FloatRow percentRow && !percentRow.Integer)
-            {
-                // A percentage here is a share of the normal amount, not a chance: say so on every such row.
-                note = (note.NullOrEmpty() ? "" : note + "  ") + "Percent of normal: 100% is the usual amount, 0% removes it.";
-            }
-
             if (!note.NullOrEmpty())
             {
                 GUI.color = Color.gray;
@@ -116,6 +110,48 @@ namespace Site44
             }
 
             Set(slid / scale);
+        }
+    }
+
+    // A multiplier chosen from named steps instead of a bare number: "dust: heavy" says more than "150%".
+    internal sealed class LevelRow : SettingRow
+    {
+        public Func<float> Get;
+        public Action<float> Set;
+        public float Default;
+        public string[] Names;
+        public float[] Values;
+
+        private int Index()
+        {
+            float value = Get();
+            int best = 0;
+            for (int i = 1; i < Values.Length; i++)
+            {
+                if (Mathf.Abs(Values[i] - value) < Mathf.Abs(Values[best] - value))
+                {
+                    best = i;
+                }
+            }
+
+            return best;
+        }
+
+        public override bool IsDefault => Mathf.Approximately(Get(), Default);
+        public override void Reset() { Set(Default); }
+
+        protected override void DrawControl(Listing_Standard list, Rect row)
+        {
+            bool enabled = Enabled == null || Enabled();
+            GUI.color = LabelColour(enabled);
+            int index = Index();
+            Widgets.Label(row, Title + ":  " + Names[index]);
+            GUI.color = enabled ? Color.white : Color.gray;
+            int slid = Mathf.RoundToInt(list.Slider(index, 0f, Names.Length - 1));
+            if (slid != index)
+            {
+                Set(Values[slid]);
+            }
         }
     }
 
@@ -266,6 +302,11 @@ namespace Site44
             return new FloatRow { Integer = integer, Label = label, Tip = tip, Scope = scope, Advanced = advanced, Effect = effect, Enabled = enabled, DisabledNote = disabledNote, Get = get, Set = set, Default = def, Min = min, Max = max };
         }
 
+        private static LevelRow Level(string label, string tip, Func<float> get, Action<float> set, string[] names, float[] values, bool advanced = false, Func<string> effect = null)
+        {
+            return new LevelRow { Label = label, Tip = tip, Advanced = advanced, Effect = effect, Get = get, Set = set, Default = 1f, Names = names, Values = values };
+        }
+
         private static ToggleRow Toggle(string label, string tip, Func<bool> get, Action<bool> set, bool def, string scope = null, bool advanced = false,
                                         Func<bool> enabled = null, string disabledNote = null)
         {
@@ -375,14 +416,18 @@ namespace Site44
 
             var looks = new List<SettingRow>
             {
-                Mult("Dust and debris", "How much dust, trash and scattered paper covers the floors. 0% = spotless.", () => S.dustAmount, v => S.dustAmount = v, 2f, null, true),
-                Mult("Outdoor props", "Sandbags, barriers, silos, crates, planters and lamp posts scattered through the yards, different for each kind of complex. 0% = none.",
-                    () => S.propDensity, v => S.propDensity = v, 3f, null, true),
-                Mult("Furniture damage", "How wrecked the furniture is. 0% = undamaged, higher = barely holding together.", () => S.ruinX, v => S.ruinX = v, 1.3f, null, true),
-                Mult("Rec rooms", "How often a break room or cafeteria turns out to be a rec room, with a billiards or card table, a television and couches. 0% = none.",
-                    () => S.recRoomFrequency, v => S.recRoomFrequency = v, 3f, null, true),
-                Mult("Specialty rooms", "How many ordinary rooms turn out to be something more specific: kitchens, dormitories, clinics, locker rooms, libraries, workshops, armories, comms rooms and classrooms.",
-                    () => S.roomVariety, v => S.roomVariety = v, 3f, null, true)
+                Level("Dust and debris", "How much dust, trash and scattered paper covers the floors.",
+                    () => S.dustAmount, v => S.dustAmount = v, new[] { "spotless", "light", "normal", "heavy", "filthy" }, new[] { 0f, 0.4f, 1f, 1.5f, 2f }, true,
+                    () => "About " + Mathf.RoundToInt(Site44Tuning.DustChanceRoom * 100f) + " of every 100 room floor cells carry dust or debris, and " + Mathf.RoundToInt(Site44Tuning.DustChanceCorridor * 100f) + " in corridors."),
+                Level("Outdoor props", "Sandbags, barriers, silos, crates, planters and lamp posts scattered through the yards, different for each kind of complex.",
+                    () => S.propDensity, v => S.propDensity = v, new[] { "none", "sparse", "normal", "dense", "cluttered" }, new[] { 0f, 0.5f, 1f, 2f, 3f }, true),
+                Level("Furniture damage", "Every piece of furniture is left at a random share of its full health, so even the worst setting leaves every piece standing, just barely. Intact rooms are exempt.",
+                    () => S.ruinX, v => S.ruinX = v, new[] { "intact", "worn", "damaged", "wrecked" }, new[] { 0f, 0.5f, 1f, 1.33f }, true,
+                    () => "Each piece is left at " + Mathf.RoundToInt(Site44Tuning.RuinedFurnitureMinHealth * 100f) + "% to " + Mathf.RoundToInt(Site44Tuning.RuinedFurnitureMaxHealth * 100f) + "% of its full health."),
+                Level("Rec rooms", "How often a break room or cafeteria turns out to be a rec room, with a billiards or card table, a television and couches.",
+                    () => S.recRoomFrequency, v => S.recRoomFrequency = v, new[] { "none", "rare", "normal", "common", "frequent" }, new[] { 0f, 0.5f, 1f, 2f, 3f }, true),
+                Level("Specialty rooms", "How many ordinary rooms turn out to be something more specific: kitchens, dormitories, clinics, locker rooms, libraries, workshops, armories, comms rooms and classrooms.",
+                    () => S.roomVariety, v => S.roomVariety = v, new[] { "none", "few", "normal", "many", "most" }, new[] { 0f, 0.5f, 1f, 2f, 3f }, true)
             };
 
             var setup = new List<SettingRow>
@@ -414,21 +459,21 @@ namespace Site44
 
             sections = new List<Section>
             {
-                new Section { Title = "The run", Subtitle = "Who goes in, what can happen to them from outside, and how wounds and moods behave.", Rows = pick(new[] {
+                new Section { Title = "General settings", Subtitle = "", Rows = pick(new[] {
                     "Starting colonists", "Enable enemy raids", "Enable caravan events", "Enable other threats", "Enable visitors and outside arrivals", "Enable weather disasters",
                     "Wound infection", "Dress wounds on descent", "Mission focus (mood bonus in a complex)", "Delvers ignore plain corpses" }) },
-                new Section { Title = "Loot and supplies", Subtitle = "What the ruins hold. Medicine and meals are scarce by default; everything else follows the loot amount.", Rows = pick(new[] {
+                new Section { Title = "Loot and supplies", Subtitle = "", Rows = pick(new[] {
                     "Food and medicine supply", "Loot amount", "Loot crate density", "Focus tabs in loot", "Delver gear in rich loot", "Intact rooms" }) },
-                new Section { Title = "Creatures and survivors", Subtitle = "Nests, sleepers in cryosleep caskets, and the remains of earlier scavengers.", Rows = pick(new[] {
+                new Section { Title = "Creatures and survivors", Subtitle = "", Rows = pick(new[] {
                     "Creature nests", "Cryosleep caskets", "Survivor caskets per complex", "Hostile caskets", "Dried-out corpses" }) },
-                new Section { Title = "Hazards and security", Subtitle = "Things in the ruins that fight back.", Rows = pick(new[] {
+                new Section { Title = "Hazards and security", Subtitle = "", Rows = pick(new[] {
                     "Facility security (experimental)", "Overheated sectors", "Prototype droid guards" }) },
-                new Section { Title = "Hacking, keys and clearance", Subtitle = "How the party gets past sealed gates: hack the terminal, find a keycard, or earn clearance.", Rows = pick(new[] {
+                new Section { Title = "Hacking, keys and clearance", Subtitle = "", Rows = pick(new[] {
                     "Cipher-lock hacking", "Puzzle difficulty", "Keycards for locked gates", "Clearance-gated wings", "Secure rooms" }) },
-                new Section { Title = "Complexes and sizes", Subtitle = "How a complex is laid out and how big it is.", Rows = pick(new[] {
+                new Section { Title = "Complexes and sizes", Subtitle = "", Rows = pick(new[] {
                     "Open layout (explore freely)", "Locked vaults", "Size of Delve complexes", "Complex used by the Breach scenario", "Size of the Breach scenario complex", "Size of quest-site complexes" }) },
-                new Section { Title = "Scenario setup", Subtitle = "How new games start.", Rows = pick(new[] { "Starting kit", "Skip world and site selection", "Ruin quest frequency" }) },
-                new Section { Title = "Look and fine detail", Subtitle = "Atmosphere and room variety. Safe to leave alone.", Rows = pick(new[] {
+                new Section { Title = "Scenario setup", Subtitle = "", Rows = pick(new[] { "Starting kit", "Skip world and site selection", "Ruin quest frequency" }) },
+                new Section { Title = "Look and fine detail", Subtitle = "", Rows = pick(new[] {
                     "Dust and debris", "Outdoor props", "Furniture damage", "Rec rooms", "Specialty rooms" }) }
             };
         }
@@ -437,7 +482,7 @@ namespace Site44
 
         private const float TocWidth = 190f;
         private const string AboutTitle = "About this version";
-        private const string StartTitle = "Starting points";
+        private const string StartTitle = "Difficulty presets";
 
         public static void Draw(Rect inRect)
         {
@@ -493,13 +538,10 @@ namespace Site44
                 }
 
                 sectionTop[section.Title] = list.CurHeight;
-                list.Gap(10f);
+                list.Gap(28f);
                 Text.Font = GameFont.Medium;
                 list.Label(section.Title);
                 Text.Font = GameFont.Small;
-                GUI.color = Color.gray;
-                list.Label(section.Subtitle);
-                GUI.color = Color.white;
                 list.GapLine(4f);
                 foreach (SettingRow row in rows)
                 {
@@ -629,7 +671,7 @@ namespace Site44
             foreach (string line in new[]
             {
                 "A run is a chain of complexes. In Delve, every complex is a level with an extraction gate to the next one, and the run ends when the whole party dies. There is no colony to build; only what your colonists carry goes down with them.",
-                "The outside world is switched off. Raids, caravans, visitors, traders and weather disasters are off by default during a Delve run. The danger comes from the ruins: creature nests, hostile sleepers, security and sealed doors. You can turn the outside world back on under \"The run\".",
+                "The outside world is switched off. Raids, caravans, visitors, traders and weather disasters are off by default during a Delve run. The danger comes from the ruins: creature nests, hostile sleepers, security and sealed doors. You can turn the outside world back on under \"General settings\".",
                 "Supplies are scarce on purpose. Medicine and meals are rare, wounds can turn septic, and a small crew cannot treat everything. Expect to ration, and expect to find a rare antiseptic injector worth keeping.",
                 "Some jobs are not optional. Terminals need someone who can hack, and the ruins need someone who can shoot, so the character page requires at least one of each. Doors can be opened by hacking a terminal, finding a keycard, or earning clearance from a badge or a node.",
                 "Changes here apply to complexes generated from now on, and they follow you into every game mode. Settings tagged Delve, Breach or Quest sites affect only that mode."
@@ -646,48 +688,61 @@ namespace Site44
 
         private static void DrawStartingPoints(Listing_Standard list)
         {
-            list.Gap(10f);
+            list.Gap(28f);
             Text.Font = GameFont.Medium;
             list.Label(StartTitle);
             Text.Font = GameFont.Small;
-            GUI.color = Color.gray;
-            list.Label("These buttons overwrite the balance settings below with a ready-made set of values. Pick one, then adjust anything you like. Sizes, biomes and scenario choices are kept.");
-            GUI.color = Color.white;
             list.GapLine(4f);
-            Rect presetRow = list.GetRect(30f);
-            float buttonWidth = presetRow.width / Site44Settings.PresetNames.Length;
+            const float gap = 6f, height = 30f;
+            Rect block = list.GetRect(height * 2f + gap);
+            string current = CurrentBalance();
+            float buttonWidth = (block.width - gap * (Site44Settings.PresetNames.Length - 1)) / Site44Settings.PresetNames.Length;
             for (int i = 0; i < Site44Settings.PresetNames.Length; i++)
             {
-                Rect button = new Rect(presetRow.x + i * buttonWidth + 2f, presetRow.y, buttonWidth - 4f, presetRow.height);
-                TooltipHandler.TipRegion(button, "Sets loot, supplies, infection, puzzles, keycards, nests and party size to the " + Site44Settings.PresetNames[i].ToLower() + " preset.");
-                if (Widgets.ButtonText(button, Site44Settings.PresetNames[i]))
+                string name = Site44Settings.PresetNames[i];
+                Rect button = new Rect(block.x + i * (buttonWidth + gap), block.y, buttonWidth, height);
+                TooltipHandler.TipRegion(button, i == 1
+                    ? "Resets every setting in this mod to its default, including sizes and scenario choices."
+                    : "Sets loot, supplies, infection, puzzles, keycards, nests and party size to the " + name.ToLower() + " preset. Sizes and scenario choices are kept.");
+                DrawPresetButton(button, name, current == name, () =>
                 {
-                    S.ApplyPreset(i);
-                }
+                    if (i == 1) S.Reset(); else S.ApplyPreset(i);
+                });
             }
 
-            if (list.ButtonText("Vanilla rules: switch off the mod's gameplay changes"))
-            {
-                S.ApplyVanillaRules();
-            }
+            Rect vanilla = new Rect(block.x, block.y + height + gap, block.width, height);
+            TooltipHandler.TipRegion(vanilla, "Switches off every change this mod makes to how the game plays: Delve events, infection, moods, supplies and hacking behave as in the base game.");
+            DrawPresetButton(vanilla, "Vanilla rules", current == "Vanilla rules", () => S.ApplyVanillaRules());
 
-            list.Gap(6f);
-            Text.Font = GameFont.Medium;
-            list.Label("Current balance: " + CurrentBalance());
-            Text.Font = GameFont.Small;
-            GUI.color = Color.gray;
+            list.Gap(8f);
             list.Label(Summary());
-            GUI.color = Color.white;
-            list.Gap(6f);
-            if (list.ButtonText("Reset every setting to its default"))
+        }
+
+        // A button that stays lit while the settings match what it sets.
+        private static void DrawPresetButton(Rect rect, string label, bool pressed, Action click)
+        {
+            if (pressed)
             {
-                S.Reset();
+                GUI.color = new Color(1f, 0.92f, 0.55f);
+            }
+
+            bool clicked = Widgets.ButtonText(rect, label);
+            GUI.color = Color.white;
+            if (pressed)
+            {
+                Widgets.DrawHighlightSelected(rect);
+            }
+
+            if (clicked)
+            {
+                click();
             }
         }
 
         private static string Summary()
         {
             List<string> parts = new List<string>();
+            parts.Add(CurrentBalance());
             parts.Add(S.startingColonists + " colonist(s)");
             parts.Add(new[] { "vanilla", "reduced", "no" }[Mathf.Clamp(S.delveInfection, 0, 2)] + " wound infection in Delve");
             parts.Add("Delve events: " + (new[] { S.delveAllowRaids, S.delveAllowCaravanEvents, S.delveAllowOtherThreats, S.delveAllowOutsideVisitors, S.delveAllowWeather }.Count(b => b) == 0 ? "all off" : "some enabled"));

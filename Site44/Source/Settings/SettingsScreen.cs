@@ -25,7 +25,6 @@ namespace Site44
         protected abstract void DrawControl(Listing_Standard list, Rect row);
         protected virtual float ControlHeight => 0f;
 
-        private const float ResetWidth = 56f;
         private static readonly Color ChangedColour = new Color(0.55f, 0.8f, 1f);
 
         public string ZeroNote = "None.";       // what the live reading says when the value is 0%
@@ -66,14 +65,8 @@ namespace Site44
         {
             bool enabled = Enabled == null || Enabled();
             Rect row = list.GetRect(Text.LineHeight + 2f);
-            bool changed = !IsDefault;
 
-            Rect resetRect = new Rect(row.xMax - ResetWidth, row.y, ResetWidth, row.height);
-            Rect controlRect = new Rect(row.x, row.y, row.width - ResetWidth - 6f, row.height);
-            if (changed && enabled && Widgets.ButtonText(resetRect, "Reset"))
-            {
-                Reset();
-            }
+            Rect controlRect = row;
 
             if (!enabled)
             {
@@ -391,15 +384,15 @@ namespace Site44
 
             var delve = new List<SettingRow>
             {
-                Toggle("Enable enemy raids", "",
+                Toggle("Vanilla enemy raids", "",
                     () => S.delveAllowRaids, v => S.delveAllowRaids = v, false, "Delve"),
-                Toggle("Enable caravan events", "Caravan ambushes, manhunter ambushes, caravan demands, and caravan meetings.",
+                Toggle("Vanilla caravan events", "Caravan ambushes, manhunter ambushes, caravan demands, and caravan meetings.",
                     () => S.delveAllowCaravanEvents, v => S.delveAllowCaravanEvents = v, false, "Delve"),
-                Toggle("Enable other threats", "Infestations, manhunter packs, animal insanity, and crashed threat ship parts.",
+                Toggle("Vanilla other threats", "Infestations, manhunter packs, animal insanity, and crashed threat ship parts.",
                     () => S.delveAllowOtherThreats, v => S.delveAllowOtherThreats = v, false, "Delve"),
-                Toggle("Enable visitors and outside arrivals", "Traders, visitors, travelers, wanderers, refugee and resource pods, and migrating herds.",
+                Toggle("Vanilla visitors and outside arrivals", "Traders, visitors, travelers, wanderers, refugee and resource pods, and migrating herds.",
                     () => S.delveAllowOutsideVisitors, v => S.delveAllowOutsideVisitors = v, false, "Delve"),
-                Toggle("Enable weather disasters", "Toxic fallout, volcanic winter, heat waves, cold snaps, flash storms, solar flares, and eclipses.",
+                Toggle("Vanilla weather disasters", "Toxic fallout, volcanic winter, heat waves, cold snaps, flash storms, solar flares, and eclipses.",
                     () => S.delveAllowWeather, v => S.delveAllowWeather = v, false, "Delve"),
                 Mult("Starting colonists", "Your group needs at least one colonist who can fight and one who can do intellectual work.",
                     () => S.startingColonists, v => S.startingColonists = Mathf.RoundToInt(v), 5f, null, false, null, null, null, 1f, 3f, true),
@@ -422,8 +415,8 @@ namespace Site44
             {
                 Mult("Food and medicine supply", "How often medicine and meals turn up in crates, caskets and on shelves, and how large their stacks are.\n0% = almost none, 400% = plentiful. Packed supplies from the starting kit are unaffected.",
                     () => S.supplyX, v => S.supplyX = v, 4f, null, false, () => "Keeps " + Pct(Site44Tuning.SupplyShare) + " of medicine and meal picks.").Zero("No medicine or meals turn up in loot, caskets or the welcome crate."),
-                Mult("Loot amount", "Scales the size of every loot stack in a complex: crates, caskets, storerooms and intact rooms.", () => S.lootAmount, v => S.lootAmount = v, 3f, min: 0.1f),
-                Mult("Loot crate density", "How many sealed hermetic crates are scattered through the ruins. They hold a few stacks of loot each. 0% = none.", () => S.crateDensity, v => S.crateDensity = v, 3f),
+                Mult("Number of loot crates", "Sealed hermetic crates scattered through the ruins, each holding a few stacks of loot.", () => S.crateDensity, v => S.crateDensity = v, 3f),
+                Mult("Loot stack size", "The size of every loot stack in a complex: crates, caskets, storerooms and intact rooms.", () => S.lootAmount, v => S.lootAmount = v, 3f, min: 0.1f),
                 Mult("Focus tabs in loot", "Chance that an ordinary loot item is a stack of focus tabs, a non-addictive stimulant that slows hunger and fatigue.",
                     () => S.drugFindX, v => S.drugFindX = v, 3f, null, true, () => "About " + Pct(Site44Tuning.DrugFindChance) + " of ordinary loot items.").Zero("No focus tabs in loot."),
                 Mult("Delver gear in rich loot", "Chance that a rich loot item is a delver's cap or vest, which lower the chance of mental breaks.",
@@ -512,10 +505,10 @@ namespace Site44
             sections = new List<Section>
             {
                 new Section { Title = "General settings", Subtitle = "", Rows = pick(new[] {
-                    "Starting colonists", "Enable enemy raids", "Enable caravan events", "Enable other threats", "Enable visitors and outside arrivals", "Enable weather disasters",
+                    "Starting colonists", "Vanilla enemy raids", "Vanilla caravan events", "Vanilla other threats", "Vanilla visitors and outside arrivals", "Vanilla weather disasters",
                     "Wound infection risk", "Wounds on descent", "Restore hunger and rest on descent", "Mission focus (mood bonus in a complex)", "Delvers ignore plain corpses" }) },
                 new Section { Title = "Loot and supplies", Subtitle = "", Rows = pick(new[] {
-                    "Food and medicine supply", "Loot amount", "Loot crate density", "Focus tabs in loot", "Delver gear in rich loot", "Intact rooms" }) },
+                    "Food and medicine supply", "Number of loot crates", "Loot stack size", "Focus tabs in loot", "Delver gear in rich loot", "Intact rooms" }) },
                 new Section { Title = "Creatures and survivors", Subtitle = "", Rows = pick(new[] {
                     "Creature nests", "Cryosleep caskets", "Survivor caskets per complex", "Hostile caskets", "Dried-out corpses" }) },
                 new Section { Title = "Hazards and security", Subtitle = "", Rows = pick(new[] {
@@ -734,9 +727,6 @@ namespace Site44
                 list.Gap(2f);
             }
 
-            GUI.color = Color.gray;
-            list.Label("Use the contents list on the left to jump around, search to find a setting, and \"Changed settings only\" to see what you have altered. A changed setting turns blue and shows its own Reset button.");
-            GUI.color = Color.white;
         }
 
         private static void DrawStartingPoints(Listing_Standard list)
@@ -873,12 +863,13 @@ namespace Site44
         {
             List<string> parts = new List<string>();
             parts.Add(CurrentBalance());
-            parts.Add(S.startingColonists + " colonist(s)");
-            parts.Add(new[] { "vanilla", "reduced", "no" }[Mathf.Clamp(S.delveInfection, 0, 2)] + " wound infection risk in Delve");
-            parts.Add("Delve events: " + (new[] { S.delveAllowRaids, S.delveAllowCaravanEvents, S.delveAllowOtherThreats, S.delveAllowOutsideVisitors, S.delveAllowWeather }.Count(b => b) == 0 ? "all off" : "some enabled"));
-            parts.Add(S.hackMinigame ? "cipher-lock hacking, " + new[] { "easy", "normal", "hard" }[Mathf.Clamp(S.puzzleDifficulty, 0, 2)] : "timed hacking");
+            parts.Add(S.startingColonists == 1 ? "1 colonist" : S.startingColonists + " colonists");
+            parts.Add("wound infection risk " + new[] { "same as vanilla", "half of vanilla", "removed" }[Mathf.Clamp(S.delveInfection, 0, 2)]);
+            int events = new[] { S.delveAllowRaids, S.delveAllowCaravanEvents, S.delveAllowOtherThreats, S.delveAllowOutsideVisitors, S.delveAllowWeather }.Count(b => b);
+            parts.Add(events == 0 ? "all Delve events disabled" : events == 5 ? "all Delve events enabled" : "some Delve events enabled");
+            parts.Add(S.hackMinigame ? "cipher-lock hacking at " + new[] { "easy", "normal", "hard" }[Mathf.Clamp(S.puzzleDifficulty, 0, 2)] + " difficulty" : "timed hacking");
             parts.Add("medicine and meals at " + Pct(Site44Tuning.SupplyShare) + " supply");
-            return string.Join(", ", parts.ToArray()) + ".";
+            return "Current settings summary: " + string.Join(", ", parts.ToArray()) + ".";
         }
     }
 }

@@ -168,7 +168,7 @@ namespace Site44.Gen
 
             var puzzle = new CipherPuzzle(answer, rng);
             puzzle.CodeLength = length;
-            puzzle.attemptsLeft = Clamp(3 + skill / 5 - (tier >= 2 ? 1 : 0), 2, 7);
+            puzzle.attemptsLeft = Clamp(4 + skill / 5 - (tier >= 2 ? 1 : 0), 3, 8);
             puzzle.purgesLeft = Clamp(skill / 4, 0, 4);
 
             // Bucket decoys by positional matches.

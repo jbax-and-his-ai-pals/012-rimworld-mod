@@ -288,7 +288,7 @@ namespace Site44
                 "Chance that a rich loot item is a delver's cap or vest, which lower the chance of mental breaks.");
             Section(list, "Hacking and security");
             list.CheckboxLabeled("Cipher-lock hacking", ref s.hackMinigame,
-                "On: gate and diagnostic terminals open a code-guessing puzzle; skill gives more attempts and fewer decoys. A failed attempt locks the terminal for two hours.\nOff: terminals are hacked with a plain timed job.");
+                "On: gate and diagnostic terminals open a code-guessing puzzle; skill gives more attempts and fewer decoys.\nOff: terminals are hacked with a plain timed job.");
             list.CheckboxLabeled("Facility security (experimental)", ref s.securityEnabled,
                 "Turrets, patrol mechanoids and alarm squads inside the complex. Off by default so the first exploration is safe.");
             list.CheckboxLabeled("Overheated sectors (gated layout only)", ref s.hotZonesEnabled,

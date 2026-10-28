@@ -98,17 +98,49 @@ namespace Site44
             return s.biomePool.Count == 0 || s.biomePool.Contains(biomeDefName);
         }
 
-        // Banded rows with the tick box at the left next to the name; the whole row toggles, so a wide screen is no obstacle.
+        // Standard climates first, then the extreme ones, which are opt-in. Banded rows with the tick box at the left
+        // next to the name; the whole row toggles, so a wide screen is no obstacle.
         public static void DrawList(Rect outer, ref Vector2 scroll)
         {
             Site44Settings s = Site44Settings.Current;
             List<BiomeDef> biomes = Candidates();
+            List<BiomeDef> standard = biomes.Where(b => !IsExtreme(b)).ToList();
+            List<BiomeDef> extreme = biomes.Where(IsExtreme).ToList();
             const float rowHeight = 30f;
-            Rect view = new Rect(0f, 0f, outer.width - 16f, biomes.Count * rowHeight);
+            const float headerHeight = 34f;
+            float height = standard.Count * rowHeight + (extreme.Count > 0 ? headerHeight * 2f + extreme.Count * rowHeight : headerHeight);
+            Rect view = new Rect(0f, 0f, outer.width - 16f, height);
             Widgets.BeginScrollView(outer, ref scroll, view);
-            for (int i = 0; i < biomes.Count; i++)
+            float y = 0f;
+            DrawHeader(new Rect(0f, y, view.width, headerHeight), "Standard climates");
+            y += headerHeight;
+            DrawRows(s, biomes, standard, view.width, ref y, rowHeight);
+            if (extreme.Count > 0)
             {
-                Rect row = new Rect(0f, i * rowHeight, view.width, rowHeight);
+                DrawHeader(new Rect(0f, y, view.width, headerHeight), "Extreme climates (opt-in, dangerous without preparation)");
+                y += headerHeight;
+                DrawRows(s, biomes, extreme, view.width, ref y, rowHeight);
+            }
+
+            Widgets.EndScrollView();
+        }
+
+        private static void DrawHeader(Rect rect, string label)
+        {
+            Text.Font = GameFont.Medium;
+            Text.Anchor = TextAnchor.LowerLeft;
+            Widgets.Label(new Rect(rect.x + 6f, rect.y, rect.width - 6f, rect.height), label);
+            Text.Anchor = TextAnchor.UpperLeft;
+            Text.Font = GameFont.Small;
+        }
+
+        private static void DrawRows(Site44Settings s, List<BiomeDef> all, List<BiomeDef> group, float width, ref float y, float rowHeight)
+        {
+            for (int i = 0; i < group.Count; i++)
+            {
+                BiomeDef biome = group[i];
+                Rect row = new Rect(0f, y, width, rowHeight);
+                y += rowHeight;
                 if (i % 2 == 1)
                 {
                     Widgets.DrawLightHighlight(row);
@@ -119,11 +151,11 @@ namespace Site44
                     Widgets.DrawHighlight(row);
                 }
 
-                bool on = IsAllowed(s, biomes[i]);
+                bool on = IsAllowed(s, biome);
                 bool before = on;
                 Widgets.Checkbox(new Vector2(row.x + 6f, row.y + 3f), ref on, 24f);
                 Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label(new Rect(row.x + 40f, row.y, row.width - 40f, row.height), biomes[i].LabelCap);
+                Widgets.Label(new Rect(row.x + 40f, row.y, row.width - 40f, row.height), biome.LabelCap);
                 Text.Anchor = TextAnchor.UpperLeft;
                 if (Widgets.ButtonInvisible(row))
                 {
@@ -132,11 +164,9 @@ namespace Site44
 
                 if (on != before)
                 {
-                    Toggle(s, biomes, biomes[i], on);
+                    Toggle(s, all, biome, on);
                 }
             }
-
-            Widgets.EndScrollView();
         }
     }
 }

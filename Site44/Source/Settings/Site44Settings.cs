@@ -15,28 +15,28 @@ namespace Site44
         public float lootAmount = 1f;
         public int startingColonists = 3;                     // 1-5
         public int puzzleDifficulty = 1;                      // 0 easy, 1 normal, 2 hard
-        public float keycardChance = 0.5f;                    // terminal gates that also have a keycard
-        public float restrictedWingChance = 0.75f;            // complexes that hold a clearance-gated wing
+        public float keycardX = 1f;                    // terminal gates that also have a keycard
+        public float restrictedWingX = 1f;            // complexes that hold a clearance-gated wing
         public float nestDensity = 1f;
         public bool delveDressWounds;                         // the lift dresses wounds on the way down (off by default)
         public int delveInfection = 1;                        // wound infection in Delve: 0 vanilla, 1 reduced, 2 none
-        public float supply = 0.25f;                          // how often medicine and meals turn up, and how large the stacks are (1 = plentiful)
+        public float supplyX = 1f;                            // food and medicine supply, x1 = about a quarter of picks kept (see Site44Tuning)
         public float crateDensity = 1f;
-        public float preservedRoomChance = 0.07f;
+        public float preservedRoomX = 1f;
 
         // People and containers
         public float casketDensity = 1f;
         public int survivorCaskets = 1;
-        public float hostileCasketShare = 0.25f;
-        public float strayCorpseChance = 0.04f;
+        public float hostileCasketX = 1f;
+        public float strayCorpseX = 1f;
 
         // Look
         public float dustAmount = 1f;
-        public float ruinLevel = 0.75f;
+        public float ruinX = 1f;
 
         // Layout and threats
         public bool openLayout = true;
-        public float lockedVaultShare = 0.25f;
+        public float lockedVaultX = 1f;
         public bool securityEnabled;
         public bool hackMinigame = true;
         public int bestDelveDepth;
@@ -51,8 +51,8 @@ namespace Site44
         public int missionFocusLevel = 2;
         public bool hardenedToBodies = true;
         public bool startingKit = true;
-        public float drugFindChance = 0.15f;
-        public float delverGearChance = 0.12f;
+        public float drugFindX = 1f;
+        public float delverGearX = 1f;
         public bool hotZonesEnabled = true;
 
         // Special rooms
@@ -75,25 +75,25 @@ namespace Site44
         public void ApplyPreset(int preset)
         {
             Site44Settings d = new Site44Settings();
-            supply = d.supply; lootAmount = d.lootAmount; crateDensity = d.crateDensity; hostileCasketShare = d.hostileCasketShare;
+            supplyX = d.supplyX; lootAmount = d.lootAmount; crateDensity = d.crateDensity; hostileCasketX = d.hostileCasketX;
             delveInfection = d.delveInfection; delveDressWounds = d.delveDressWounds; puzzleDifficulty = d.puzzleDifficulty;
-            keycardChance = d.keycardChance; nestDensity = d.nestDensity; startingColonists = d.startingColonists;
-            drugFindChance = d.drugFindChance; securityEnabled = d.securityEnabled; missionFocusLevel = d.missionFocusLevel;
+            keycardX = d.keycardX; nestDensity = d.nestDensity; startingColonists = d.startingColonists;
+            drugFindX = d.drugFindX; securityEnabled = d.securityEnabled; missionFocusLevel = d.missionFocusLevel;
             switch (preset)
             {
                 case 0:
-                    supply = 0.6f; lootAmount = 1.3f; crateDensity = 1.3f; hostileCasketShare = 0.1f;
-                    delveInfection = 2; delveDressWounds = true; puzzleDifficulty = 0; keycardChance = 0.7f;
-                    nestDensity = 0.5f; startingColonists = 4; drugFindChance = 0.25f; missionFocusLevel = 3;
+                    supplyX = 2.4f; lootAmount = 1.3f; crateDensity = 1.3f; hostileCasketX = 0.4f;
+                    delveInfection = 2; delveDressWounds = true; puzzleDifficulty = 0; keycardX = 1.4f;
+                    nestDensity = 0.5f; startingColonists = 4; drugFindX = 1.7f; missionFocusLevel = 3;
                     break;
                 case 2:
-                    supply = 0.1f; lootAmount = 0.8f; crateDensity = 0.8f; hostileCasketShare = 0.4f;
-                    delveInfection = 0; puzzleDifficulty = 2; keycardChance = 0.3f; nestDensity = 1.5f; drugFindChance = 0.1f;
+                    supplyX = 0.4f; lootAmount = 0.8f; crateDensity = 0.8f; hostileCasketX = 1.6f;
+                    delveInfection = 0; puzzleDifficulty = 2; keycardX = 0.6f; nestDensity = 1.5f; drugFindX = 0.7f;
                     break;
                 case 3:
-                    supply = 0f; lootAmount = 0.6f; crateDensity = 0.6f; hostileCasketShare = 0.55f;
-                    delveInfection = 0; puzzleDifficulty = 2; keycardChance = 0.15f; nestDensity = 2.2f; startingColonists = 2;
-                    drugFindChance = 0.05f; securityEnabled = true; missionFocusLevel = 1;
+                    supplyX = 0f; lootAmount = 0.6f; crateDensity = 0.6f; hostileCasketX = 2.2f;
+                    delveInfection = 0; puzzleDifficulty = 2; keycardX = 0.3f; nestDensity = 2.2f; startingColonists = 2;
+                    drugFindX = 0.3f; securityEnabled = true; missionFocusLevel = 1;
                     break;
             }
         }
@@ -105,7 +105,7 @@ namespace Site44
             delveNoRaids = false; delveNoCaravanEvents = false; delveNoOtherThreats = false; delveNoOutsideVisitors = false; delveNoWeather = false;
             delveInfection = 0; delveDressWounds = false;
             missionFocusLevel = 0; hardenedToBodies = false; startingKit = false;
-            supply = 1f; drugFindChance = 0f; delverGearChance = 0f;
+            supplyX = 4f; drugFindX = 0f; delverGearX = 0f;
             hackMinigame = false; securityEnabled = false; hotZonesEnabled = false;
         }
 
@@ -113,13 +113,13 @@ namespace Site44
         {
             Site44Settings defaults = new Site44Settings();
             lootAmount = defaults.lootAmount;
-            supply = defaults.supply;
+            supplyX = defaults.supplyX;
             delveInfection = defaults.delveInfection;
             delveDressWounds = defaults.delveDressWounds;
             startingColonists = defaults.startingColonists;
             puzzleDifficulty = defaults.puzzleDifficulty;
-            keycardChance = defaults.keycardChance;
-            restrictedWingChance = defaults.restrictedWingChance;
+            keycardX = defaults.keycardX;
+            restrictedWingX = defaults.restrictedWingX;
             nestDensity = defaults.nestDensity;
             skipWorldSetup = defaults.skipWorldSetup;
             biomePool = new List<string>();
@@ -130,15 +130,15 @@ namespace Site44
             delveNoOutsideVisitors = defaults.delveNoOutsideVisitors;
             delveNoWeather = defaults.delveNoWeather;
             crateDensity = defaults.crateDensity;
-            preservedRoomChance = defaults.preservedRoomChance;
+            preservedRoomX = defaults.preservedRoomX;
             casketDensity = defaults.casketDensity;
             survivorCaskets = defaults.survivorCaskets;
-            hostileCasketShare = defaults.hostileCasketShare;
-            strayCorpseChance = defaults.strayCorpseChance;
+            hostileCasketX = defaults.hostileCasketX;
+            strayCorpseX = defaults.strayCorpseX;
             dustAmount = defaults.dustAmount;
-            ruinLevel = defaults.ruinLevel;
+            ruinX = defaults.ruinX;
             openLayout = defaults.openLayout;
-            lockedVaultShare = defaults.lockedVaultShare;
+            lockedVaultX = defaults.lockedVaultX;
             securityEnabled = defaults.securityEnabled;
             hotZonesEnabled = defaults.hotZonesEnabled;
             recRoomFrequency = defaults.recRoomFrequency;
@@ -156,24 +156,24 @@ namespace Site44
         public override void ExposeData()
         {
             Scribe_Values.Look(ref lootAmount, "lootAmount", 1f);
-            Scribe_Values.Look(ref supply, "supply", 0.25f);
+            Scribe_Values.Look(ref supplyX, "supplyX", 1f);
             Scribe_Values.Look(ref delveInfection, "delveInfection", 1);
             Scribe_Values.Look(ref delveDressWounds, "delveDressWounds");
             Scribe_Values.Look(ref startingColonists, "startingColonists", 3);
             Scribe_Values.Look(ref puzzleDifficulty, "puzzleDifficulty", 1);
-            Scribe_Values.Look(ref keycardChance, "keycardChance", 0.5f);
-            Scribe_Values.Look(ref restrictedWingChance, "restrictedWingChance", 0.75f);
+            Scribe_Values.Look(ref keycardX, "keycardX", 1f);
+            Scribe_Values.Look(ref restrictedWingX, "restrictedWingX", 1f);
             Scribe_Values.Look(ref nestDensity, "nestDensity", 1f);
             Scribe_Values.Look(ref crateDensity, "crateDensity", 1f);
-            Scribe_Values.Look(ref preservedRoomChance, "preservedRoomChance", 0.07f);
+            Scribe_Values.Look(ref preservedRoomX, "preservedRoomX", 1f);
             Scribe_Values.Look(ref casketDensity, "casketDensity", 1f);
             Scribe_Values.Look(ref survivorCaskets, "survivorCaskets", 1);
-            Scribe_Values.Look(ref hostileCasketShare, "hostileCasketShare", 0.25f);
-            Scribe_Values.Look(ref strayCorpseChance, "strayCorpseChance", 0.04f);
+            Scribe_Values.Look(ref hostileCasketX, "hostileCasketX", 1f);
+            Scribe_Values.Look(ref strayCorpseX, "strayCorpseX", 1f);
             Scribe_Values.Look(ref dustAmount, "dustAmount", 1f);
-            Scribe_Values.Look(ref ruinLevel, "ruinLevel", 0.75f);
+            Scribe_Values.Look(ref ruinX, "ruinX", 1f);
             Scribe_Values.Look(ref openLayout, "openLayout", true);
-            Scribe_Values.Look(ref lockedVaultShare, "lockedVaultShare", 0.25f);
+            Scribe_Values.Look(ref lockedVaultX, "lockedVaultX", 1f);
             Scribe_Values.Look(ref securityEnabled, "securityEnabled");
             Scribe_Values.Look(ref hackMinigame, "hackMinigame", true);
             Scribe_Values.Look(ref bestDelveDepth, "bestDelveDepth");
@@ -192,8 +192,8 @@ namespace Site44
             Scribe_Values.Look(ref missionFocusLevel, "missionFocusLevel", 2);
             Scribe_Values.Look(ref hardenedToBodies, "hardenedToBodies", true);
             Scribe_Values.Look(ref startingKit, "startingKit", true);
-            Scribe_Values.Look(ref drugFindChance, "drugFindChance", 0.15f);
-            Scribe_Values.Look(ref delverGearChance, "delverGearChance", 0.12f);
+            Scribe_Values.Look(ref drugFindX, "drugFindX", 1f);
+            Scribe_Values.Look(ref delverGearX, "delverGearX", 1f);
             Scribe_Values.Look(ref hotZonesEnabled, "hotZonesEnabled", true);
             Scribe_Values.Look(ref recRoomFrequency, "recRoomFrequency", 1f);
             Scribe_Values.Look(ref secureRoomDensity, "secureRoomDensity", 1f);
@@ -307,14 +307,15 @@ namespace Site44
             }
 
             Section(list, "Treasure");
-            s.supply = Percent(list, "Food and medicine supply", s.supply, 0f, 1f,
-                "How often medicine and meals turn up in crates, caskets and on shelves, and how large their stacks are.\n0% is almost none; 100% is plentiful. Packed supplies from the starting kit are unaffected.");
+            s.supplyX = Multiplier(list, "Food and medicine supply", s.supplyX, 0f, 4f,
+                "How often medicine and meals turn up in crates, caskets and on shelves, and how large their stacks are.\nx0 = almost none, x1 = a quarter of the picks kept, x4 = plentiful. Packed supplies from the starting kit are unaffected.");
             s.lootAmount = Multiplier(list, "Loot amount", s.lootAmount, 0.1f, 3f,
                 "Scales the size of every loot stack in a complex: crates, caskets, storerooms and intact rooms.\nx1 is normal.");
             s.crateDensity = Multiplier(list, "Loot crate density", s.crateDensity, 0f, 3f,
                 "How many sealed hermetic crates are scattered through the ruins. They hold a few stacks of loot each.\nx0 = none, x1 = normal.");
-            s.preservedRoomChance = Percent(list, "Intact room chance", s.preservedRoomChance, 0f, 0.5f,
-                "Chance that an ordinary room survived intact: clean sterile floor, undamaged furniture and better loot.\nStorage, server and reactor wings always have at least one.");
+            s.preservedRoomX = Multiplier(list, "Intact rooms", s.preservedRoomX, 0f, 7f,
+                "Chance that an ordinary room survived intact: clean sterile floor, undamaged furniture and better loot.\nStorage, server and reactor wings always have at least one.
+x1 is normal.");
 
             Section(list, "People and containers");
             s.casketDensity = Multiplier(list, "Cryosleep caskets", s.casketDensity, 0f, 3f,
@@ -322,24 +323,27 @@ namespace Site44
             list.Label("Survivor caskets per complex:  " + s.survivorCaskets, -1f, new TipSignal(
                 "Caskets holding a friendly sleeper who joins you when opened. One stranded delver per complex keeps it believable."));
             s.survivorCaskets = Mathf.RoundToInt(list.Slider(s.survivorCaskets, 0, 3));
-            s.hostileCasketShare = Percent(list, "Hostile share of caskets", s.hostileCasketShare, 0f, 0.8f,
-                "Share of the remaining caskets that hold a hostile sleeper. They only appear deep inside, never near the entrance.");
-            s.strayCorpseChance = Percent(list, "Dried-out corpse chance (per room)", s.strayCorpseChance, 0f, 0.25f,
-                "Chance that a room holds the remains of an earlier scavenger, sometimes with their loot.");
+            s.hostileCasketX = Multiplier(list, "Hostile caskets", s.hostileCasketX, 0f, 3f,
+                "Share of the remaining caskets that hold a hostile sleeper. They only appear deep inside, never near the entrance.
+x1 is normal.");
+            s.strayCorpseX = Multiplier(list, "Dried-out corpses", s.strayCorpseX, 0f, 6f,
+                "Chance that a room holds the remains of an earlier scavenger, sometimes with their loot.
+x1 is normal.");
 
             Section(list, "Look");
             s.dustAmount = Multiplier(list, "Dust and debris", s.dustAmount, 0f, 2f,
                 "How much dust, trash and scattered paper covers the floors. x0 = spotless, x1 = normal.");
             s.propDensity = Multiplier(list, "Outdoor props", s.propDensity, 0f, 3f,
                 "Sandbags, barriers, silos, crates, planters and lamp posts scattered through the yards, different for each kind of complex.\nx0 = none, x1 = normal.");
-            s.ruinLevel = Percent(list, "Furniture damage", s.ruinLevel, 0f, 1f,
-                "How wrecked the furniture is. 0% = undamaged, 100% = barely holding together.");
+            s.ruinX = Multiplier(list, "Furniture damage", s.ruinX, 0f, 1.3f,
+                "How wrecked the furniture is. x0 = undamaged, x1 = normal, higher = barely holding together.");
 
             Section(list, "Layout and threats");
             list.CheckboxLabeled("Open layout (explore freely)", ref s.openLayout,
                 "On: every door is a plain door and the whole complex can be explored in any order.\nOff: sectors are sealed behind terminal gates and clearance levels.");
-            s.lockedVaultShare = Percent(list, "Locked vaults (open layout)", s.lockedVaultShare, 0f, 1f,
-                "In the open layout, the share of terminal gates that stay locked as optional vaults, opened by hacking a terminal.");
+            s.lockedVaultX = Multiplier(list, "Locked vaults (open layout)", s.lockedVaultX, 0f, 4f,
+                "In the open layout, the share of terminal gates that stay locked as optional vaults, opened by hacking a terminal.
+x1 is normal.");
             Section(list, "New game setup");
             list.CheckboxLabeled("Skip world and site selection", ref s.skipWorldSetup,
                 "The Site-44 scenarios use nothing from the world except the climate and biome, so a default world and a start tile are chosen for you. Turn off to use the ordinary world and landing-site pages. Not used when the Odyssey expansion is active.");
@@ -377,10 +381,12 @@ namespace Site44
                 "Colonists inside a complex stop being upset by ordinary corpses. Rotting corpses still bother them.");
             list.CheckboxLabeled("Starting kit (Breach scenario)", ref s.startingKit,
                 "Starting colonists begin fed and rested, in good spirits, with survival meals and focus tabs.");
-            s.drugFindChance = Percent(list, "Focus tabs in loot", s.drugFindChance, 0f, 0.5f,
-                "Chance that an ordinary loot item is a stack of focus tabs, a non-addictive stimulant that slows hunger and fatigue.");
-            s.delverGearChance = Percent(list, "Delver gear in rich loot", s.delverGearChance, 0f, 0.5f,
-                "Chance that a rich loot item is a delver's cap or vest, which lower the chance of mental breaks.");
+            s.drugFindX = Multiplier(list, "Focus tabs in loot", s.drugFindX, 0f, 3f,
+                "Chance that an ordinary loot item is a stack of focus tabs, a non-addictive stimulant that slows hunger and fatigue.
+x1 is normal.");
+            s.delverGearX = Multiplier(list, "Delver gear in rich loot", s.delverGearX, 0f, 4f,
+                "Chance that a rich loot item is a delver's cap or vest, which lower the chance of mental breaks.
+x1 is normal.");
             Section(list, "Hacking and security");
             list.Label("Puzzle difficulty:  " + new[] { "easy", "normal", "hard" }[Mathf.Clamp(s.puzzleDifficulty, 0, 2)], -1f, new TipSignal(
                 "Easy: two extra attempts and fewer decoys. Normal: four attempts, plus one per five skill levels. Hard: four attempts at most, more decoys and more look-alike words."));
@@ -392,10 +398,12 @@ namespace Site44
             list.CheckboxLabeled("Overheated sectors (gated layout only)", ref s.hotZonesEnabled,
                 "Some sectors in the gated layout are dangerously hot until the coolant valve is turned.");
 
-            s.keycardChance = Percent(list, "Keycard for a locked gate", s.keycardChance, 0f, 1f,
-                "Chance that a terminal-locked gate also has a keycard on the near side, usually guarded by a nest. A second way past the gate besides hacking.");
-            s.restrictedWingChance = Percent(list, "Clearance-gated wing", s.restrictedWingChance, 0f, 1f,
-                "Chance that a complex holds an advanced wing with better loot, behind a terminal that wants clearance. A badge or a granting node on the near side raises your clearance.");
+            s.keycardX = Multiplier(list, "Keycards for locked gates", s.keycardX, 0f, 2f,
+                "Chance that a terminal-locked gate also has a keycard on the near side, usually guarded by a nest. A second way past the gate besides hacking.
+x1 is normal.");
+            s.restrictedWingX = Multiplier(list, "Clearance-gated wings", s.restrictedWingX, 0f, 1.3f,
+                "Chance that a complex holds an advanced wing with better loot, behind a terminal that wants clearance. A badge or a granting node on the near side raises your clearance.
+x1 is normal.");
             s.nestDensity = Multiplier(list, "Creature nests", s.nestDensity, 0f, 3f,
                 "How many rooms are guarded by a hostile nest. x0 = none, x1 = normal.");
 

@@ -53,12 +53,12 @@ namespace Site44
 
         private static ThingDef PickLootOnce(bool rich)
         {
-            if (rich && Rand.Chance(Site44Settings.Current.delverGearChance))
+            if (rich && Rand.Chance(Site44Tuning.DelverGearChance))
             {
                 return Rand.Bool ? Site44MoraleDefOf.Site44_DelverCap : Site44MoraleDefOf.Site44_DelverVest;
             }
 
-            if (!rich && Rand.Chance(Site44Settings.Current.drugFindChance))
+            if (!rich && Rand.Chance(Site44Tuning.DrugFindChance))
             {
                 return Site44MoraleDefOf.Site44_FocusTab;
             }

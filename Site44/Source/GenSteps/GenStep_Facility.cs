@@ -82,7 +82,7 @@ namespace Site44
             plan = siteType != null
                 ? BuildingPlanner.Generate(width, height, planSeed, siteType.ToProfile())
                 : BuildingPlanner.Generate(width, height, planSeed);
-            FacilityGraph.RestrictedChancePercent = Mathf.RoundToInt(100f * Site44Settings.Current.restrictedWingChance);
+            FacilityGraph.RestrictedChancePercent = Mathf.RoundToInt(100f * Site44Tuning.RestrictedWingChance);
             graph = FacilityGraph.Build(plan, targetZones, graphSeed);
             faction = Site44Tuning.SecurityEnabled ? FacilityFaction.GetOrCreate() : null;
 

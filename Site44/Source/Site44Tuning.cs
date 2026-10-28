@@ -16,7 +16,7 @@ namespace Site44
         // Open layout: every door is a plain door and the whole complex can be explored freely. A share of the
         // gates stays locked behind terminals as optional vaults. Off = the gated progression layout.
         public static bool OpenLayout => S.openLayout;
-        public static float OpenLayoutLockedShare => S.lockedVaultShare;
+        public static float OpenLayoutLockedShare => Mathf.Clamp01(0.25f * S.lockedVaultX);
 
         // Turrets, patrol mechs and terminal alarms.
         public static bool SecurityEnabled => S.securityEnabled;
@@ -25,14 +25,20 @@ namespace Site44
         public static bool HotZonesEnabled => S.hotZonesEnabled;
 
         // Share of ordinary side rooms that survived intact: clean sterile floor, undamaged furniture, better loot.
-        public static float PreservedRoomChance => S.preservedRoomChance;
+        public static float PreservedRoomChance => Mathf.Clamp01(0.07f * S.preservedRoomX);
 
         // Multiplier on every loot stack placed in the complex.
         // Delve levels up to this depth avoid extreme climates when the biome pool allows.
         public const int MildLevels = 3;
 
         // Chance that a terminal-locked gate also has a keycard on the near side, and that the card is guarded by a nest.
-        public static float KeycardChance => S.keycardChance;
+        public static float KeycardChance => Mathf.Clamp01(0.5f * S.keycardX);
+
+        // Share of medicine and meal picks kept at x1 supply, and the bait item chances at x1.
+        public static float SupplyShare => Mathf.Clamp01(0.25f * S.supplyX);
+        public static float DrugFindChance => Mathf.Clamp01(0.15f * S.drugFindX);
+        public static float DelverGearChance => Mathf.Clamp01(0.12f * S.delverGearX);
+        public static float RestrictedWingChance => Mathf.Clamp01(0.75f * S.restrictedWingX);
         public const float KeycardNestChance = 0.7f;
 
         // Chance that a diagnostic or hatch node carries a bonus action.
@@ -49,12 +55,12 @@ namespace Site44
 
         public static bool KeepSupply(ThingDef def)
         {
-            return !IsConsumable(def) || Rand.Chance(S.supply);
+            return !IsConsumable(def) || Rand.Chance(SupplyShare);
         }
 
         public static int ScarceCount(ThingDef def, int count)
         {
-            return IsConsumable(def) ? Mathf.Min(count, 1 + Mathf.RoundToInt(8f * S.supply)) : count;
+            return IsConsumable(def) ? Mathf.Min(count, 1 + Mathf.RoundToInt(8f * SupplyShare)) : count;
         }
 
         public static float LootAmount => S.lootAmount * (GameComponent_Delve.Level?.LootMultiplier ?? 1f);
@@ -71,10 +77,10 @@ namespace Site44
         public static float CasketDensity => S.casketDensity * (T != null ? T.casketFactor : 1f);
         public const int RoomsPerCasket = 35;
         public static int SurvivorCaskets => S.survivorCaskets;
-        public static float HostileCasketShare => Mathf.Clamp01(S.hostileCasketShare + (GameComponent_Delve.Level?.HostileCasketBonus ?? 0f));
+        public static float HostileCasketShare => Mathf.Clamp01(0.25f * S.hostileCasketX + (GameComponent_Delve.Level?.HostileCasketBonus ?? 0f));
 
         // Share of rooms holding a dried-out corpse (with loot half the time).
-        public static float StrayCorpseChance => Mathf.Clamp01(S.strayCorpseChance * (T != null ? T.strayCorpseFactor : 1f));
+        public static float StrayCorpseChance => Mathf.Clamp01(0.04f * S.strayCorpseX * (T != null ? T.strayCorpseFactor : 1f));
 
         // Special rooms: rec rooms are uncommon; secure rooms are locked dead ends with one surprise each.
         public static float RecRoomFrequency => S.recRoomFrequency;
@@ -89,7 +95,7 @@ namespace Site44
         public const float OpenRoofShare = 0.3f;
 
         // Furniture hit points as a fraction of maximum in ruined rooms: ruin 0 is pristine, 1 is wrecked.
-        public static float RuinedFurnitureMinHealth => Mathf.Lerp(0.8f, 0.05f, S.ruinLevel);
-        public static float RuinedFurnitureMaxHealth => Mathf.Lerp(1.0f, 0.45f, S.ruinLevel);
+        public static float RuinedFurnitureMinHealth => Mathf.Lerp(0.8f, 0.05f, Mathf.Clamp01(0.75f * S.ruinX));
+        public static float RuinedFurnitureMaxHealth => Mathf.Lerp(1.0f, 0.45f, Mathf.Clamp01(0.75f * S.ruinX));
     }
 }

@@ -40,7 +40,7 @@ Goal: a first beta-quality build of Site-44 that a stranger can install, start, 
 1. End-to-end test of the real scenario path, plus a save and load test.
 2. A visible per-level goal readout.
 3. End-of-run summary: depth reached, best depth, what killed the party.
-4. A decision on facility security (see below).
+4. A threat budget per level, spent on creature nests and security sectors (done; tuning from play remains).
 5. First-time messages that explain the gate, terminals, keycards and clearance.
 6. The accessibility pass over every window.
 7. A balance pass over the first ten levels with the presets.
@@ -70,7 +70,6 @@ Goal: a first beta-quality build of Site-44 that a stranger can install, start, 
 
 ## Open decisions
 
-- Facility security: make it a core Delve hazard (on by default, scaled by depth, clearance calms it), or cut it for the beta.
 - Whether Breach and quest sites ship in the beta at all, or sit behind a setting.
 - How much story: a few terminal logs, or one authored arc per run.
 - Strip the enclave code now, or after the beta build is stable.

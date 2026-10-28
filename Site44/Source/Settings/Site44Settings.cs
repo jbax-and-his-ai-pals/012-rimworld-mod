@@ -39,7 +39,8 @@ namespace Site44
         // Layout and threats
         public bool openLayout = true;
         public float lockedVaultX = 1f;
-        public bool securityEnabled;
+        public int securityLevel = 2;                         // facility security: 0 off, 1 light, 2 normal, 3 heavy
+        public float dangerX = 1f;                            // how much danger each level is given to spend
         public bool hackMinigame = true;
         public int bestDelveDepth;
         public bool skipWorldSetup = true;
@@ -80,7 +81,7 @@ namespace Site44
             supplyX = d.supplyX; lootAmount = d.lootAmount; crateDensity = d.crateDensity; hostileCasketX = d.hostileCasketX;
             delveInfection = d.delveInfection; delveDescentCare = d.delveDescentCare; delveDescentRest = d.delveDescentRest; puzzleDifficulty = d.puzzleDifficulty;
             keycardX = d.keycardX; nestDensity = d.nestDensity; startingColonists = d.startingColonists;
-            drugFindX = d.drugFindX; securityEnabled = d.securityEnabled; missionFocusLevel = d.missionFocusLevel;
+            drugFindX = d.drugFindX; securityLevel = d.securityLevel; dangerX = d.dangerX; missionFocusLevel = d.missionFocusLevel;
             delveAllowRaids = d.delveAllowRaids; delveAllowCaravanEvents = d.delveAllowCaravanEvents; delveAllowOtherThreats = d.delveAllowOtherThreats;
             delveAllowOutsideVisitors = d.delveAllowOutsideVisitors; delveAllowWeather = d.delveAllowWeather;
             switch (preset)
@@ -88,23 +89,23 @@ namespace Site44
                 case 0:
                     supplyX = 2.4f; lootAmount = 1.3f; crateDensity = 1.3f; hostileCasketX = 0.4f;
                     delveInfection = 2; delveDescentCare = 2; puzzleDifficulty = 0; keycardX = 1.4f;
-                    nestDensity = 0.5f; startingColonists = 4; drugFindX = 1.7f; missionFocusLevel = 3;
+                    nestDensity = 0.5f; startingColonists = 4; securityLevel = 1; dangerX = 0.6f; drugFindX = 1.7f; missionFocusLevel = 3;
                     break;
                 case 2:
                     supplyX = 0.4f; lootAmount = 0.8f; crateDensity = 0.8f; hostileCasketX = 1.6f;
-                    delveInfection = 0; puzzleDifficulty = 2; keycardX = 0.6f; nestDensity = 1.5f; drugFindX = 0.7f;
+                    delveInfection = 0; puzzleDifficulty = 2; keycardX = 0.6f; nestDensity = 1.5f; drugFindX = 0.7f; dangerX = 1.4f;
                     break;
                 case 3:
                     supplyX = 0f; lootAmount = 0.6f; crateDensity = 0.6f; hostileCasketX = 2.2f;
                     delveInfection = 0; puzzleDifficulty = 2; keycardX = 0.3f; nestDensity = 2.2f; startingColonists = 2;
-                    drugFindX = 0.3f; securityEnabled = true; missionFocusLevel = 1;
+                    drugFindX = 0.3f; securityLevel = 3; dangerX = 1.8f; missionFocusLevel = 1;
                     break;
                 case 4:
                     // Not balanced to be won: a lone colonist, no medicine, vanilla infection, nests and sleepers everywhere,
                     // no keycards, and the outside world switched back on (raids, threats, weather).
                     supplyX = 0f; lootAmount = 0.4f; crateDensity = 0.4f; hostileCasketX = 3f;
                     delveInfection = 0; puzzleDifficulty = 2; keycardX = 0f; nestDensity = 3f; startingColonists = 1;
-                    drugFindX = 0f; securityEnabled = true; missionFocusLevel = 0;
+                    drugFindX = 0f; securityLevel = 3; dangerX = 2.5f; missionFocusLevel = 0;
                     delveAllowRaids = true; delveAllowOtherThreats = true; delveAllowWeather = true;
                     break;
             }
@@ -118,7 +119,7 @@ namespace Site44
             delveInfection = 0; delveDescentCare = 0; delveDescentRest = false;
             missionFocusLevel = 0; hardenedToBodies = false; startingKit = false;
             supplyX = 4f; drugFindX = 0f; delverGearX = 0f;
-            hackMinigame = false; securityEnabled = false; hotZonesEnabled = false;
+            hackMinigame = false; securityLevel = 0; hotZonesEnabled = false;
         }
 
         // Every setting back to its default, whatever has been added since (the best Delve depth is a record, so it stays).
@@ -156,7 +157,8 @@ namespace Site44
             Scribe_Values.Look(ref ruinX, "ruinX", 1f);
             Scribe_Values.Look(ref openLayout, "openLayout", true);
             Scribe_Values.Look(ref lockedVaultX, "lockedVaultX", 1f);
-            Scribe_Values.Look(ref securityEnabled, "securityEnabled");
+            Scribe_Values.Look(ref securityLevel, "securityLevel", 2);
+            Scribe_Values.Look(ref dangerX, "dangerX", 1f);
             Scribe_Values.Look(ref hackMinigame, "hackMinigame", true);
             Scribe_Values.Look(ref bestDelveDepth, "bestDelveDepth");
             Scribe_Values.Look(ref skipWorldSetup, "skipWorldSetup", true);

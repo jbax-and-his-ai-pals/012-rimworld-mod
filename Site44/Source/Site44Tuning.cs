@@ -19,7 +19,12 @@ namespace Site44
         public static float OpenLayoutLockedShare => Mathf.Clamp01(0.25f * S.lockedVaultX);
 
         // Turrets, patrol mechs and terminal alarms.
-        public static bool SecurityEnabled => S.securityEnabled;
+        public static bool SecurityEnabled => S.securityLevel > 0;
+
+        // Each level spends one budget of danger on nests and security (see ThreatBudget).
+        public static float DangerFactor => S.dangerX;
+        public static float SecurityWeight => new[] { 0f, 0.5f, 1f, 1.6f }[Mathf.Clamp(S.securityLevel, 0, 3)];
+        public static float AlarmChance => new[] { 0f, 0.15f, 0.35f, 0.5f }[Mathf.Clamp(S.securityLevel, 0, 3)];
 
         // Overheated sectors in the gated layout.
         public static bool HotZonesEnabled => S.hotZonesEnabled;

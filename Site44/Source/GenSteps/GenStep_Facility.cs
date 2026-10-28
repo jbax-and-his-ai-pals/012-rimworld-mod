@@ -31,6 +31,10 @@ namespace Site44
         private string containerSummary = "";
         private string propSummary = "";
         private readonly HashSet<Pawn> ownedHostiles = new HashSet<Pawn>();
+        private readonly Dictionary<int, int> securityTiers = new Dictionary<int, int>();   // security zone id -> tier of its guard group
+        private readonly List<ThreatPick> nestPicks = new List<ThreatPick>();
+        private readonly HashSet<int> nestRooms = new HashSet<int>();
+        private int threatDepth = 1;
         private int waterFlattened;
         private PlanRoom welcomeRoom;
         private readonly HashSet<int> executiveRooms = new HashSet<int>();
@@ -64,6 +68,9 @@ namespace Site44
             executiveRooms.Clear();
             secureRooms.Clear();
             ownedHostiles.Clear();
+            securityTiers.Clear();
+            nestPicks.Clear();
+            nestRooms.Clear();
             foyers.Clear();
             welcomePos = IntVec3.Invalid;
             recRoomCount = 0;
@@ -113,6 +120,7 @@ namespace Site44
                 SurroundWithRock();
             }
 
+            BuildThreatPlan();
             foreach (Zone zone in graph.Zones)
             {
                 BuildZone(zone);
@@ -120,6 +128,7 @@ namespace Site44
 
             PlaceContainers();
             PlaceExtraction();
+            PlaceInsiderSource();
             PopulateSecureRooms();
             MarkEntrances();
             PlaceDoorMarkers();
@@ -1732,7 +1741,7 @@ namespace Site44
                 BeatChance = Site44Tuning.BeatChance,
                 CasketWeight = 14f * Mathf.Max(0f, Site44Tuning.CasketDensity),
                 StashWeight = 15f * Mathf.Max(0f, Site44Tuning.StrayCorpseChance / 0.15f),
-                NestWeight = 12f * Mathf.Max(0f, Site44Settings.Current.nestDensity)
+                NestWeight = 0f   // nests come from the threat budget
             };
             RoomBeat[] beats = RoomBeats.Plan(Rand.Int, beatRooms, startRoom, settings);
 
@@ -1777,6 +1786,20 @@ namespace Site44
                             nests++;
                         }
                         break;
+                }
+            }
+
+            // The budget's nests, each with the loot it guards: more dangerous nests guard better loot.
+            foreach (ThreatPick pick in nestPicks)
+            {
+                PlanRoom nestRoom = plan.Rooms[pick.SiteId];
+                if (SpawnNest(nestRoom, pick.Tier))
+                {
+                    nests++;
+                    if (Rand.Chance(new[] { 0.6f, 0.85f, 1f }[Mathf.Clamp(pick.Tier, 1, 3) - 1]) && containers.TrySpawnCrate(nestRoom, pick.Tier >= 2, true))
+                    {
+                        crates++;
+                    }
                 }
             }
 
@@ -1864,22 +1887,21 @@ namespace Site44
         private static readonly string[] SmallCritters = { "Megascarab" };
 
         // A pack of hostile creatures that attack what they see. They are ours, so the start sweep leaves them alone.
-        private bool SpawnNest(PlanRoom room, int zoneDepth)
+        private bool SpawnNest(PlanRoom room, int tier)
         {
             if (Faction.OfInsects == null)
             {
                 return false;
             }
 
-            int delveDepth = GameComponent_Delve.IsDelve ? (GameComponent_Delve.Instance?.depth ?? 1) : 1;
             List<string> kinds = new List<string>();
-            int count = Rand.RangeInclusive(2, 3);
+            int count = tier <= 1 ? 2 : Rand.RangeInclusive(2, 3);
             for (int i = 0; i < count; i++)
             {
-                kinds.Add(delveDepth >= 2 && Rand.Chance(0.4f) ? "Spelopede" : "Megascarab");
+                kinds.Add(tier >= 2 && Rand.Chance(0.4f) ? "Spelopede" : "Megascarab");
             }
 
-            if (delveDepth >= 3 && Rand.Chance(0.3f))
+            if (tier >= 3 && Rand.Chance(0.5f))
             {
                 kinds.Add("Megaspider");
             }
@@ -2167,7 +2189,21 @@ namespace Site44
         // or a diagnostic node that grants the rung once solved.
         private void PlaceClearanceSource(Zone wing, Zone parent, List<PlanRoom> rooms, int gateRoomId)
         {
-            List<PlanRoom> options = rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 9 && r.Id != gateRoomId && !IsEntryRoom(r)).ToList();
+            if (TryPlaceTierSource(wing.RequiredTier, "wing " + wing.Id, rooms, gateRoomId))
+            {
+                return;
+            }
+
+            Log.Warning("[Site-44] no source of clearance found for wing " + wing.Id + "; opening its gate.");
+            map.GetComponent<MapComponent_Facility>().UnsealSector(wing.Id.ToString());
+            wing.Restricted = false;
+            wing.RequiredTier = 0;
+        }
+
+        // A badge lying in a room (often guarded), or a diagnostic node that grants the rung once solved.
+        private bool TryPlaceTierSource(int tier, string label, List<PlanRoom> rooms, int excludeRoomId)
+        {
+            List<PlanRoom> options = rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 9 && r.Id != excludeRoomId && !IsEntryRoom(r)).ToList();
             options.Shuffle();
             bool badge = Rand.Chance(0.5f);
             ThingDef badgeDef = DefDatabase<ThingDef>.GetNamedSilentFail("Site44_ClearanceBadge");
@@ -2178,29 +2214,58 @@ namespace Site44
                 if (badge && badgeDef != null && TryFindFreeCell(room, out cell))
                 {
                     Thing_ClearanceBadge item = (Thing_ClearanceBadge)ThingMaker.MakeThing(badgeDef);
-                    item.tier = wing.RequiredTier;
+                    item.tier = tier;
                     item.mapId = map.uniqueID;
                     GenSpawn.Spawn(item, cell, map);
-                    bool guarded = Site44Settings.Current.nestDensity > 0f && Rand.Chance(Site44Tuning.KeycardNestChance) && SpawnNest(room, parent.Depth);
-                    Log.Message("[Site-44] clearance badge (tier " + wing.RequiredTier + ") for wing " + wing.Id + " in room " + room.Id + (guarded ? ", guarded." : "."));
-                    return;
+                    bool guarded = Site44Settings.Current.nestDensity > 0f && Rand.Chance(Site44Tuning.KeycardNestChance) && SpawnNest(room, GuardNestTier());
+                    Log.Message("[Site-44] clearance badge (tier " + tier + ") for " + label + " in room " + room.Id + (guarded ? ", guarded." : "."));
+                    return true;
                 }
 
                 IntVec3 spot;
                 if (!badge && nodeDef != null && TryFindSpotInRoom(room, nodeDef.size, out spot))
                 {
                     Building_FacilityTerminal node = SpawnConsole(nodeDef, spot, TerminalKind.Diagnostic);
-                    node.grantTier = wing.RequiredTier;
+                    node.grantTier = tier;
                     node.extra = NodeExtra.None;
-                    Log.Message("[Site-44] clearance node (tier " + wing.RequiredTier + ") for wing " + wing.Id + " in room " + room.Id + ".");
-                    return;
+                    Log.Message("[Site-44] clearance node (tier " + tier + ") for " + label + " in room " + room.Id + ".");
+                    return true;
                 }
             }
 
-            Log.Warning("[Site-44] no source of clearance found for wing " + wing.Id + "; opening its gate.");
-            map.GetComponent<MapComponent_Facility>().UnsealSector(wing.Id.ToString());
-            wing.Restricted = false;
-            wing.RequiredTier = 0;
+            return false;
+        }
+
+        // With security on, there is always a way to be recognised as staff: a badge or node in a room the party can reach
+        // without opening a locked gate.
+        private void PlaceInsiderSource()
+        {
+            if (securityTiers.Count == 0)
+            {
+                return;
+            }
+
+            System.Func<Zone, bool> reachable = zone =>
+            {
+                for (Zone current = zone; current.ParentId >= 0; current = graph.Zones[current.ParentId])
+                {
+                    if (lockedGateZones.Contains(current.Id))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            };
+            List<PlanRoom> rooms = plan.Rooms.Where(r =>
+            {
+                Zone zone = graph.Zones[graph.ZoneOfRoom(r.Id)];
+                return !r.IsCorridor && zone.Kind != SectorKind.Security && !zone.Restricted && reachable(zone) && !nestRooms.Contains(r.Id);
+            }).ToList();
+            if (!TryPlaceTierSource(FacilityFaction.AllyTier, "the security network", rooms, -1))
+            {
+                Log.Warning("[Site-44] no room found for a staff clearance source.");
+            }
         }
 
         private void PlaceKeycard(Zone gated, Zone parent, List<PlanRoom> rooms, int gateRoomId)
@@ -2225,7 +2290,7 @@ namespace Site44
                 card.sectorId = gated.Id.ToString();
                 card.mapId = map.uniqueID;
                 GenSpawn.Spawn(card, cell, map);
-                bool guarded = Site44Settings.Current.nestDensity > 0f && Rand.Chance(Site44Tuning.KeycardNestChance) && SpawnNest(room, parent.Depth);
+                bool guarded = Site44Settings.Current.nestDensity > 0f && Rand.Chance(Site44Tuning.KeycardNestChance) && SpawnNest(room, GuardNestTier());
                 Log.Message("[Site-44] keycard for sector " + gated.Id + " in room " + room.Id + (guarded ? ", guarded." : "."));
                 return;
             }
@@ -2417,9 +2482,123 @@ namespace Site44
             }
         }
 
+        // ----- threat budget -----
+
+        private int StartRoomId()
+        {
+            foreach (PlanLink link in plan.Links)
+            {
+                if (link.Cell.X == plan.MainEntrance.X && link.Cell.Y == plan.MainEntrance.Y)
+                {
+                    return link.RoomA >= 0 ? link.RoomA : Mathf.Max(0, link.RoomB);
+                }
+            }
+
+            return 0;
+        }
+
+        // One budget of danger per level, spent on creature nests and security sectors (see ThreatBudget). The sites are chosen
+        // by rules: nowhere near the arrival, never next to each other, never in the secure rooms.
+        private void BuildThreatPlan()
+        {
+            Site44Settings settings = Site44Settings.Current;
+            threatDepth = GameComponent_Delve.IsDelve ? Mathf.Max(1, GameComponent_Delve.Instance != null ? GameComponent_Delve.Instance.depth : 1) : 1;
+
+            Dictionary<int, int> hops = new Dictionary<int, int>();
+            Queue<int> queue = new Queue<int>();
+            int start = StartRoomId();
+            hops[start] = 0;
+            queue.Enqueue(start);
+            while (queue.Count > 0)
+            {
+                int current = queue.Dequeue();
+                foreach (PlanLink link in plan.Links)
+                {
+                    int other = link.RoomA == current ? link.RoomB : link.RoomB == current ? link.RoomA : -1;
+                    if (other >= 0 && !hops.ContainsKey(other))
+                    {
+                        hops[other] = hops[current] + 1;
+                        queue.Enqueue(other);
+                    }
+                }
+            }
+
+            HashSet<int> secureIds = new HashSet<int>(secureRooms.Select(v => v.room.Id).Concat(secureRooms.Select(v => v.outer.Id)));
+            Dictionary<int, ThreatSite> nestSites = new Dictionary<int, ThreatSite>();
+            foreach (PlanRoom room in plan.Rooms)
+            {
+                Zone zone = graph.Zones[graph.ZoneOfRoom(room.Id)];
+                int roomHops;
+                if (room.IsCorridor || room.Cells.Count < 9 || IsEntryRoom(room) || secureIds.Contains(room.Id) || zone.Kind == SectorKind.Security
+                    || !hops.TryGetValue(room.Id, out roomHops) || roomHops < 4)
+                {
+                    continue;
+                }
+
+                nestSites[room.Id] = new ThreatSite { Id = room.Id, ZoneId = zone.Id, Kind = ThreatKind.Nest };
+            }
+
+            foreach (PlanLink link in plan.Links)
+            {
+                ThreatSite a, b;
+                if (link.RoomA >= 0 && link.RoomB >= 0 && nestSites.TryGetValue(link.RoomA, out a) && nestSites.TryGetValue(link.RoomB, out b))
+                {
+                    a.Neighbours.Add(b.Id);
+                    b.Neighbours.Add(a.Id);
+                }
+            }
+
+            List<ThreatSite> sites = nestSites.Values.ToList();
+            if (Site44Tuning.SecurityEnabled && faction != null)
+            {
+                foreach (Zone zone in graph.Zones.Where(z => z.Kind == SectorKind.Security))
+                {
+                    PlanRoom main = RoomsOf(zone).Where(r => !r.IsCorridor).OrderByDescending(r => r.Cells.Count).FirstOrDefault();
+                    int mainHops;
+                    if (main != null && hops.TryGetValue(main.Id, out mainHops) && mainHops >= 3)
+                    {
+                        sites.Add(new ThreatSite { Id = zone.Id, ZoneId = zone.Id, Kind = ThreatKind.Security });
+                    }
+                }
+            }
+
+            int roomCount = plan.Rooms.Count(r => !r.IsCorridor);
+            ThreatSettings threat = new ThreatSettings
+            {
+                Depth = threatDepth,
+                Budget = ThreatBudget.BudgetFor(threatDepth, roomCount, Site44Tuning.DangerFactor),
+                NestWeight = settings.nestDensity,
+                SecurityWeight = Site44Tuning.SecurityWeight
+            };
+            List<ThreatPick> picks = ThreatBudget.Plan(Rand.Int, sites, threat);
+            foreach (ThreatPick pick in picks)
+            {
+                if (pick.Kind == ThreatKind.Security)
+                {
+                    securityTiers[pick.SiteId] = pick.Tier;
+                }
+                else
+                {
+                    nestPicks.Add(pick);
+                    nestRooms.Add(pick.SiteId);
+                }
+            }
+
+            Log.Message("[Site-44] threat: depth " + threatDepth + ", " + roomCount + " rooms, danger " + Mathf.RoundToInt(Site44Tuning.DangerFactor * 100f) + "%, budget "
+                        + threat.Budget.ToString("0.0") + ", spent " + picks.Sum(p => p.Cost).ToString("0.0") + " on " + securityTiers.Count + " security sector(s) and "
+                        + nestPicks.Count + " nest(s) from " + sites.Count(x => x.Kind == ThreatKind.Security) + " and " + nestSites.Count + " possible sites.");
+        }
+
+        // Nests that guard a keycard or badge sit outside the budget and follow the depth.
+        private int GuardNestTier()
+        {
+            return Mathf.Min(2, ThreatBudget.NestTierCap(threatDepth));
+        }
+
         private void SpawnSecurity(List<PlanRoom> rooms, Zone zone, PlanRoom main)
         {
-            if (!Site44Tuning.SecurityEnabled || faction == null)
+            int tier;
+            if (!Site44Tuning.SecurityEnabled || faction == null || !securityTiers.TryGetValue(zone.Id, out tier))
             {
                 return;
             }
@@ -2427,7 +2606,7 @@ namespace Site44
             MapComponent_Facility facilityComp = map.GetComponent<MapComponent_Facility>();
             SecurityGroup group = new SecurityGroup { id = facilityComp.securityGroups.Count + 1 };
             facilityComp.securityGroups.Add(group);
-            int turrets = Mathf.Clamp(2 + zone.Depth / 3, 2, 6);
+            int turrets = new[] { 2, 3, 4, 5 }[Mathf.Clamp(tier, 1, 4) - 1];
             for (int i = 0; i < turrets; i++)
             {
                 IntVec3 cell;
@@ -2443,7 +2622,7 @@ namespace Site44
             }
 
             List<Pawn> mechs = new List<Pawn>();
-            foreach (string kindName in FacilityMechs.SquadFor(zone.Depth))
+            foreach (string kindName in FacilityMechs.SquadFor(new[] { 1, 4, 7, 10 }[Mathf.Clamp(tier, 1, 4) - 1]))
             {
                 Pawn mech = FacilityMechs.Make(kindName, faction);
                 IntVec3 cell;
@@ -2452,6 +2631,7 @@ namespace Site44
                     GenSpawn.Spawn(mech, cell, map);
                     mechs.Add(mech);
                     group.droids.Add(mech);
+                    ownedHostiles.Add(mech);
                 }
             }
 
@@ -2465,6 +2645,11 @@ namespace Site44
             {
                 SpawnConsole(Site44DefOf.Site44_Terminal, consoleSpot, TerminalKind.Security).groupId = group.id;
             }
+
+            Log.Message("[Site-44] security sector " + zone.Id + ": tier " + tier + ", " + group.turrets.Count + " turret(s), " + group.droids.Count + " mechanoid(s).");
+
+            // A guarded sector holds something worth the risk.
+            new FacilityContainers(map, plan, origin, IsFree).TrySpawnCrate(main, tier >= 2, true);
         }
 
         // Delve mode: an extraction gate and its terminal in the room farthest from the start.
@@ -2485,7 +2670,8 @@ namespace Site44
 
             // Quick test: the nearest suitable room instead of the farthest, and the gate starts unlocked.
             bool quick = GameComponent_Delve.QuickTest;
-            IEnumerable<PlanRoom> candidates = plan.Rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 12 && !IsEntryRoom(r) && !graph.Zones[graph.ZoneOfRoom(r.Id)].Restricted);
+            IEnumerable<PlanRoom> candidates = plan.Rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 12 && !IsEntryRoom(r) && !graph.Zones[graph.ZoneOfRoom(r.Id)].Restricted
+                                                         && !nestRooms.Contains(r.Id) && graph.Zones[graph.ZoneOfRoom(r.Id)].Kind != SectorKind.Security);
             if (!candidates.Any(r => TryFindSpotInRoom(r, Site44DefOf.Site44_ExtractionGate.size, out IntVec3 probe)))
             {
                 candidates = plan.Rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 12);

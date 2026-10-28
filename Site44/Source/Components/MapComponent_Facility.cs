@@ -12,11 +12,11 @@ namespace Site44
         private const int HeatCadenceTicks = 150;
         private const float HotZoneTemperature = 90f;
         private const float SafeTemperature = 21f;
-        private const float AlarmChance = 0.35f;
 
         public int clearance;
         public string siteTypeDefName;   // which kind of complex this is; names the insider clearance rung
         public IntVec3 startCell = IntVec3.Invalid;
+        public bool securityAnnounced;
         public bool coolantLoopDiverted;
         public bool mainReactorOnline;
         public float facilityAiIntegrity = 1f;
@@ -160,7 +160,7 @@ namespace Site44
 
         public void MaybeTriggerAlarm(IntVec3 near)
         {
-            if (Site44Tuning.SecurityEnabled && Rand.Value < AlarmChance)
+            if (Site44Tuning.SecurityEnabled && Rand.Value < Site44Tuning.AlarmChance)
             {
                 TriggerAlarm(near, 2 + Tier * 2);
             }
@@ -205,6 +205,7 @@ namespace Site44
             if (IsFacilityMap && Find.TickManager.TicksGame % 60 == 0)
             {
                 ScanBadges();
+                AnnounceSecurity();
             }
 
             if (!IsFacilityMap || coolantLoopDiverted || !Site44Tuning.HotZonesEnabled)
@@ -214,6 +215,28 @@ namespace Site44
             if (Find.TickManager.TicksGame % HeatCadenceTicks == 0)
             {
                 ApplyHeat(HotZoneTemperature);
+            }
+        }
+
+        // The first time a colonist comes near the facility's defences, say what they are and how to stand them down.
+        private void AnnounceSecurity()
+        {
+            if (securityAnnounced || securityGroups.Count == 0 || Tier >= FacilityFaction.AllyTier)
+            {
+                return;
+            }
+
+            foreach (SecurityGroup group in securityGroups)
+            {
+                foreach (Thing turret in group.turrets)
+                {
+                    if (turret != null && turret.Spawned && map.mapPawns.FreeColonistsSpawned.Any(p => p.Position.DistanceTo(turret.Position) <= 30f))
+                    {
+                        securityAnnounced = true;
+                        Find.LetterStack.ReceiveLetter("Defences active", "This complex's defences are awake. A security terminal can take them over or shut them down, and higher clearance makes the facility treat the party as staff.", LetterDefOf.NeutralEvent, new LookTargets(turret));
+                        return;
+                    }
+                }
             }
         }
 
@@ -257,6 +280,7 @@ namespace Site44
         {
             base.ExposeData();
             Scribe_Values.Look(ref clearance, "clearance");
+            Scribe_Values.Look(ref securityAnnounced, "securityAnnounced");
             Scribe_Values.Look(ref siteTypeDefName, "siteTypeDefName");
             Scribe_Values.Look(ref startCell, "startCell", IntVec3.Invalid);
             Scribe_Values.Look(ref announcedTier, "announcedTier");

@@ -119,6 +119,15 @@ namespace Site44
                 status = "Idle: " + KindLabel() + ".";
             }
 
+            if (!used && (kind == TerminalKind.Gate || kind == TerminalKind.Diagnostic) && Map != null)
+            {
+                MapComponent_Facility facility = Map.GetComponent<MapComponent_Facility>();
+                if (facility != null && facility.securityGroups.Count > 0 && facility.Tier < FacilityFaction.AllyTier)
+                {
+                    status += " Hacking here may raise the alarm.";
+                }
+            }
+
             return text.NullOrEmpty() ? status : text + "\n" + status;
         }
 

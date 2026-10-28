@@ -304,7 +304,7 @@ namespace Site44
         private static readonly string[] PresetFields =
         {
             "supplyX", "lootAmount", "crateDensity", "hostileCasketX", "delveInfection", "delveDescentCare", "delveDescentRest", "puzzleDifficulty",
-            "keycardX", "nestDensity", "startingColonists", "drugFindX", "securityEnabled", "missionFocusLevel",
+            "keycardX", "nestDensity", "startingColonists", "drugFindX", "securityLevel", "dangerX", "missionFocusLevel",
             "delveAllowRaids", "delveAllowCaravanEvents", "delveAllowOtherThreats", "delveAllowOutsideVisitors", "delveAllowWeather"
         };
 
@@ -312,7 +312,7 @@ namespace Site44
         {
             "delveAllowRaids", "delveAllowCaravanEvents", "delveAllowOtherThreats", "delveAllowOutsideVisitors", "delveAllowWeather",
             "delveInfection", "delveDescentCare", "delveDescentRest", "missionFocusLevel", "hardenedToBodies", "startingKit", "supplyX", "drugFindX",
-            "delverGearX", "hackMinigame", "securityEnabled", "hotZonesEnabled"
+            "delverGearX", "hackMinigame", "securityLevel", "hotZonesEnabled"
         };
 
         private static bool Same(Site44Settings a, Site44Settings b, string[] names)
@@ -464,9 +464,11 @@ namespace Site44
                     () => S.keycardX, v => S.keycardX = v, 2f, null, false, () => "About " + Pct(Site44Tuning.KeycardChance) + " of locked gates."),
                 Mult("Clearance-gated wings", "Chance that a complex holds an advanced wing with better loot, behind a terminal that wants clearance. A badge or a granting node on the near side raises your clearance.",
                     () => S.restrictedWingX, v => S.restrictedWingX = v, 1.3f, null, false, () => "About " + Pct(Site44Tuning.RestrictedWingChance) + " of complexes."),
-                Mult("Creature nests", "How many rooms are guarded by a hostile nest. 0% = none.", () => S.nestDensity, v => S.nestDensity = v, 3f),
-                Toggle("Facility security (experimental)", "Turrets, patrol mechanoids and alarm squads inside the complex. Off by default so the first exploration is safe.",
-                    () => S.securityEnabled, v => S.securityEnabled = v, false),
+                Mult("Creature nests", "How much of each level's danger is spent on creature nests.", () => S.nestDensity, v => S.nestDensity = v, 3f),
+                Mult("Danger", "How much danger each level is given to spend on creature nests and security.",
+                    () => S.dangerX, v => S.dangerX = v, 3f),
+                Choice("Facility security", "Turrets and mechanoid guards in security sectors; a security terminal or staff clearance stands them down.",
+                    () => S.securityLevel, v => S.securityLevel = v, 2, new[] { "off", "light", "normal", "heavy" }),
                 Toggle("Open layout (explore freely)", "On: every door is a plain door and the whole complex can be explored in any order.\nOff: sectors are sealed behind terminal gates and clearance levels.",
                     () => S.openLayout, v => S.openLayout = v, true),
                 Mult("Locked vaults", "In the open layout, the share of terminal gates that stay locked as optional vaults, opened by hacking a terminal.",
@@ -530,9 +532,9 @@ namespace Site44
                 new Section { Title = "Loot and supplies", Subtitle = "", Rows = pick(new[] {
                     "Food and medicine supply", "Number of loot crates", "Loot stack size", "Focus tabs in loot", "Delver gear in rich loot", "Intact rooms" }) },
                 new Section { Title = "Creatures and survivors", Subtitle = "", Rows = pick(new[] {
-                    "Creature nests", "Cryosleep caskets", "Survivor caskets per complex", "Hostile caskets", "Dried-out corpses" }) },
+                    "Cryosleep caskets", "Survivor caskets per complex", "Hostile caskets", "Dried-out corpses" }) },
                 new Section { Title = "Hazards and security", Subtitle = "", Rows = pick(new[] {
-                    "Facility security (experimental)", "Overheated sectors", "Prototype droid guards" }) },
+                    "Danger", "Creature nests", "Facility security", "Overheated sectors", "Prototype droid guards" }) },
                 new Section { Title = "Hacking, keys and clearance", Subtitle = "", Rows = pick(new[] {
                     "Cipher-lock hacking", "Puzzle difficulty", "Keycards for locked gates", "Clearance-gated wings", "Secure rooms" }) },
                 new Section { Title = "Complexes and sizes", Subtitle = "", Rows = pick(new[] {
@@ -841,9 +843,15 @@ namespace Site44
                 score += S.startingColonists <= 2 ? 3 : 1;
             }
 
-            if (S.securityEnabled)
+            if (S.securityLevel >= 3)
             {
                 score += 1;
+            }
+
+            if (S.dangerX >= 2f)
+            {
+                reasons.Add("Danger is set very high.");
+                score += 2;
             }
 
             if (S.hostileCasketX >= 2f)

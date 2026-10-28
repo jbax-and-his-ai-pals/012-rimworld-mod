@@ -46,7 +46,7 @@ namespace Site44
         // Loot comes from the current site type's table when it has one, else the built-in table.
         private static ThingDef PickLoot(bool rich)
         {
-            // A medicine or meal pick that fails the scarcity roll is simply a stack fewer, not swapped for something else.
+            // A medicine or meal pick that fails the supply roll is simply a stack fewer, not swapped for something else.
             ThingDef pick = PickLootOnce(rich);
             return Site44Tuning.KeepSupply(pick) ? pick : null;
         }

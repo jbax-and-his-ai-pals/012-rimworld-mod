@@ -20,7 +20,7 @@ namespace Site44
         public float nestDensity = 1f;
         public bool delveDressWounds;                         // the lift dresses wounds on the way down (off by default)
         public int delveInfection = 1;                        // wound infection in Delve: 0 vanilla, 1 reduced, 2 none
-        public float scarcity = 0.75f;                        // how rarely medicine and meals turn up, and how small the stacks are
+        public float supply = 0.25f;                          // how often medicine and meals turn up, and how large the stacks are (1 = plentiful)
         public float crateDensity = 1f;
         public float preservedRoomChance = 0.07f;
 
@@ -75,23 +75,23 @@ namespace Site44
         public void ApplyPreset(int preset)
         {
             Site44Settings d = new Site44Settings();
-            scarcity = d.scarcity; lootAmount = d.lootAmount; crateDensity = d.crateDensity; hostileCasketShare = d.hostileCasketShare;
+            supply = d.supply; lootAmount = d.lootAmount; crateDensity = d.crateDensity; hostileCasketShare = d.hostileCasketShare;
             delveInfection = d.delveInfection; delveDressWounds = d.delveDressWounds; puzzleDifficulty = d.puzzleDifficulty;
             keycardChance = d.keycardChance; nestDensity = d.nestDensity; startingColonists = d.startingColonists;
             drugFindChance = d.drugFindChance; securityEnabled = d.securityEnabled; missionFocusLevel = d.missionFocusLevel;
             switch (preset)
             {
                 case 0:
-                    scarcity = 0.4f; lootAmount = 1.3f; crateDensity = 1.3f; hostileCasketShare = 0.1f;
+                    supply = 0.6f; lootAmount = 1.3f; crateDensity = 1.3f; hostileCasketShare = 0.1f;
                     delveInfection = 2; delveDressWounds = true; puzzleDifficulty = 0; keycardChance = 0.7f;
                     nestDensity = 0.5f; startingColonists = 4; drugFindChance = 0.25f; missionFocusLevel = 3;
                     break;
                 case 2:
-                    scarcity = 0.9f; lootAmount = 0.8f; crateDensity = 0.8f; hostileCasketShare = 0.4f;
+                    supply = 0.1f; lootAmount = 0.8f; crateDensity = 0.8f; hostileCasketShare = 0.4f;
                     delveInfection = 0; puzzleDifficulty = 2; keycardChance = 0.3f; nestDensity = 1.5f; drugFindChance = 0.1f;
                     break;
                 case 3:
-                    scarcity = 1f; lootAmount = 0.6f; crateDensity = 0.6f; hostileCasketShare = 0.55f;
+                    supply = 0f; lootAmount = 0.6f; crateDensity = 0.6f; hostileCasketShare = 0.55f;
                     delveInfection = 0; puzzleDifficulty = 2; keycardChance = 0.15f; nestDensity = 2.2f; startingColonists = 2;
                     drugFindChance = 0.05f; securityEnabled = true; missionFocusLevel = 1;
                     break;
@@ -105,7 +105,7 @@ namespace Site44
             delveNoRaids = false; delveNoCaravanEvents = false; delveNoOtherThreats = false; delveNoOutsideVisitors = false; delveNoWeather = false;
             delveInfection = 0; delveDressWounds = false;
             missionFocusLevel = 0; hardenedToBodies = false; startingKit = false;
-            scarcity = 0f; drugFindChance = 0f; delverGearChance = 0f;
+            supply = 1f; drugFindChance = 0f; delverGearChance = 0f;
             hackMinigame = false; securityEnabled = false; hotZonesEnabled = false;
         }
 
@@ -113,7 +113,7 @@ namespace Site44
         {
             Site44Settings defaults = new Site44Settings();
             lootAmount = defaults.lootAmount;
-            scarcity = defaults.scarcity;
+            supply = defaults.supply;
             delveInfection = defaults.delveInfection;
             delveDressWounds = defaults.delveDressWounds;
             startingColonists = defaults.startingColonists;
@@ -156,7 +156,7 @@ namespace Site44
         public override void ExposeData()
         {
             Scribe_Values.Look(ref lootAmount, "lootAmount", 1f);
-            Scribe_Values.Look(ref scarcity, "scarcity", 0.75f);
+            Scribe_Values.Look(ref supply, "supply", 0.25f);
             Scribe_Values.Look(ref delveInfection, "delveInfection", 1);
             Scribe_Values.Look(ref delveDressWounds, "delveDressWounds");
             Scribe_Values.Look(ref startingColonists, "startingColonists", 3);
@@ -293,7 +293,7 @@ namespace Site44
             for (int i = 0; i < Site44Settings.PresetNames.Length; i++)
             {
                 Rect button = new Rect(presetRow.x + i * buttonWidth + 2f, presetRow.y, buttonWidth - 4f, presetRow.height);
-                TooltipHandler.TipRegion(button, "Sets loot, scarcity, infection, puzzles, keycards, nests and party size to the " + Site44Settings.PresetNames[i].ToLower()
+                TooltipHandler.TipRegion(button, "Sets loot, supplies, infection, puzzles, keycards, nests and party size to the " + Site44Settings.PresetNames[i].ToLower()
                                                   + " preset. Sizes, biomes and scenario choices are kept. Adjust anything afterwards.");
                 if (Widgets.ButtonText(button, Site44Settings.PresetNames[i]))
                 {
@@ -307,8 +307,8 @@ namespace Site44
             }
 
             Section(list, "Treasure");
-            s.scarcity = Multiplier(list, "Food and medicine scarcity", s.scarcity, 0f, 1f,
-                "How rare medicine and meals are in crates, caskets and on shelves, and how small their stacks are.\n0% is generous; 100% is almost none. Packed supplies from the starting kit are unaffected.");
+            s.supply = Percent(list, "Food and medicine supply", s.supply, 0f, 1f,
+                "How often medicine and meals turn up in crates, caskets and on shelves, and how large their stacks are.\n0% is almost none; 100% is plentiful. Packed supplies from the starting kit are unaffected.");
             s.lootAmount = Multiplier(list, "Loot amount", s.lootAmount, 0.1f, 3f,
                 "Scales the size of every loot stack in a complex: crates, caskets, storerooms and intact rooms.\nx1 is normal.");
             s.crateDensity = Multiplier(list, "Loot crate density", s.crateDensity, 0f, 3f,

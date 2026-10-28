@@ -49,12 +49,12 @@ namespace Site44
 
         public static bool KeepSupply(ThingDef def)
         {
-            return !IsConsumable(def) || Rand.Chance(1f - S.scarcity);
+            return !IsConsumable(def) || Rand.Chance(S.supply);
         }
 
         public static int ScarceCount(ThingDef def, int count)
         {
-            return IsConsumable(def) ? Mathf.Min(count, 1 + Mathf.RoundToInt(8f * (1f - S.scarcity))) : count;
+            return IsConsumable(def) ? Mathf.Min(count, 1 + Mathf.RoundToInt(8f * S.supply)) : count;
         }
 
         public static float LootAmount => S.lootAmount * (GameComponent_Delve.Level?.LootMultiplier ?? 1f);

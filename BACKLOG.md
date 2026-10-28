@@ -68,7 +68,7 @@ Loot amount, crate density, casket density, survivor casket count, hostile caske
 
 ## Pacing and engagement (2026-10)
 
-- Done: room beat planner (`RoomBeats`), headline loot in every beat crate, hostile creature nests, scarcity setting for medicine and meals, hatch nodes, rare node bonus actions, Delve and Breach default to Small.
+- Done: room beat planner (`RoomBeats`), headline loot in every beat crate, hostile creature nests, supply setting for medicine and meals, hatch nodes, rare node bonus actions, Delve and Breach default to Small.
 - Next: story breadcrumbs as a system of their own (terminal logs, notes, environmental scenes), hazard rooms that need protective gear, a visible per-level goal (restore power, data nodes), set-piece rooms, node Puzzle beat.
-- To watch in play: crate density with beats on, nest danger by depth, whether Small is the right default size, whether 75% scarcity is right outside Delve.
+- To watch in play: crate density with beats on, nest danger by depth, whether Small is the right default size, whether 25% supply is right outside Delve.
 - Rats and other non-insect critters need a hostile faction to behave as nests; only insects for now.

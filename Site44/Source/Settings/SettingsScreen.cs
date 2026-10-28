@@ -119,6 +119,7 @@ namespace Site44
         public float Default, Min, Max;
         public bool Integer;
         private string buffer;
+        private float lastModel = float.NaN;
 
         public override bool IsDefault => Mathf.Approximately(Get(), Default);
         protected override bool AtZero => !Integer && Mathf.Approximately(Get(), 0f);
@@ -130,6 +131,12 @@ namespace Site44
             GUI.color = LabelColour(enabled);
             Widgets.Label(new Rect(row.x, row.y, row.width - 100f, row.height), Title);
             GUI.color = enabled ? Color.white : Color.gray;
+
+            // A preset or another row changed this value behind the text box's back: show the real number again.
+            if (!float.IsNaN(lastModel) && !Mathf.Approximately(Get(), lastModel))
+            {
+                buffer = null;
+            }
 
             float scale = Integer ? 1f : 100f;
             float min = Min * scale, max = Max * scale;
@@ -150,6 +157,7 @@ namespace Site44
             }
 
             Set(slid / scale);
+            lastModel = Get();
         }
     }
 
@@ -271,6 +279,7 @@ namespace Site44
 
         private static string query = "";
         private static bool changedOnly;
+        private static HashSet<string> pinned = new HashSet<string>();
         private static Vector2 scroll;
         private static float viewHeight = 3000f;
         private static float pendingScroll = -1f;
@@ -545,6 +554,12 @@ namespace Site44
             query = Widgets.TextField(new Rect(searchRow.x + 62f, searchRow.y, searchRow.width - 62f - 190f, 26f), query);
             bool changedBox = changedOnly;
             Widgets.CheckboxLabeled(new Rect(searchRow.xMax - 184f, searchRow.y + 1f, 184f, 26f), "Modified settings only", ref changedBox);
+            if (changedBox && !changedOnly)
+            {
+                // Remember which rows are modified right now: they stay listed until the filter is switched off, even if one is set back to its default.
+                pinned = new HashSet<string>(allRows.Where(row => !row.IsDefault).Select(row => row.Label));
+            }
+
             changedOnly = changedBox;
             bool filtering = !query.NullOrEmpty() || changedOnly;
 
@@ -642,7 +657,7 @@ namespace Site44
 
         private static bool Matches(SettingRow row)
         {
-            if (changedOnly && row.IsDefault)
+            if (changedOnly && !pinned.Contains(row.Label))
             {
                 return false;
             }

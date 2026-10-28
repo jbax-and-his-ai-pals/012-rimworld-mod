@@ -290,7 +290,7 @@ namespace Site44
 
         private static readonly string[] PresetFields =
         {
-            "supplyX", "lootAmount", "crateDensity", "hostileCasketX", "delveInfection", "delveDressWounds", "puzzleDifficulty",
+            "supplyX", "lootAmount", "crateDensity", "hostileCasketX", "delveInfection", "delveDescentCare", "delveDescentRest", "puzzleDifficulty",
             "keycardX", "nestDensity", "startingColonists", "drugFindX", "securityEnabled", "missionFocusLevel",
             "delveAllowRaids", "delveAllowCaravanEvents", "delveAllowOtherThreats", "delveAllowOutsideVisitors", "delveAllowWeather"
         };
@@ -298,7 +298,7 @@ namespace Site44
         private static readonly string[] VanillaFields =
         {
             "delveAllowRaids", "delveAllowCaravanEvents", "delveAllowOtherThreats", "delveAllowOutsideVisitors", "delveAllowWeather",
-            "delveInfection", "delveDressWounds", "missionFocusLevel", "hardenedToBodies", "startingKit", "supplyX", "drugFindX",
+            "delveInfection", "delveDescentCare", "delveDescentRest", "missionFocusLevel", "hardenedToBodies", "startingKit", "supplyX", "drugFindX",
             "delverGearX", "hackMinigame", "securityEnabled", "hotZonesEnabled"
         };
 
@@ -391,22 +391,25 @@ namespace Site44
 
             var delve = new List<SettingRow>
             {
-                Toggle("Enable enemy raids", "Ticked: ordinary enemy raids can happen during a run. Unticked (the default): none do.",
+                Toggle("Enable enemy raids", "",
                     () => S.delveAllowRaids, v => S.delveAllowRaids = v, false, "Delve"),
-                Toggle("Enable caravan events", "Ticked: caravan ambushes, manhunter ambushes, caravan demands and caravan meetings can happen. Unticked (the default): none do.",
+                Toggle("Enable caravan events", "Caravan ambushes, manhunter ambushes, caravan demands, and caravan meetings.",
                     () => S.delveAllowCaravanEvents, v => S.delveAllowCaravanEvents = v, false, "Delve"),
-                Toggle("Enable other threats", "Ticked: infestations, manhunter packs, animal insanity and crashed threat ship parts can happen. Unticked (the default): none do.",
+                Toggle("Enable other threats", "Infestations, manhunter packs, animal insanity, and crashed threat ship parts.",
                     () => S.delveAllowOtherThreats, v => S.delveAllowOtherThreats = v, false, "Delve"),
-                Toggle("Enable visitors and outside arrivals", "Ticked: traders, visitors, travelers, wanderers, refugee and resource pods and migrating herds can happen. Unticked (the default): none do.",
+                Toggle("Enable visitors and outside arrivals", "Traders, visitors, travelers, wanderers, refugee and resource pods, and migrating herds.",
                     () => S.delveAllowOutsideVisitors, v => S.delveAllowOutsideVisitors = v, false, "Delve"),
-                Toggle("Enable weather disasters", "Ticked: toxic fallout, volcanic winter, heat waves, cold snaps, flash storms, solar flares and eclipses can happen. Unticked (the default): none do.",
+                Toggle("Enable weather disasters", "Toxic fallout, volcanic winter, heat waves, cold snaps, flash storms, solar flares, and eclipses.",
                     () => S.delveAllowWeather, v => S.delveAllowWeather = v, false, "Delve"),
-                Mult("Starting colonists", "How many colonists a new Site-44 game starts with, chosen from a larger pool on the character page. A larger party survives longer; a smaller one makes every loss count.\nThe character page requires one colonist who can shoot and one who can do intellectual work.",
+                Mult("Starting colonists", "Your group needs at least one colonist who can fight and one who can do intellectual work.",
                     () => S.startingColonists, v => S.startingColonists = Mathf.RoundToInt(v), 5f, null, false, null, null, null, 1f, 3f, true),
-                Choice("Wound infection", "How often a fresh wound goes septic during a Delve run. A small crew with scarce medicine can be overwhelmed by the vanilla rate. Other scenarios always use vanilla.",
-                    () => S.delveInfection, v => S.delveInfection = v, 1, new[] { "vanilla", "reduced (half)", "none" }, "Delve"),
-                Toggle("Dress wounds on descent", "Passing through an extraction gate dresses every wound that can still be tended. Off by default, so wounds carry down with the party.",
-                    () => S.delveDressWounds, v => S.delveDressWounds = v, false, "Delve"),
+                Choice("Wound infection risk", "Chance that a fresh wound becomes infected, compared with the base game.",
+                    () => S.delveInfection, v => S.delveInfection = v, 1, new[] { "same as vanilla", "half of vanilla", "none" }, "Delve"),
+                Choice("Wounds on descent", "What the extraction gate does for the party's injuries on the way down.",
+                    () => S.delveDescentCare, v => S.delveDescentCare = v, 0, new[] { "carried down", "dressed", "healed", "fully restored" }, "Delve",
+                    () => new[] { "Wounds carry down with the party.", "Every wound that can still be tended is dressed.", "Injuries and infections are removed; scars, illnesses and missing parts stay.", "Everything the game can fix is fixed, including missing parts and scars." }[Mathf.Clamp(S.delveDescentCare, 0, 3)]),
+                Toggle("Restore hunger and rest on descent", "Fills food and rest for the whole party at each extraction gate.",
+                    () => S.delveDescentRest, v => S.delveDescentRest = v, false, "Delve"),
                 Choice("Mission focus (mood bonus in a complex)", "A steady mood lift for colonists working inside a ruined complex. Raise it if mental breaks are too frequent.",
                     () => S.missionFocusLevel, v => S.missionFocusLevel = v, 2, new[] { "off", "low (+3)", "normal (+6)", "high (+10)" }),
                 Toggle("Delvers ignore plain corpses", "Colonists inside a complex stop being upset by ordinary corpses. Rotting corpses still bother them.",
@@ -510,7 +513,7 @@ namespace Site44
             {
                 new Section { Title = "General settings", Subtitle = "", Rows = pick(new[] {
                     "Starting colonists", "Enable enemy raids", "Enable caravan events", "Enable other threats", "Enable visitors and outside arrivals", "Enable weather disasters",
-                    "Wound infection", "Dress wounds on descent", "Mission focus (mood bonus in a complex)", "Delvers ignore plain corpses" }) },
+                    "Wound infection risk", "Wounds on descent", "Restore hunger and rest on descent", "Mission focus (mood bonus in a complex)", "Delvers ignore plain corpses" }) },
                 new Section { Title = "Loot and supplies", Subtitle = "", Rows = pick(new[] {
                     "Food and medicine supply", "Loot amount", "Loot crate density", "Focus tabs in loot", "Delver gear in rich loot", "Intact rooms" }) },
                 new Section { Title = "Creatures and survivors", Subtitle = "", Rows = pick(new[] {
@@ -871,7 +874,7 @@ namespace Site44
             List<string> parts = new List<string>();
             parts.Add(CurrentBalance());
             parts.Add(S.startingColonists + " colonist(s)");
-            parts.Add(new[] { "vanilla", "reduced", "no" }[Mathf.Clamp(S.delveInfection, 0, 2)] + " wound infection in Delve");
+            parts.Add(new[] { "vanilla", "reduced", "no" }[Mathf.Clamp(S.delveInfection, 0, 2)] + " wound infection risk in Delve");
             parts.Add("Delve events: " + (new[] { S.delveAllowRaids, S.delveAllowCaravanEvents, S.delveAllowOtherThreats, S.delveAllowOutsideVisitors, S.delveAllowWeather }.Count(b => b) == 0 ? "all off" : "some enabled"));
             parts.Add(S.hackMinigame ? "cipher-lock hacking, " + new[] { "easy", "normal", "hard" }[Mathf.Clamp(S.puzzleDifficulty, 0, 2)] : "timed hacking");
             parts.Add("medicine and meals at " + Pct(Site44Tuning.SupplyShare) + " supply");

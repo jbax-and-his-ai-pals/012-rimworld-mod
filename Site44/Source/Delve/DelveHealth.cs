@@ -47,6 +47,84 @@ namespace Site44
             }
         }
 
+        // What the extraction gate does for the party on the way down, as the settings ask. Returns a one-line report.
+        public static string OnDescent(IEnumerable<Pawn> party, Site44Settings settings)
+        {
+            List<Pawn> pawns = party.Where(p => p.health != null).ToList();
+            List<string> done = new List<string>();
+            if (settings.delveDescentCare == 1)
+            {
+                int dressed = TendParty(pawns);
+                if (dressed > 0)
+                {
+                    done.Add("dresses " + dressed + " wound(s)");
+                }
+            }
+            else if (settings.delveDescentCare == 2)
+            {
+                int removed = 0;
+                HediffDef infection = DefDatabase<HediffDef>.GetNamedSilentFail("WoundInfection");
+                foreach (Pawn pawn in pawns)
+                {
+                    foreach (Hediff hediff in pawn.health.hediffSet.hediffs.Where(h => (h is Hediff_Injury && !h.IsPermanent()) || (infection != null && h.def == infection)).ToList())
+                    {
+                        pawn.health.RemoveHediff(hediff);
+                        removed++;
+                    }
+                }
+
+                if (removed > 0)
+                {
+                    done.Add("clears " + removed + " injur" + (removed == 1 ? "y" : "ies") + " and infection(s)");
+                }
+            }
+            else if (settings.delveDescentCare >= 3)
+            {
+                int fixedCount = 0;
+                foreach (Pawn pawn in pawns)
+                {
+                    for (int i = 0; i < 60; i++)
+                    {
+                        string result = HealthUtility.FixWorstHealthCondition(pawn);
+                        if (result.NullOrEmpty())
+                        {
+                            break;
+                        }
+
+                        fixedCount++;
+                    }
+                }
+
+                if (fixedCount > 0)
+                {
+                    done.Add("treats " + fixedCount + " condition(s)");
+                }
+            }
+
+            if (settings.delveDescentRest)
+            {
+                foreach (Pawn pawn in pawns)
+                {
+                    if (pawn.needs != null)
+                    {
+                        if (pawn.needs.food != null)
+                        {
+                            pawn.needs.food.CurLevelPercentage = 1f;
+                        }
+
+                        if (pawn.needs.rest != null)
+                        {
+                            pawn.needs.rest.CurLevelPercentage = 1f;
+                        }
+                    }
+                }
+
+                done.Add("refills food and rest");
+            }
+
+            return done.Count == 0 ? null : "The lift's med bay " + string.Join(" and ", done.ToArray()) + " on the way down.";
+        }
+
         // The gate's med bay: every wound that can still be tended is dressed on the way down.
         public static int TendParty(IEnumerable<Pawn> party)
         {

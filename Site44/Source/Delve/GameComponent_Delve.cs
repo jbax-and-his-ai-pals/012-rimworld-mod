@@ -173,10 +173,10 @@ namespace Site44
                 GenSpawn.Spawn(pawn, CellFinder.RandomClosewalkCellNear(spot, map, 6, c => c.Standable(map)), map);
             }
 
-            int dressed = Site44Settings.Current.delveDressWounds ? DelveHealth.TendParty(party) : 0;
-            if (dressed > 0)
+            string care = DelveHealth.OnDescent(party, Site44Settings.Current);
+            if (!care.NullOrEmpty())
             {
-                Messages.Message("The lift's med bay dresses " + dressed + " wound(s) on the way down.", MessageTypeDefOf.PositiveEvent, false);
+                Messages.Message(care, MessageTypeDefOf.PositiveEvent, false);
             }
 
             Verse.Current.Game.CurrentMap = map;

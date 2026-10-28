@@ -94,6 +94,12 @@ namespace Site44
         public Thing RandomLoot()
         {
             ThingDef def = PickLoot(false);
+            // Medicine in a headline crate is as scarce as medicine anywhere else.
+            if (Site44Tuning.IsConsumable(def) && !Site44Tuning.KeepSupply(def))
+            {
+                def = Def("ComponentIndustrial");
+            }
+
             if (def == null)
             {
                 return null;
@@ -303,8 +309,12 @@ namespace Site44
                 return null;
             }
 
-            AddSupply(crate, "MedicineIndustrial", 1);
-            AddSupply(crate, "MealSurvivalPack", 3);
+            if (Site44Tuning.SupplyShare > 0f)
+            {
+                AddSupply(crate, "MedicineIndustrial", 1);
+                AddSupply(crate, "MealSurvivalPack", 3);
+            }
+
             AddSupply(crate, "Bedroll", 2);
             GenSpawn.Spawn(crate, spot, map, Rot4.North);
             return crate;

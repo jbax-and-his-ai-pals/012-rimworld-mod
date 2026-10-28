@@ -28,6 +28,40 @@ namespace Site44
         private const float ResetWidth = 56f;
         private static readonly Color ChangedColour = new Color(0.55f, 0.8f, 1f);
 
+        public string ZeroNote = "None.";       // what the live reading says when the value is 0%
+        protected virtual bool AtZero => false;
+
+        public SettingRow Zero(string note)
+        {
+            ZeroNote = note;
+            return this;
+        }
+
+        // The first sentence of the tip is always on screen; the full tip is a hover only when there is more than that.
+        private static string FirstSentence(string text, out bool hasMore)
+        {
+            hasMore = false;
+            if (text.NullOrEmpty())
+            {
+                return null;
+            }
+
+            int end = text.IndexOf(". ", StringComparison.Ordinal);
+            int newline = text.IndexOf((char)10);
+            if (newline >= 0 && (end < 0 || newline < end))
+            {
+                end = newline - 1;
+            }
+
+            if (end < 0)
+            {
+                return text;
+            }
+
+            hasMore = true;
+            return text.Substring(0, end + 1);
+        }
+
         public void Draw(Listing_Standard list)
         {
             bool enabled = Enabled == null || Enabled();
@@ -47,20 +81,32 @@ namespace Site44
             }
 
             DrawControl(list, controlRect);
-            TooltipHandler.TipRegion(row, Tip + (Scope != null ? "\nApplies to: " + Scope + "." : ""));
             GUI.color = Color.white;
 
-            string note = !enabled ? DisabledNote : (Effect != null ? Effect() : null);
-            if (!note.NullOrEmpty())
+            bool hasMore;
+            string description = FirstSentence(Tip, out hasMore);
+            string reading = !enabled ? DisabledNote : (Effect != null ? (AtZero ? ZeroNote : Effect()) : null);
+            Text.Font = GameFont.Tiny;
+            GUI.color = Color.gray;
+            if (!description.NullOrEmpty())
             {
-                GUI.color = Color.gray;
-                Text.Font = GameFont.Tiny;
-                list.Label(note);
-                Text.Font = GameFont.Small;
-                GUI.color = Color.white;
+                list.Label(description);
             }
 
-            list.Gap(4f);
+            if (!reading.NullOrEmpty())
+            {
+                list.Label(reading);
+            }
+
+            Text.Font = GameFont.Small;
+            GUI.color = Color.white;
+            if (hasMore)
+            {
+                Rect hover = new Rect(row.x, row.y, row.width, list.CurHeight - row.y);
+                TooltipHandler.TipRegion(hover, Tip);
+            }
+
+            list.Gap(10f);
         }
 
         protected string Title => Label + (Scope != null ? "  [" + Scope + "]" : "");
@@ -82,6 +128,7 @@ namespace Site44
         private string buffer;
 
         public override bool IsDefault => Mathf.Approximately(Get(), Default);
+        protected override bool AtZero => !Integer && Mathf.Approximately(Get(), 0f);
         public override void Reset() { Set(Default); buffer = null; }
 
         protected override void DrawControl(Listing_Standard list, Rect row)
@@ -138,6 +185,7 @@ namespace Site44
         }
 
         public override bool IsDefault => Mathf.Approximately(Get(), Default);
+        protected override bool AtZero => Mathf.Approximately(Get(), 0f);
         public override void Reset() { Set(Default); }
 
         protected override void DrawControl(Listing_Standard list, Rect row)
@@ -369,15 +417,15 @@ namespace Site44
             var loot = new List<SettingRow>
             {
                 Mult("Food and medicine supply", "How often medicine and meals turn up in crates, caskets and on shelves, and how large their stacks are.\n0% = almost none, 400% = plentiful. Packed supplies from the starting kit are unaffected.",
-                    () => S.supplyX, v => S.supplyX = v, 4f, null, false, () => "Keeps about " + Pct(Site44Tuning.SupplyShare) + " of medicine and meal picks."),
+                    () => S.supplyX, v => S.supplyX = v, 4f, null, false, () => "Keeps " + Pct(Site44Tuning.SupplyShare) + " of medicine and meal picks.").Zero("No medicine or meals turn up in loot, caskets or the welcome crate."),
                 Mult("Loot amount", "Scales the size of every loot stack in a complex: crates, caskets, storerooms and intact rooms.", () => S.lootAmount, v => S.lootAmount = v, 3f, min: 0.1f),
                 Mult("Loot crate density", "How many sealed hermetic crates are scattered through the ruins. They hold a few stacks of loot each. 0% = none.", () => S.crateDensity, v => S.crateDensity = v, 3f),
                 Mult("Focus tabs in loot", "Chance that an ordinary loot item is a stack of focus tabs, a non-addictive stimulant that slows hunger and fatigue.",
-                    () => S.drugFindX, v => S.drugFindX = v, 3f, null, true, () => "About " + Pct(Site44Tuning.DrugFindChance) + " of ordinary loot items."),
+                    () => S.drugFindX, v => S.drugFindX = v, 3f, null, true, () => "About " + Pct(Site44Tuning.DrugFindChance) + " of ordinary loot items.").Zero("No focus tabs in loot."),
                 Mult("Delver gear in rich loot", "Chance that a rich loot item is a delver's cap or vest, which lower the chance of mental breaks.",
                     () => S.delverGearX, v => S.delverGearX = v, 4f, null, true, () => "About " + Pct(Site44Tuning.DelverGearChance) + " of rich loot items."),
-                Mult("Intact rooms", "Chance that an ordinary room survived intact: clean sterile floor, undamaged furniture and better loot. Storage, server and reactor wings always have at least one.",
-                    () => S.preservedRoomX, v => S.preservedRoomX = v, 7f, null, true, () => "About " + Pct(Site44Tuning.PreservedRoomChance) + " of ordinary rooms."),
+                Mult("Intact rooms", "Chance that an ordinary room survived intact: clean sterile floor, undamaged furniture and better loot. Storage, server and reactor wings always have at least one, unless this is 0%.",
+                    () => S.preservedRoomX, v => S.preservedRoomX = v, 7f, null, true, () => "About " + Pct(Site44Tuning.PreservedRoomChance) + " of ordinary rooms.").Zero("No ordinary room survives intact; secure rooms stay pristine."),
                 Mult("Cryosleep caskets", "How many sealed cryosleep caskets there are. Each holds a friendly survivor, a hostile sleeper, a body, or just loot. 0% = none.",
                     () => S.casketDensity, v => S.casketDensity = v, 3f, null, false, () => "At 100%, about one casket per 35 rooms."),
                 Mult("Survivor caskets per complex", "Caskets holding a friendly sleeper who joins you when opened.", () => S.survivorCaskets, v => S.survivorCaskets = Mathf.RoundToInt(v), 3f, null, true, null,
@@ -543,6 +591,7 @@ namespace Site44
                 list.Label(section.Title);
                 Text.Font = GameFont.Small;
                 list.GapLine(4f);
+                list.Gap(8f);
                 foreach (SettingRow row in rows)
                 {
                     DrawRowSafely(list, row);
@@ -693,6 +742,7 @@ namespace Site44
             list.Label(StartTitle);
             Text.Font = GameFont.Small;
             list.GapLine(4f);
+            list.Gap(6f);
             const float gap = 6f, height = 30f;
             Rect block = list.GetRect(height * 2f + gap);
             string current = CurrentBalance();

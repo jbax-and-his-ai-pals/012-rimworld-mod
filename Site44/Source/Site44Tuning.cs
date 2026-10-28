@@ -77,7 +77,7 @@ namespace Site44
         public static float CasketDensity => S.casketDensity * (T != null ? T.casketFactor : 1f);
         public const int RoomsPerCasket = 35;
         public static int SurvivorCaskets => S.survivorCaskets;
-        public static float HostileCasketShare => Mathf.Clamp01(0.25f * S.hostileCasketX + (GameComponent_Delve.Level?.HostileCasketBonus ?? 0f));
+        public static float HostileCasketShare => S.hostileCasketX <= 0f ? 0f : Mathf.Clamp01(0.25f * S.hostileCasketX + (GameComponent_Delve.Level?.HostileCasketBonus ?? 0f));
 
         // Share of rooms holding a dried-out corpse (with loot half the time).
         public static float StrayCorpseChance => Mathf.Clamp01(0.04f * S.strayCorpseX * (T != null ? T.strayCorpseFactor : 1f));

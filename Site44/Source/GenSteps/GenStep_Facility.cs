@@ -1920,7 +1920,7 @@ namespace Site44
                 }
             }
 
-            if (zone.Kind == SectorKind.Courtyard)
+            if (zone.Kind == SectorKind.Courtyard || Site44Tuning.PreservedRoomChance <= 0f)
             {
                 return chosen;
             }
@@ -2181,7 +2181,7 @@ namespace Site44
                     item.tier = wing.RequiredTier;
                     item.mapId = map.uniqueID;
                     GenSpawn.Spawn(item, cell, map);
-                    bool guarded = Rand.Chance(Site44Tuning.KeycardNestChance) && SpawnNest(room, parent.Depth);
+                    bool guarded = Site44Settings.Current.nestDensity > 0f && Rand.Chance(Site44Tuning.KeycardNestChance) && SpawnNest(room, parent.Depth);
                     Log.Message("[Site-44] clearance badge (tier " + wing.RequiredTier + ") for wing " + wing.Id + " in room " + room.Id + (guarded ? ", guarded." : "."));
                     return;
                 }
@@ -2225,7 +2225,7 @@ namespace Site44
                 card.sectorId = gated.Id.ToString();
                 card.mapId = map.uniqueID;
                 GenSpawn.Spawn(card, cell, map);
-                bool guarded = Rand.Chance(Site44Tuning.KeycardNestChance) && SpawnNest(room, parent.Depth);
+                bool guarded = Site44Settings.Current.nestDensity > 0f && Rand.Chance(Site44Tuning.KeycardNestChance) && SpawnNest(room, parent.Depth);
                 Log.Message("[Site-44] keycard for sector " + gated.Id + " in room " + room.Id + (guarded ? ", guarded." : "."));
                 return;
             }

@@ -168,7 +168,7 @@ namespace Site44.Gen
 
             var puzzle = new CipherPuzzle(answer, rng);
             puzzle.CodeLength = length;
-            puzzle.attemptsLeft = Clamp(4 + skill / 5 - (tier >= 2 ? 1 : 0), 3, 8);
+            puzzle.attemptsLeft = Clamp(4 + skill / 5, 4, 8);
             puzzle.purgesLeft = Clamp(skill / 4, 0, 4);
 
             // Bucket decoys by positional matches.
@@ -201,7 +201,8 @@ namespace Site44.Gen
                 }
             };
 
-            int nNear = count >= 12 ? 2 : 1;
+            // Harder terminals hide more look-alikes: words sharing most of their letters in place with the answer.
+            int nNear = 1 + tier;
             int nZero = Math.Max(1, (need + 3) / 4);
             int nLow = Math.Max(1, (need * 35 + 99) / 100);
             take(near, nNear);

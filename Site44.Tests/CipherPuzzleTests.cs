@@ -63,7 +63,7 @@ namespace Site44.Tests
                     int s = Clamp(skill, 0, 20), t = Clamp(tier, 0, 3);
                     Assert.Equal(t <= 1 ? 5 : (t == 2 ? 6 : 7), p.CodeLength);
                     Assert.Equal(Clamp(16 - s / 2 + t, 6, 20), p.Candidates.Count);
-                    Assert.Equal(Clamp(4 + s / 5 - (t >= 2 ? 1 : 0), 3, 8), p.AttemptsLeft);
+                    Assert.Equal(Clamp(4 + s / 5, 4, 8), p.AttemptsLeft);
                     Assert.Equal(Clamp(s / 4, 0, 4), p.PurgesLeft);
                     Assert.Equal(CipherOutcome.Continue, p.State);
                     Assert.Empty(p.History);

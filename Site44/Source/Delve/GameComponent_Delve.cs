@@ -173,7 +173,7 @@ namespace Site44
                 GenSpawn.Spawn(pawn, CellFinder.RandomClosewalkCellNear(spot, map, 6, c => c.Standable(map)), map);
             }
 
-            int dressed = DelveHealth.TendParty(party);
+            int dressed = Site44Settings.Current.delveDressWounds ? DelveHealth.TendParty(party) : 0;
             if (dressed > 0)
             {
                 Messages.Message("The lift's med bay dresses " + dressed + " wound(s) on the way down.", MessageTypeDefOf.PositiveEvent, false);

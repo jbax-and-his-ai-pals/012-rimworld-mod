@@ -18,6 +18,7 @@ namespace Site44
         public float keycardChance = 0.5f;                    // terminal gates that also have a keycard
         public float restrictedWingChance = 0.75f;            // complexes that hold a clearance-gated wing
         public float nestDensity = 1f;
+        public bool delveDressWounds;                         // the lift dresses wounds on the way down (off by default)
         public int delveInfection = 1;                        // wound infection in Delve: 0 vanilla, 1 reduced, 2 none
         public float scarcity = 0.75f;                        // how rarely medicine and meals turn up, and how small the stacks are
         public float crateDensity = 1f;
@@ -74,6 +75,7 @@ namespace Site44
             lootAmount = defaults.lootAmount;
             scarcity = defaults.scarcity;
             delveInfection = defaults.delveInfection;
+            delveDressWounds = defaults.delveDressWounds;
             startingColonists = defaults.startingColonists;
             puzzleDifficulty = defaults.puzzleDifficulty;
             keycardChance = defaults.keycardChance;
@@ -116,6 +118,7 @@ namespace Site44
             Scribe_Values.Look(ref lootAmount, "lootAmount", 1f);
             Scribe_Values.Look(ref scarcity, "scarcity", 0.75f);
             Scribe_Values.Look(ref delveInfection, "delveInfection", 1);
+            Scribe_Values.Look(ref delveDressWounds, "delveDressWounds");
             Scribe_Values.Look(ref startingColonists, "startingColonists", 3);
             Scribe_Values.Look(ref puzzleDifficulty, "puzzleDifficulty", 1);
             Scribe_Values.Look(ref keycardChance, "keycardChance", 0.5f);
@@ -301,6 +304,8 @@ namespace Site44
             list.Label("Wound infection in Delve:  " + new[] { "vanilla", "reduced", "none" }[Mathf.Clamp(s.delveInfection, 0, 2)], -1f, new TipSignal(
                 "How often a fresh wound goes septic during a Delve run. A small crew with scarce medicine can be overwhelmed by the vanilla rate. Other scenarios always use vanilla."));
             s.delveInfection = Mathf.RoundToInt(list.Slider(s.delveInfection, 0f, 2f));
+            list.CheckboxLabeled("Dress wounds on descent", ref s.delveDressWounds,
+                "Passing through an extraction gate dresses every wound that can still be tended. Off by default, so wounds carry down with the party.");
 
             Section(list, "Morale");
             list.Label("Mission focus (mood bonus inside a complex):  " + new[] { "off", "low (+3)", "normal (+6)", "high (+10)" }[Mathf.Clamp(s.missionFocusLevel, 0, 3)], -1f, new TipSignal(

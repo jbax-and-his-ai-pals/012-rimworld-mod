@@ -25,9 +25,11 @@ namespace Site44
 
         public static GameComponent_Delve Instance => Verse.Current.Game?.GetComponent<GameComponent_Delve>();
 
-        // Delve mode is on once a run has started, and also in test runs launched with -site44delve (level 1 is generated
-        // before the run formally starts).
-        public static bool IsDelve => (Instance != null && Instance.active) || GenCommandLine.CommandLineArgPassed("site44delve") || GenCommandLine.CommandLineArgPassed("site44quickdelve");
+        // Delve mode is on once a run has started. Level 1 is generated before the run formally starts, so a Delve scenario
+        // (or a test run launched with -site44delve) counts as well.
+        public static bool IsDelve => (Instance != null && Instance.active)
+                                      || GenCommandLine.CommandLineArgPassed("site44delve") || GenCommandLine.CommandLineArgPassed("site44quickdelve")
+                                      || (Find.Scenario != null && Find.Scenario.AllParts.Any(p => p is ScenPart_Site44Delve));
 
         // Quick test: the scenario part asks for it, or the -site44quickdelve launch flag.
         public static bool QuickTest =>

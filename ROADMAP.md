@@ -1,5 +1,7 @@
 # Roadmap
 
+The next milestone is the Delve beta (BETA.md). Phases 2, 3, 4 and 6 are archived (ARCHIVE.md) and are not being worked on.
+
 Legend: `[x]` done, `[~]` in progress, `[ ]` planned. Each phase builds on the one before; tasks inside a phase can usually be done in any order.
 
 ## Phase 0: the ruins (done)
@@ -18,7 +20,7 @@ Legend: `[x]` done, `[~]` in progress, `[ ]` planned. Each phase builds on the o
 - [~] **1.4 Security consoles**: a console in a nearby security office switches its group between hostile, standby, allied and disabled, gated by the minigame
 - [ ] **1.5 Settings and docs** for density and default states
 
-## Phase 2: the enclave
+## Phase 2: the enclave (archived)
 
 - [x] **2.1 Enclave site type**: a friendly settlement laid out from the town plan, with a safe approach (walls come from the plan's wall projects)
 - [~] **2.2 Residents**: a hidden faction, neutral then allied by standing, villagers under a lord (guards and daily routines still to do)
@@ -26,7 +28,7 @@ Legend: `[x]` done, `[~]` in progress, `[ ]` planned. Each phase builds on the o
 - [~] **2.4 Standing system**: standing rises daily while present and gates growth (deliveries, cleared sites, ranks and a readout still to do)
 - [x] **2.5 Visitable enclave quest** on the world map
 
-## Phase 3: the living town
+## Phase 3: the living town (archived)
 
 - [x] **3.1 Town plan generator**: an ordered list of projects (houses, stalls, walls, gardens) laid out around a plaza (pure and tested)
 - [~] **3.2 Staged builders**: villagers walk to a site and the building appears in stages (tiles appear over time; villagers do not yet walk to the site)
@@ -35,7 +37,7 @@ Legend: `[x]` done, `[~]` in progress, `[ ]` planned. Each phase builds on the o
 - [ ] **3.5 Lodging ladder**: cot, room, apartment, suite, with furniture allowed inside your own lodging
 - [ ] **3.6 "Delver in Residence" scenario**: start as a lodger in the enclave, opt-in
 
-## Phase 4: the wider world
+## Phase 4: the wider world (archived)
 
 - [ ] **4.1 Data cores and clues** as loot that feed research and point to other sites
 - [ ] **4.2 Questline** chaining several complex types, with the enclave as quest giver
@@ -52,7 +54,7 @@ A one-shot or long-haul run where each complex tile is a level. Reach the extrac
 - [x] **D.4 Run state and scenario**: depth counter, a "Site-44 Delve" scenario, best-depth record, end-of-run summary
 - [ ] **D.5 Between levels**: a short rest or supply stop (what carries over, what does not), tuned in play
 
-## Phase 6: the world layer (after the enclave work)
+## Phase 6: the world layer (after the enclave work) (archived)
 
 - [ ] **6.1 Expedition contracts** offered by the enclave: retrieve, rescue, clear, timed
 - [ ] **6.2 Survival layer** on top of delve mode: the outside world, towns, goals and progression that cater to delvers

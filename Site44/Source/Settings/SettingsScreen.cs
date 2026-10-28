@@ -10,6 +10,13 @@ namespace Site44
 {
     // The settings screen: tabs of rows. Every row knows its default (so changed rows are marked and can be reset one by one),
     // which game modes it affects, whether it applies right now, and what its value means in plain terms.
+    internal static class Ui
+    {
+        // Secondary text: light enough to read comfortably on the dark panel, still quieter than the labels.
+        public static readonly UnityEngine.Color Muted = new UnityEngine.Color(0.78f, 0.78f, 0.78f);
+        public static readonly UnityEngine.Color Disabled = new UnityEngine.Color(0.62f, 0.62f, 0.62f);
+    }
+
     internal abstract class SettingRow
     {
         public string Label;
@@ -66,11 +73,17 @@ namespace Site44
             bool enabled = Enabled == null || Enabled();
             Rect row = list.GetRect(Text.LineHeight + 2f);
 
-            Rect controlRect = row;
+            Rect controlRect = new Rect(row.x + 12f, row.y, row.width - 12f, row.height);
 
             if (!enabled)
             {
-                GUI.color = Color.gray;
+                GUI.color = Ui.Disabled;
+            }
+
+            // A modified setting gets a bar at its left edge as well as the blue label, so the mark never depends on colour alone.
+            if (enabled && !IsDefault)
+            {
+                Widgets.DrawBoxSolid(new Rect(row.x, row.y + 1f, 4f, row.height - 2f), ChangedColour);
             }
 
             DrawControl(list, controlRect);
@@ -79,8 +92,7 @@ namespace Site44
             bool hasMore;
             string description = FirstSentence(Tip, out hasMore);
             string reading = !enabled ? DisabledNote : (Effect != null ? (AtZero ? ZeroNote : Effect()) : null);
-            Text.Font = GameFont.Tiny;
-            GUI.color = Color.gray;
+            GUI.color = Ui.Muted;
             if (!description.NullOrEmpty())
             {
                 list.Label(description);
@@ -91,7 +103,6 @@ namespace Site44
                 list.Label(reading);
             }
 
-            Text.Font = GameFont.Small;
             GUI.color = Color.white;
             if (hasMore)
             {
@@ -106,7 +117,7 @@ namespace Site44
 
         protected Color LabelColour(bool enabled)
         {
-            return !enabled ? Color.gray : (IsDefault ? Color.white : ChangedColour);
+            return !enabled ? Ui.Disabled : (IsDefault ? Color.white : ChangedColour);
         }
     }
 
@@ -130,7 +141,7 @@ namespace Site44
             bool enabled = Enabled == null || Enabled();
             GUI.color = LabelColour(enabled);
             Widgets.Label(new Rect(row.x, row.y, row.width - 100f, row.height), Title);
-            GUI.color = enabled ? Color.white : Color.gray;
+            GUI.color = enabled ? Color.white : Ui.Disabled;
 
             // A preset or another row changed this value behind the text box's back: show the real number again.
             if (!float.IsNaN(lastModel) && !Mathf.Approximately(Get(), lastModel))
@@ -195,7 +206,7 @@ namespace Site44
             GUI.color = LabelColour(enabled);
             int index = Index();
             Widgets.Label(row, Title + ":  " + Names[index]);
-            GUI.color = enabled ? Color.white : Color.gray;
+            GUI.color = enabled ? Color.white : Ui.Disabled;
             int slid = Mathf.RoundToInt(list.Slider(index, 0f, Names.Length - 1));
             if (slid != index)
             {
@@ -239,7 +250,7 @@ namespace Site44
             GUI.color = LabelColour(enabled);
             int value = Mathf.Clamp(Get(), 0, Names.Length - 1);
             Widgets.Label(row, Title + ":  " + Names[value]);
-            GUI.color = enabled ? Color.white : Color.gray;
+            GUI.color = enabled ? Color.white : Ui.Disabled;
             Set(Mathf.RoundToInt(list.Slider(value, 0f, Names.Length - 1)));
         }
     }
@@ -260,7 +271,7 @@ namespace Site44
             bool enabled = Enabled == null || Enabled();
             GUI.color = LabelColour(enabled);
             Widgets.Label(new Rect(row.x, row.y, row.width - 170f, row.height), Title + ":  " + Get());
-            GUI.color = enabled ? Color.white : Color.gray;
+            GUI.color = enabled ? Color.white : Ui.Disabled;
             if (Widgets.ButtonText(new Rect(row.xMax - 164f, row.y, 164f, row.height), Button))
             {
                 Pick();
@@ -613,7 +624,7 @@ namespace Site44
 
             if (filtering && shown == 0)
             {
-                GUI.color = Color.gray;
+                GUI.color = Ui.Muted;
                 list.Label("No settings match.");
                 GUI.color = Color.white;
             }
@@ -715,7 +726,7 @@ namespace Site44
             {
                 y += 10f;
                 int changed = allRows.Count(r => !r.IsDefault);
-                GUI.color = Color.gray;
+                GUI.color = Ui.Muted;
                 Widgets.Label(new Rect(toc.x, y, toc.width, 60f), changed == 0 ? "Every setting is at its default." : changed + " setting(s) changed from their defaults.");
                 GUI.color = Color.white;
             }

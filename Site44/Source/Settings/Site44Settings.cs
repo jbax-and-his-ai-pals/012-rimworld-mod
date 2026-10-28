@@ -284,6 +284,10 @@ namespace Site44
             list.Label("Ruined complexes you find on the world map, and the Site-44 Breach scenario. Changes apply to complexes generated from now on; hover a setting for details.");
             GUI.color = Color.white;
 
+            Section(list, "Starting points");
+            GUI.color = Color.gray;
+            list.Label("These buttons overwrite the settings below with a ready-made set of values. Pick one, then adjust anything you like.");
+            GUI.color = Color.white;
             Rect presetRow = list.GetRect(30f);
             float buttonWidth = presetRow.width / Site44Settings.PresetNames.Length;
             for (int i = 0; i < Site44Settings.PresetNames.Length; i++)

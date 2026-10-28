@@ -47,8 +47,8 @@ namespace Site44
 
         public void LockOut(Pawn hacker)
         {
-            lockedUntil = Find.TickManager.TicksGame + 2 * GenDate.TicksPerHour;
-            Messages.Message(hacker.LabelShort + " is locked out of the terminal. It will accept new attempts in two hours.", this, MessageTypeDefOf.NegativeEvent, false);
+            // A failed attempt costs no waiting: the terminal accepts another try straight away.
+            Messages.Message(hacker.LabelShort + " fails to crack the terminal. It can be tried again at once.", this, MessageTypeDefOf.NegativeEvent, false);
             MapComponent_Facility facility = Map.GetComponent<MapComponent_Facility>();
             if (facility.Tier < FacilityFaction.AllyTier)
             {

@@ -33,6 +33,7 @@ namespace Site44
         public string sectorId;
         public int groupId = -1;
         public int requiredTier;
+        public int grantTier;           // a node that raises the level's clearance to this rung when solved (0: none)
         public NodeExtra extra;
         private bool used;
         private int lockedUntil;
@@ -43,7 +44,7 @@ namespace Site44
 
         public bool LockedOut => Find.TickManager.TicksGame < lockedUntil;
 
-        public int PuzzleTier => kind == TerminalKind.Gate ? Mathf.Clamp(requiredTier, 0, 3) : (kind == TerminalKind.Security ? 2 : (kind == TerminalKind.Extraction ? 3 : 1));
+        public int PuzzleTier => kind == TerminalKind.Gate ? Mathf.Clamp(requiredTier, 0, 3) : (kind == TerminalKind.Diagnostic && grantTier > 0 ? Mathf.Clamp(grantTier, 0, 3) : kind == TerminalKind.Security ? 2 : (kind == TerminalKind.Extraction ? 3 : 1));
 
         public void LockOut(Pawn hacker)
         {
@@ -82,6 +83,7 @@ namespace Site44
             Scribe_Values.Look(ref sectorId, "sectorId");
             Scribe_Values.Look(ref groupId, "groupId", -1);
             Scribe_Values.Look(ref requiredTier, "requiredTier");
+            Scribe_Values.Look(ref grantTier, "grantTier");
             Scribe_Values.Look(ref extra, "extra");
             Scribe_Values.Look(ref used, "used");
             Scribe_Values.Look(ref lockedUntil, "lockedUntil");
@@ -110,7 +112,7 @@ namespace Site44
             }
             else if (kind == TerminalKind.Gate)
             {
-                status = "Locked: " + KindLabel() + ". Needs clearance " + DirectorVoice.TierName(requiredTier, Map) + ".";
+                status = requiredTier > 0 ? "Locked: " + KindLabel() + ". Needs clearance " + DirectorVoice.TierName(requiredTier, Map) + "." : "Locked: " + KindLabel() + ".";
             }
             else
             {
@@ -224,18 +226,23 @@ namespace Site44
             switch (kind)
             {
                 case TerminalKind.Gate:
-                    int tierBefore = facility.Tier;
                     int unsealed = facility.UnsealSector(sectorId);
-                    facility.AddPoints(Progression.GatePoints);
                     Messages.Message(hacker.LabelShort + " overrides the terminal. " + unsealed + " hatch(es) unseal.", new LookTargets(Position, Map), MessageTypeDefOf.PositiveEvent);
-                    if (tierBefore < FacilityFaction.AllyTier)
+                    if (facility.Tier < FacilityFaction.AllyTier)
                     {
                         facility.MaybeTriggerAlarm(Position);
                     }
                     break;
                 case TerminalKind.Diagnostic:
-                    facility.AddPoints(Progression.DiagnosticPoints);
-                    Messages.Message(hacker.LabelShort + " completes the diagnostic. Facility confidence in your credentials rises.", new LookTargets(Position, Map), MessageTypeDefOf.PositiveEvent);
+                    if (grantTier > facility.Tier)
+                    {
+                        facility.GrantClearance(grantTier);
+                        Messages.Message(hacker.LabelShort + " completes the diagnostic. Credentials updated: " + DirectorVoice.TierName(grantTier, Map) + ".", new LookTargets(Position, Map), MessageTypeDefOf.PositiveEvent);
+                    }
+                    else
+                    {
+                        Messages.Message(hacker.LabelShort + " completes the diagnostic.", new LookTargets(Position, Map), MessageTypeDefOf.PositiveEvent);
+                    }
                     break;
                 case TerminalKind.Valve:
                     facility.DivertCoolant();

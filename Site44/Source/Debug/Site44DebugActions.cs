@@ -154,19 +154,23 @@ namespace Site44
             Messages.Message("[Site-44] unsealed " + sectorIds.Count + " sector(s).", MessageTypeDefOf.NeutralEvent, false);
         }
 
-        [DebugAction("Site-44", "Add 1 clearance point", allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        [DebugAction("Site-44", "Raise clearance one rung", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void AddPoint()
         {
-            Facility()?.AddPoints(1);
+            MapComponent_Facility facility = Facility();
+            if (facility != null)
+            {
+                facility.GrantClearance(facility.Tier + 1);
+            }
         }
 
         [DebugAction("Site-44", "Set clearance to OVERSEER", allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void MaxClearance()
         {
             MapComponent_Facility facility = Facility();
-            if (facility != null && facility.points < 9)
+            if (facility != null)
             {
-                facility.AddPoints(9 - facility.points);
+                facility.GrantClearance(Progression.MaxTier);
             }
         }
 

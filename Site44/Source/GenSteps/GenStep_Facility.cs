@@ -680,7 +680,7 @@ namespace Site44
             foreach (Zone gateZone in graph.Zones)
             {
                 if (gateZone.GateLink >= 0 && gateZone.Gate == GateKind.Terminal
-                    && (!Site44Tuning.OpenLayout || Rand.Chance(Site44Tuning.OpenLayoutLockedShare))
+                    && (gateZone.Restricted || !Site44Tuning.OpenLayout || Rand.Chance(Site44Tuning.OpenLayoutLockedShare))
                     && FacilityGraph.ExteriorRoom(plan, plan.Links[gateZone.GateLink]) < 0)   // a hatch only ever guards an internal door
                 {
                     lockedGateZones.Add(gateZone.Id);
@@ -1778,6 +1778,16 @@ namespace Site44
                 }
             }
 
+            // Advanced wings: a rich, headline crate in most rooms.
+            foreach (PlanRoom room in plan.Rooms)
+            {
+                Zone wing = graph.Zones[graph.ZoneOfRoom(room.Id)];
+                if (wing.Restricted && lockedGateZones.Contains(wing.Id) && !room.IsCorridor && room.Cells.Count >= 9 && containers.TrySpawnCrate(room, true, true))
+                {
+                    crates++;
+                }
+            }
+
             // Caskets: survivors first, then hostile sleepers and remains by share, the rest just loot. Hostile sleepers
             // keep their old rules: deep inside, and well away from the start.
             int total = casketRooms.Count;
@@ -2120,7 +2130,14 @@ namespace Site44
                     Building_FacilityTerminal terminal = SpawnConsole(Site44DefOf.Site44_Terminal, spot, TerminalKind.Gate);
                     terminal.sectorId = child.Id.ToString();
                     terminal.requiredTier = child.RequiredTier;
-                    PlaceKeycard(child, parent, rooms, roomId);
+                    if (child.Restricted)
+                    {
+                        PlaceClearanceSource(child, parent, rooms, roomId);
+                    }
+                    else
+                    {
+                        PlaceKeycard(child, parent, rooms, roomId);
+                    }
                 }
                 else
                 {
@@ -2131,6 +2148,46 @@ namespace Site44
 
         // The other way past a sealed gate: a keycard lying in a room on the near side. It is usually guarded by a nest,
         // so this route tends to be the more dangerous one.
+        // The way to earn a restricted wing's clearance, always on the near side: a badge lying in a room (often guarded),
+        // or a diagnostic node that grants the rung once solved.
+        private void PlaceClearanceSource(Zone wing, Zone parent, List<PlanRoom> rooms, int gateRoomId)
+        {
+            List<PlanRoom> options = rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 9 && r.Id != gateRoomId && !IsEntryRoom(r)).ToList();
+            options.Shuffle();
+            bool badge = Rand.Chance(0.5f);
+            ThingDef badgeDef = DefDatabase<ThingDef>.GetNamedSilentFail("Site44_ClearanceBadge");
+            ThingDef nodeDef = DefDatabase<ThingDef>.GetNamedSilentFail("Site44_DiagnosticNode");
+            foreach (PlanRoom room in options)
+            {
+                IntVec3 cell;
+                if (badge && badgeDef != null && TryFindFreeCell(room, out cell))
+                {
+                    Thing_ClearanceBadge item = (Thing_ClearanceBadge)ThingMaker.MakeThing(badgeDef);
+                    item.tier = wing.RequiredTier;
+                    item.mapId = map.uniqueID;
+                    GenSpawn.Spawn(item, cell, map);
+                    bool guarded = Rand.Chance(Site44Tuning.KeycardNestChance) && SpawnNest(room, parent.Depth);
+                    Log.Message("[Site-44] clearance badge (tier " + wing.RequiredTier + ") for wing " + wing.Id + " in room " + room.Id + (guarded ? ", guarded." : "."));
+                    return;
+                }
+
+                IntVec3 spot;
+                if (!badge && nodeDef != null && TryFindSpotInRoom(room, nodeDef.size, out spot))
+                {
+                    Building_FacilityTerminal node = SpawnConsole(nodeDef, spot, TerminalKind.Diagnostic);
+                    node.grantTier = wing.RequiredTier;
+                    node.extra = NodeExtra.None;
+                    Log.Message("[Site-44] clearance node (tier " + wing.RequiredTier + ") for wing " + wing.Id + " in room " + room.Id + ".");
+                    return;
+                }
+            }
+
+            Log.Warning("[Site-44] no source of clearance found for wing " + wing.Id + "; opening its gate.");
+            map.GetComponent<MapComponent_Facility>().UnsealSector(wing.Id.ToString());
+            wing.Restricted = false;
+            wing.RequiredTier = 0;
+        }
+
         private void PlaceKeycard(Zone gated, Zone parent, List<PlanRoom> rooms, int gateRoomId)
         {
             if (!Rand.Chance(Site44Tuning.KeycardChance))
@@ -2413,7 +2470,7 @@ namespace Site44
 
             // Quick test: the nearest suitable room instead of the farthest, and the gate starts unlocked.
             bool quick = GameComponent_Delve.QuickTest;
-            IEnumerable<PlanRoom> candidates = plan.Rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 12 && !IsEntryRoom(r));
+            IEnumerable<PlanRoom> candidates = plan.Rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 12 && !IsEntryRoom(r) && !graph.Zones[graph.ZoneOfRoom(r.Id)].Restricted);
             if (!candidates.Any(r => TryFindSpotInRoom(r, Site44DefOf.Site44_ExtractionGate.size, out IntVec3 probe)))
             {
                 candidates = plan.Rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 12);

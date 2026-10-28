@@ -14,7 +14,7 @@ namespace Site44
         private const float SafeTemperature = 21f;
         private const float AlarmChance = 0.35f;
 
-        public int points;
+        public int clearance;
         public string siteTypeDefName;   // which kind of complex this is; names the insider clearance rung
         public IntVec3 startCell = IntVec3.Invalid;
         public bool coolantLoopDiverted;
@@ -37,7 +37,7 @@ namespace Site44
         }
 
         public bool IsFacilityMap => gridNx > 0;
-        public int Tier => Progression.TierForPoints(points);
+        public int Tier => clearance;
         public int GridNx => gridNx;
         public int GridNy => gridNy;
         public int GridSeed => gridSeed;
@@ -63,9 +63,10 @@ namespace Site44
 
         public bool IsSectorUnlocked(string sectorId) => unlockedSectors.Contains(sectorId);
 
-        public void AddPoints(int amount)
+        // Clearance only ever rises: a badge or a granting node sets it to at least the given rung.
+        public void GrantClearance(int tier)
         {
-            points += amount;
+            clearance = System.Math.Max(clearance, System.Math.Min(tier, Progression.MaxTier));
             while (announcedTier < Tier)
             {
                 announcedTier++;
@@ -123,7 +124,6 @@ namespace Site44
             coolantLoopDiverted = true;
             ApplyHeat(SafeTemperature);
             Find.LetterStack.ReceiveLetter(DirectorVoice.CoolantLabel, DirectorVoice.CoolantText, LetterDefOf.PositiveEvent);
-            AddPoints(Progression.ValvePoints);
         }
 
         public void BringReactorOnline()
@@ -143,7 +143,6 @@ namespace Site44
             }
 
             Find.LetterStack.ReceiveLetter(DirectorVoice.ReactorLabel, DirectorVoice.ReactorText, LetterDefOf.PositiveEvent);
-            AddPoints(Progression.ReactorPoints);
         }
 
         public SecurityGroup GroupById(int id)
@@ -203,6 +202,11 @@ namespace Site44
 
         public override void MapComponentTick()
         {
+            if (IsFacilityMap && Find.TickManager.TicksGame % 60 == 0)
+            {
+                ScanBadges();
+            }
+
             if (!IsFacilityMap || coolantLoopDiverted || !Site44Tuning.HotZonesEnabled)
             {
                 return;
@@ -210,6 +214,29 @@ namespace Site44
             if (Find.TickManager.TicksGame % HeatCadenceTicks == 0)
             {
                 ApplyHeat(HotZoneTemperature);
+            }
+        }
+
+        // A colonist carrying a badge for this level is recognised at the badge's clearance; the badge is spent.
+        private void ScanBadges()
+        {
+            foreach (Pawn pawn in map.mapPawns.FreeColonistsSpawned)
+            {
+                Thing_ClearanceBadge badge = pawn.inventory.innerContainer.OfType<Thing_ClearanceBadge>().FirstOrDefault(b => b.mapId == map.uniqueID)
+                                             ?? pawn.carryTracker.CarriedThing as Thing_ClearanceBadge;
+                if (badge == null || badge.mapId != map.uniqueID)
+                {
+                    continue;
+                }
+
+                int tier = badge.tier;
+                string who = pawn.LabelShort;
+                badge.Destroy();
+                if (tier > clearance)
+                {
+                    Messages.Message(who + " is scanned by a clearance badge: " + DirectorVoice.TierName(tier, map) + ".", pawn, MessageTypeDefOf.PositiveEvent, false);
+                    GrantClearance(tier);
+                }
             }
         }
 
@@ -229,7 +256,7 @@ namespace Site44
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Values.Look(ref points, "points");
+            Scribe_Values.Look(ref clearance, "clearance");
             Scribe_Values.Look(ref siteTypeDefName, "siteTypeDefName");
             Scribe_Values.Look(ref startCell, "startCell", IntVec3.Invalid);
             Scribe_Values.Look(ref announcedTier, "announcedTier");

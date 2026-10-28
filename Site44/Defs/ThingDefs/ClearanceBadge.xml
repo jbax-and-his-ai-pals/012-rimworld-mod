@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <ThingDef ParentName="ResourceBase">
+    <defName>Site44_ClearanceBadge</defName>
+    <label>clearance badge</label>
+    <description>A laminated access badge. A colonist carrying it is recognised by this level's systems at the badge's clearance. It is used up on first scan.</description>
+    <thingClass>Site44.Thing_ClearanceBadge</thingClass>
+    <graphicData>
+      <texPath>Things/Item/Resource/ComponentIndustrial</texPath>
+      <graphicClass>Graphic_StackCount</graphicClass>
+      <color>(0.45,0.7,1)</color>
+    </graphicData>
+    <stackLimit>1</stackLimit>
+    <statBases>
+      <MarketValue>40</MarketValue>
+      <Mass>0.05</Mass>
+    </statBases>
+    <thingCategories Inherit="False" />
+    <tradeability>None</tradeability>
+    <techLevel>Industrial</techLevel>
+  </ThingDef>
+
+</Defs>

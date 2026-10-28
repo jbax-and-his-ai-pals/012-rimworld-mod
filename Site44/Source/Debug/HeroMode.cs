@@ -55,10 +55,7 @@ namespace Site44
                     continue;
                 }
 
-                if (facility.points < 9)
-                {
-                    facility.AddPoints(9 - facility.points);
-                }
+                facility.GrantClearance(3);
 
                 foreach (string sectorId in map.listerThings.ThingsOfDef(Site44DefOf.Site44_SealedHatch)
                              .OfType<Building_SealedHatch>().Select(h => h.sectorId).Distinct().ToList())

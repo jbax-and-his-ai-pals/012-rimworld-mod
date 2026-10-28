@@ -372,6 +372,14 @@ namespace Site44.Tests
                     }
                     // tiers / gates
                     if (z.Gate == GateKind.Open) Assert.Equal(0, z.RequiredTier);
+                    // only a restricted wing (a dead-end hall or storage zone, never the EVA cache) asks for clearance
+                    Assert.Equal(z.Restricted, z.RequiredTier > 0);
+                    if (z.Restricted)
+                    {
+                        Assert.Equal(GateKind.Terminal, z.Gate);
+                        Assert.Empty(z.Children);
+                        Assert.False(z.EvaCache);
+                    }
                     Assert.InRange(z.RequiredTier, 0, Progression.MaxTier);
                 }
                 Assert.Equal(n - 1, edges);
@@ -475,6 +483,16 @@ namespace Site44.Tests
             var dumps = new HashSet<string>();
             for (int seed = 0; seed < 30; seed++) dumps.Add(Dump(FacilityGraph.Build(plan, 10, seed)));
             Assert.True(dumps.Count > 10);
+        }
+
+        [Fact]
+        public void SomeSeedsHaveARestrictedWingButNotAll()
+        {
+            var plan = FacilityTestPlans.MakeBar(6);
+            int with = 0;
+            for (int seed = 0; seed < 60; seed++)
+                if (FacilityGraph.Build(plan, 16, seed).Zones.Any(z => z.Restricted)) with++;
+Assert.InRange(with, 15, 58);
         }
 
         [Fact]

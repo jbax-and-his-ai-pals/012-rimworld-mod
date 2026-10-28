@@ -64,7 +64,7 @@ namespace Site44
             string text = base.GetInspectString();
             string status = sectorId != null && sectorId.StartsWith("vault")
                 ? "Secure room. Sealed until a nearby terminal is hacked."
-                : "Sealed. Needs a terminal override (clearance " + DirectorVoice.TierName(requiredTier, Map) + ") or a keycard.";
+                : requiredTier > 0 ? "Restricted wing. Needs clearance " + DirectorVoice.TierName(requiredTier, Map) + " at its terminal." : "Sealed. Needs a terminal override or a keycard.";
             return text.NullOrEmpty() ? status : text + "\n" + status;
         }
     }

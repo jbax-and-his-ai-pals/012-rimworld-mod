@@ -15,7 +15,8 @@ namespace Site44.Gen
         public List<int> Children = new List<int>();
         public SectorKind Kind;
         public GateKind Gate;                           // gate on the entry from the parent (root: Open, unused)
-        public int RequiredTier;                        // clearance tier for a Terminal gate (0..Progression.MaxTier)
+        public int RequiredTier;                        // clearance tier for a Terminal gate (0..Progression.MaxTier); only restricted wings have one
+        public bool Restricted;                         // an advanced wing: a leaf zone behind a clearance-gated terminal, with better loot
         public int GateLink = -1;                       // index into plan.Links of the Door tile chosen as this zone's gate from its parent (-1 for root)
         public bool EvaCache;                           // exactly one Storage zone (reachable without crossing a HotZone) holds the EVA suits
     }
@@ -221,6 +222,7 @@ namespace Site44.Gen
             ChooseGateLinks(rng);
             AssignGates(rng);
             AssignRoles(rng);
+            AssignRestricted(rng);
             ComputeSealed();
         }
 
@@ -319,7 +321,30 @@ namespace Site44.Gen
                 if (z.ParentId < 0) { z.Gate = GateKind.Open; z.RequiredTier = 0; continue; }
                 if (rng.Next(100) < 45) { z.Gate = GateKind.Open; z.RequiredTier = 0; continue; }
                 z.Gate = GateKind.Terminal;
-                int t = z.Depth <= 2 ? 0 : z.Depth <= 5 ? 1 : z.Depth <= 9 ? 2 : 3;
+                z.RequiredTier = 0;   // an ordinary terminal gate asks for no clearance; AssignRestricted marks the few that do
+            }
+        }
+
+        // Some complexes hold an advanced wing: a dead-end zone whose terminal wants clearance. The way to earn it (a badge
+        // or a granting node) always lies on the near side, so a wing is optional and never blocks the rest.
+        private void AssignRestricted(FacilityRng rng)
+        {
+            var candidates = new List<Zone>();
+            foreach (Zone z in zones)
+            {
+                bool plain = z.Kind == SectorKind.Hall || z.Kind == SectorKind.Security || z.Kind == SectorKind.Diagnostic || (z.Kind == SectorKind.Storage && !z.EvaCache);
+                if (z.ParentId >= 0 && z.Children.Count == 0 && plain) candidates.Add(z);
+            }
+
+            if (zones.Count < 5 || candidates.Count == 0 || rng.Next(100) >= 75) return;
+            int wings = zones.Count >= 9 && candidates.Count > 1 && rng.Next(100) < 30 ? 2 : 1;
+            for (int i = 0; i < wings && candidates.Count > 0; i++)
+            {
+                Zone z = candidates[rng.Next(candidates.Count)];
+                candidates.Remove(z);
+                z.Restricted = true;
+                z.Gate = GateKind.Terminal;
+                int t = 1 + z.Depth / 3 + (rng.Next(100) < 25 ? 1 : 0);
                 z.RequiredTier = Math.Min(t, Progression.MaxTier);
             }
         }
@@ -505,8 +530,6 @@ namespace Site44.Gen
                 foreach (Zone z in zones)
                 {
                     if (visited[z.Id] || z.ParentId < 0 || !visited[z.ParentId]) continue;
-                    int tier = Progression.TierForPoints(points);
-                    if (z.Gate == GateKind.Terminal && tier < z.RequiredTier) continue;
                     if (z.Kind == SectorKind.HotZone && !(coolant || hasEva)) continue;
 
                     visited[z.Id] = true;

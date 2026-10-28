@@ -98,6 +98,17 @@ namespace Site44
             }
         }
 
+        // Vanilla rules: switches off every change this mod makes to how the game plays, leaving only the ruined complexes
+        // themselves. Events, infection, moods, supplies and hacking all behave as in the base game.
+        public void ApplyVanillaRules()
+        {
+            delveNoRaids = false; delveNoCaravanEvents = false; delveNoOtherThreats = false; delveNoOutsideVisitors = false; delveNoWeather = false;
+            delveInfection = 0; delveDressWounds = false;
+            missionFocusLevel = 0; hardenedToBodies = false; startingKit = false;
+            scarcity = 0f; drugFindChance = 0f; delverGearChance = 0f;
+            hackMinigame = false; securityEnabled = false; hotZonesEnabled = false;
+        }
+
         public void Reset()
         {
             Site44Settings defaults = new Site44Settings();
@@ -284,6 +295,11 @@ namespace Site44
                 {
                     s.ApplyPreset(i);
                 }
+            }
+
+            if (list.ButtonText("Vanilla rules (switch off the mod's gameplay changes)"))
+            {
+                s.ApplyVanillaRules();
             }
 
             Section(list, "Treasure");

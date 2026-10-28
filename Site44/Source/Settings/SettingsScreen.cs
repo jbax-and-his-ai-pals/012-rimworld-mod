@@ -544,7 +544,7 @@ namespace Site44
             Widgets.Label(new Rect(searchRow.x, searchRow.y + 3f, 60f, 24f), "Search");
             query = Widgets.TextField(new Rect(searchRow.x + 62f, searchRow.y, searchRow.width - 62f - 190f, 26f), query);
             bool changedBox = changedOnly;
-            Widgets.CheckboxLabeled(new Rect(searchRow.xMax - 184f, searchRow.y + 1f, 184f, 26f), "Changed settings only", ref changedBox);
+            Widgets.CheckboxLabeled(new Rect(searchRow.xMax - 184f, searchRow.y + 1f, 184f, 26f), "Modified settings only", ref changedBox);
             changedOnly = changedBox;
             bool filtering = !query.NullOrEmpty() || changedOnly;
 

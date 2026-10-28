@@ -20,7 +20,7 @@ namespace Site44
         {
             string text = base.GetInspectString();
             string status = unlocked
-                ? "Open. Stack loot beside the gate to carry it down."
+                ? "Open. The party goes down carrying only what it holds."
                 : "Sealed. The extraction terminal controls it.";
             return text.NullOrEmpty() ? status : text + "\n" + status;
         }

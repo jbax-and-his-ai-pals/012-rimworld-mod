@@ -85,7 +85,11 @@ namespace Site44
             graph = FacilityGraph.Build(plan, targetZones, graphSeed);
             faction = Site44Tuning.SecurityEnabled ? FacilityFaction.GetOrCreate() : null;
 
-            Reposition(width, height);
+            if (!GameComponent_Delve.IsDelve)
+            {
+                Reposition(width, height);
+            }
+
             startSpotForSafety = World(plan.Start);
             foreach (PlanRoom exec in plan.Rooms.Where(r => r.Function.ToString() == "PrivateOffice" && r.Cells.Count >= 20)
                          .OrderByDescending(r => r.Cells.Count).Take(2))
@@ -103,6 +107,11 @@ namespace Site44
             DigForecourts();
             BuildTiles();
             PaintPaths();
+            if (GameComponent_Delve.IsDelve)
+            {
+                SurroundWithRock();
+            }
+
             foreach (Zone zone in graph.Zones)
             {
                 BuildZone(zone);
@@ -555,6 +564,64 @@ namespace Site44
                 FilthMaker.TryMakeFilth(c, map, ThingDef.Named(Rand.Chance(0.6f) ? "Filth_RubbleBuilding" : "Filth_Dirt"), 1);
             }
         }
+
+        // Delve levels are the complex and nothing else: everything beyond a margin around the buildings, the paved
+        // paths and a small yard at the start is solid rock under a thick roof, so the map has no outside to wander.
+        private void SurroundWithRock()
+        {
+            ThingDef rock = Find.World.NaturalRockTypesIn(map.Tile).FirstOrDefault() ?? DefDatabase<ThingDef>.GetNamedSilentFail("Granite");
+            if (rock == null)
+            {
+                return;
+            }
+
+            TerrainDef rockTerrain = rock.building != null ? rock.building.naturalTerrain : null;
+            IntVec3 start = World(plan.Start);
+            int filled = 0;
+            foreach (IntVec3 c in map.AllCells)
+            {
+                int px = c.x - origin.x;
+                int py = c.z - origin.z;
+                bool open = Mathf.Max(Mathf.Abs(c.x - start.x), Mathf.Abs(c.z - start.z)) <= DelveFringe;
+                if (!open && plan.InBounds(px, py))
+                {
+                    open = plan.At(px, py) != PlanTile.Outside || NearBuilding(px, py, DelveMargin)
+                           || map.terrainGrid.TerrainAt(c) == TerrainDef.Named("PavedTile");
+                }
+
+                if (open)
+                {
+                    continue;
+                }
+
+                Thing edifice = c.GetEdifice(map);
+                if (edifice == null || edifice.def.building == null || !edifice.def.building.isNaturalRock)
+                {
+                    List<Thing> things = c.GetThingList(map);
+                    for (int i = things.Count - 1; i >= 0; i--)
+                    {
+                        if (things[i].def.category != ThingCategory.Pawn)
+                        {
+                            things[i].Destroy();
+                        }
+                    }
+
+                    GenSpawn.Spawn(ThingMaker.MakeThing(rock), c, map);
+                    if (rockTerrain != null)
+                    {
+                        map.terrainGrid.SetTerrain(c, rockTerrain);
+                    }
+                }
+
+                map.roofGrid.SetRoof(c, RoofDefOf.RoofRockThick);
+                filled++;
+            }
+
+            Log.Message("[Site-44] delve: " + filled + " cells of rock around the complex.");
+        }
+
+        private const int DelveMargin = 5;   // open ground kept around the buildings
+        private const int DelveFringe = 9;   // open ground kept around the start
 
         private bool NearBuilding(int x, int y, int distance)
         {
@@ -2277,6 +2344,14 @@ namespace Site44
         }
 
         // Delve mode: an extraction gate and its terminal in the room farthest from the start.
+        // The lobby and the rest of the entrance zone: where the party arrives, never where it leaves.
+        private bool IsEntryRoom(PlanRoom room)
+        {
+            string function = room.Function.ToString();
+            return function == "Lobby" || function == "Reception" || function == "Atrium"
+                   || graph.Zones[graph.ZoneOfRoom(room.Id)].Kind == SectorKind.Courtyard;
+        }
+
         private void PlaceExtraction()
         {
             if (!GameComponent_Delve.IsDelve)
@@ -2286,7 +2361,12 @@ namespace Site44
 
             // Quick test: the nearest suitable room instead of the farthest, and the gate starts unlocked.
             bool quick = GameComponent_Delve.QuickTest;
-            IEnumerable<PlanRoom> candidates = plan.Rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 12);
+            IEnumerable<PlanRoom> candidates = plan.Rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 12 && !IsEntryRoom(r));
+            if (!candidates.Any(r => TryFindSpotInRoom(r, Site44DefOf.Site44_ExtractionGate.size, out IntVec3 probe)))
+            {
+                candidates = plan.Rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 12);
+            }
+
             PlanRoom target = (quick
                     ? candidates.OrderBy(r => Mathf.Abs(r.Anchor.X - plan.Start.X) + Mathf.Abs(r.Anchor.Y - plan.Start.Y))
                     : candidates.OrderByDescending(r => Mathf.Abs(r.Anchor.X - plan.Start.X) + Mathf.Abs(r.Anchor.Y - plan.Start.Y)))

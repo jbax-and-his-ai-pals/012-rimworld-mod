@@ -12,8 +12,6 @@ namespace Site44
     // harder than the last. The run ends when the whole party is dead.
     public class GameComponent_Delve : GameComponent
     {
-        private const float StashRadius = 8f;
-
         public bool active;
         public int depth = 1;
         public List<string> biomePool = new List<string>();   // fixed when the run starts; empty = every biome
@@ -127,9 +125,6 @@ namespace Site44
             }
 
             List<Pawn> party = from.mapPawns.AllPawnsSpawned.Where(p => p.IsColonist && !p.Dead).ToList();
-            List<Thing> stash = from.listerThings.AllThings
-                .Where(t => t.def.category == ThingCategory.Item && t.Position.DistanceTo(gatePosition) <= StashRadius)
-                .ToList();
 
             SiteTypeDef type = SiteTypes.All.Where(t => t.questWeight > 0f).RandomElementByWeight(t => t.questWeight);
             PlanetTile tile;
@@ -173,19 +168,10 @@ namespace Site44
                 GenSpawn.Spawn(pawn, CellFinder.RandomClosewalkCellNear(spot, map, 6, c => c.Standable(map)), map);
             }
 
-            foreach (Thing item in stash)
-            {
-                if (item.Spawned)
-                {
-                    item.DeSpawn();
-                    GenPlace.TryPlaceThing(item, CellFinder.RandomClosewalkCellNear(spot, map, 6, c => c.Standable(map)), map, ThingPlaceMode.Near);
-                }
-            }
-
             Verse.Current.Game.CurrentMap = map;
             CameraJumper.TryJump(spot, map);
             Messages.Message("Depth " + depth + ": " + type.LabelCap + ".", MessageTypeDefOf.PositiveEvent, false);
-            Log.Message("[Site-44] delve: depth " + depth + " (" + type.defName + "), " + party.Count + " colonist(s) and " + stash.Count + " stash stack(s) carried.");
+            Log.Message("[Site-44] delve: depth " + depth + " (" + type.defName + "), " + party.Count + " colonist(s) carried down.");
 
             if (from.Parent is Site)
             {

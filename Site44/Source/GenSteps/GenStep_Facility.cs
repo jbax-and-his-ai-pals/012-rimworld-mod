@@ -168,6 +168,25 @@ namespace Site44
                 }
             }
 
+            // The vanilla animal step picks cells without knowing about the rock ring, so wildlife can land inside it.
+            if (GameComponent_Delve.IsDelve)
+            {
+                int buried = 0;
+                foreach (Pawn animal in map.mapPawns.AllPawnsSpawned.ToList())
+                {
+                    if (animal.Faction == null && animal.RaceProps.Animal && !animal.Position.Standable(map))
+                    {
+                        animal.Destroy();
+                        buried++;
+                    }
+                }
+
+                if (buried > 0)
+                {
+                    Log.Message("[Site-44] delve: removed " + buried + " animal(s) placed inside rock.");
+                }
+            }
+
             foreach (Thing thing in map.listerThings.AllThings.ToList())
             {
                 if (thing is Building_Turret && thing.Faction != null && !thing.Faction.IsPlayer && thing.Faction.HostileTo(player)

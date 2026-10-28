@@ -32,7 +32,7 @@ namespace Site44
         public const int MildLevels = 3;
 
         // Chance that a terminal-locked gate also has a keycard on the near side, and that the card is guarded by a nest.
-        public const float KeycardChance = 0.5f;
+        public static float KeycardChance => S.keycardChance;
         public const float KeycardNestChance = 0.7f;
 
         // Chance that a diagnostic or hatch node carries a bonus action.

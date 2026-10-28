@@ -136,12 +136,13 @@ namespace Site44.Gen
 
         private static int Clamp(int v, int lo, int hi) { return v < lo ? lo : (v > hi ? hi : v); }
 
-        public static CipherPuzzle Create(int seed, int hackerSkill, int tier)
+        public static CipherPuzzle Create(int seed, int hackerSkill, int tier, int difficulty = 1)
         {
             int skill = Clamp(hackerSkill, 0, 20);
             tier = Clamp(tier, 0, 3);
             int length = tier <= 1 ? 5 : (tier == 2 ? 6 : 7);
-            int count = Clamp(16 - skill / 2 + tier, 6, 20);
+            difficulty = Clamp(difficulty, 0, 2);
+            int count = Clamp(16 - skill / 2 + tier + (difficulty - 1) * 4, 6, 22);
 
             var rng = new Rng(unchecked(seed + skill * 7919 + tier * 104729));
             string[] pool = pools[length];
@@ -168,7 +169,7 @@ namespace Site44.Gen
 
             var puzzle = new CipherPuzzle(answer, rng);
             puzzle.CodeLength = length;
-            puzzle.attemptsLeft = Clamp(4 + skill / 5, 4, 8);
+            puzzle.attemptsLeft = difficulty == 0 ? Clamp(6 + skill / 5, 6, 10) : difficulty == 1 ? Clamp(4 + skill / 5, 4, 8) : Clamp(4 + skill / 10, 4, 6);
             puzzle.purgesLeft = Clamp(skill / 4, 0, 4);
 
             // Bucket decoys by positional matches.
@@ -202,7 +203,7 @@ namespace Site44.Gen
             };
 
             // Harder terminals hide more look-alikes: words sharing most of their letters in place with the answer.
-            int nNear = 1 + tier;
+            int nNear = Math.Max(1, 1 + tier + (difficulty - 1));
             int nZero = Math.Max(1, (need + 3) / 4);
             int nLow = Math.Max(1, (need * 35 + 99) / 100);
             take(near, nNear);

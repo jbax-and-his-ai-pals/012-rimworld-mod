@@ -13,6 +13,11 @@ namespace Site44
 
         // Treasure
         public float lootAmount = 1f;
+        public int startingColonists = 3;                     // 1-5
+        public int puzzleDifficulty = 1;                      // 0 easy, 1 normal, 2 hard
+        public float keycardChance = 0.5f;                    // terminal gates that also have a keycard
+        public float restrictedWingChance = 0.75f;            // complexes that hold a clearance-gated wing
+        public float nestDensity = 1f;
         public float scarcity = 0.75f;                        // how rarely medicine and meals turn up, and how small the stacks are
         public float crateDensity = 1f;
         public float preservedRoomChance = 0.07f;
@@ -67,6 +72,11 @@ namespace Site44
             Site44Settings defaults = new Site44Settings();
             lootAmount = defaults.lootAmount;
             scarcity = defaults.scarcity;
+            startingColonists = defaults.startingColonists;
+            puzzleDifficulty = defaults.puzzleDifficulty;
+            keycardChance = defaults.keycardChance;
+            restrictedWingChance = defaults.restrictedWingChance;
+            nestDensity = defaults.nestDensity;
             skipWorldSetup = defaults.skipWorldSetup;
             biomePool = new List<string>();
             biomePoolV2 = false;
@@ -103,6 +113,11 @@ namespace Site44
         {
             Scribe_Values.Look(ref lootAmount, "lootAmount", 1f);
             Scribe_Values.Look(ref scarcity, "scarcity", 0.75f);
+            Scribe_Values.Look(ref startingColonists, "startingColonists", 3);
+            Scribe_Values.Look(ref puzzleDifficulty, "puzzleDifficulty", 1);
+            Scribe_Values.Look(ref keycardChance, "keycardChance", 0.5f);
+            Scribe_Values.Look(ref restrictedWingChance, "restrictedWingChance", 0.75f);
+            Scribe_Values.Look(ref nestDensity, "nestDensity", 1f);
             Scribe_Values.Look(ref crateDensity, "crateDensity", 1f);
             Scribe_Values.Look(ref preservedRoomChance, "preservedRoomChance", 0.07f);
             Scribe_Values.Look(ref casketDensity, "casketDensity", 1f);
@@ -274,6 +289,12 @@ namespace Site44
                 "Switches off traders, visitors, travelers, wanderers, refugee and resource pods, migrating herds and similar arrivals.");
             list.CheckboxLabeled("No weather disasters", ref s.delveNoWeather,
                 "Switches off toxic fallout, volcanic winter, heat waves, cold snaps, flash storms, solar flares and eclipses.");
+            Section(list, "Party");
+            list.Label("Starting colonists:  " + s.startingColonists, -1f, new TipSignal(
+                "How many colonists a new Site-44 game starts with, chosen from a larger pool on the character page. A larger party survives longer; a smaller one makes every loss count."));
+            s.startingColonists = Mathf.RoundToInt(list.Slider(s.startingColonists, 1f, 5f));
+            list.Label("The character page requires at least one colonist who can shoot and one who can do intellectual work, since fighting and hacking come up in every complex.");
+
             Section(list, "Morale");
             list.Label("Mission focus (mood bonus inside a complex):  " + new[] { "off", "low (+3)", "normal (+6)", "high (+10)" }[Mathf.Clamp(s.missionFocusLevel, 0, 3)], -1f, new TipSignal(
                 "A steady mood lift for colonists working inside a ruined complex. Raise it if breaks are too frequent."));
@@ -287,12 +308,22 @@ namespace Site44
             s.delverGearChance = Percent(list, "Delver gear in rich loot", s.delverGearChance, 0f, 0.5f,
                 "Chance that a rich loot item is a delver's cap or vest, which lower the chance of mental breaks.");
             Section(list, "Hacking and security");
+            list.Label("Puzzle difficulty:  " + new[] { "easy", "normal", "hard" }[Mathf.Clamp(s.puzzleDifficulty, 0, 2)], -1f, new TipSignal(
+                "Easy: two extra attempts and fewer decoys. Normal: four attempts, plus one per five skill levels. Hard: four attempts at most, more decoys and more look-alike words."));
+            s.puzzleDifficulty = Mathf.RoundToInt(list.Slider(s.puzzleDifficulty, 0f, 2f));
             list.CheckboxLabeled("Cipher-lock hacking", ref s.hackMinigame,
                 "On: gate and diagnostic terminals open a code-guessing puzzle; skill gives more attempts and fewer decoys.\nOff: terminals are hacked with a plain timed job.");
             list.CheckboxLabeled("Facility security (experimental)", ref s.securityEnabled,
                 "Turrets, patrol mechanoids and alarm squads inside the complex. Off by default so the first exploration is safe.");
             list.CheckboxLabeled("Overheated sectors (gated layout only)", ref s.hotZonesEnabled,
                 "Some sectors in the gated layout are dangerously hot until the coolant valve is turned.");
+
+            s.keycardChance = Percent(list, "Keycard for a locked gate", s.keycardChance, 0f, 1f,
+                "Chance that a terminal-locked gate also has a keycard on the near side, usually guarded by a nest. A second way past the gate besides hacking.");
+            s.restrictedWingChance = Percent(list, "Clearance-gated wing", s.restrictedWingChance, 0f, 1f,
+                "Chance that a complex holds an advanced wing with better loot, behind a terminal that wants clearance. A badge or a granting node on the near side raises your clearance.");
+            s.nestDensity = Multiplier(list, "Creature nests", s.nestDensity, 0f, 3f,
+                "How many rooms are guarded by a hostile nest. x0 = none, x1 = normal.");
 
             Section(list, "Special rooms");
             s.recRoomFrequency = Multiplier(list, "Rec rooms", s.recRoomFrequency, 0f, 3f,

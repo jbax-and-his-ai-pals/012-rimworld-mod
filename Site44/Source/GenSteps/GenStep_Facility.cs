@@ -82,6 +82,7 @@ namespace Site44
             plan = siteType != null
                 ? BuildingPlanner.Generate(width, height, planSeed, siteType.ToProfile())
                 : BuildingPlanner.Generate(width, height, planSeed);
+            FacilityGraph.RestrictedChancePercent = Mathf.RoundToInt(100f * Site44Settings.Current.restrictedWingChance);
             graph = FacilityGraph.Build(plan, targetZones, graphSeed);
             faction = Site44Tuning.SecurityEnabled ? FacilityFaction.GetOrCreate() : null;
 
@@ -1730,7 +1731,8 @@ namespace Site44
             {
                 BeatChance = Site44Tuning.BeatChance,
                 CasketWeight = 14f * Mathf.Max(0f, Site44Tuning.CasketDensity),
-                StashWeight = 15f * Mathf.Max(0f, Site44Tuning.StrayCorpseChance / 0.15f)
+                StashWeight = 15f * Mathf.Max(0f, Site44Tuning.StrayCorpseChance / 0.15f),
+                NestWeight = 12f * Mathf.Max(0f, Site44Settings.Current.nestDensity)
             };
             RoomBeat[] beats = RoomBeats.Plan(Rand.Int, beatRooms, startRoom, settings);
 

@@ -327,6 +327,9 @@ namespace Site44.Gen
 
         // Some complexes hold an advanced wing: a dead-end zone whose terminal wants clearance. The way to earn it (a badge
         // or a granting node) always lies on the near side, so a wing is optional and never blocks the rest.
+        // Percent of complexes that hold a restricted wing; the game sets it from the settings.
+        public static int RestrictedChancePercent = 75;
+
         private void AssignRestricted(FacilityRng rng)
         {
             var candidates = new List<Zone>();
@@ -336,7 +339,7 @@ namespace Site44.Gen
                 if (z.ParentId >= 0 && z.Children.Count == 0 && plain) candidates.Add(z);
             }
 
-            if (zones.Count < 5 || candidates.Count == 0 || rng.Next(100) >= 75) return;
+            if (zones.Count < 5 || candidates.Count == 0 || rng.Next(100) >= RestrictedChancePercent) return;
             int wings = zones.Count >= 9 && candidates.Count > 1 && rng.Next(100) < 30 ? 2 : 1;
             for (int i = 0; i < wings && candidates.Count > 0; i++)
             {

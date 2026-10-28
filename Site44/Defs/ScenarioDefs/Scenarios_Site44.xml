@@ -21,10 +21,14 @@ Playing with Ideology? Choose the Classic ideoligion on the ideoligion page: a p
       <summary>Start in the breached courtyard of a sealed megastructure.</summary>
       <parts>
 
-        <li Class="ScenPart_ConfigPage_ConfigureStartingPawns">
+        <li Class="Site44.ScenPart_Site44StartingPawns">
           <def>ConfigPage_ConfigureStartingPawns</def>
           <pawnCount>3</pawnCount>
           <pawnChoiceCount>8</pawnChoiceCount>
+          <requiredSkills>
+            <li>Shooting</li>
+            <li>Intellectual</li>
+          </requiredSkills>
         </li>
 
         <li Class="ScenPart_PlayerPawnsArriveMethod">

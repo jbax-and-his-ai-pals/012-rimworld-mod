@@ -69,7 +69,7 @@ namespace Site44
         // Delivery
         public float questFrequency = 1f;
 
-        public static readonly string[] PresetNames = { "Easier", "Default", "Harder", "Brutal" };
+        public static readonly string[] PresetNames = { "Easier", "Default", "Harder", "Brutal", "Unfair" };
 
         // Balance presets: only the difficulty settings change. Sizes, biomes, scenario choices and the event switches are kept.
         public void ApplyPreset(int preset)
@@ -79,6 +79,8 @@ namespace Site44
             delveInfection = d.delveInfection; delveDressWounds = d.delveDressWounds; puzzleDifficulty = d.puzzleDifficulty;
             keycardX = d.keycardX; nestDensity = d.nestDensity; startingColonists = d.startingColonists;
             drugFindX = d.drugFindX; securityEnabled = d.securityEnabled; missionFocusLevel = d.missionFocusLevel;
+            delveAllowRaids = d.delveAllowRaids; delveAllowCaravanEvents = d.delveAllowCaravanEvents; delveAllowOtherThreats = d.delveAllowOtherThreats;
+            delveAllowOutsideVisitors = d.delveAllowOutsideVisitors; delveAllowWeather = d.delveAllowWeather;
             switch (preset)
             {
                 case 0:
@@ -94,6 +96,14 @@ namespace Site44
                     supplyX = 0f; lootAmount = 0.6f; crateDensity = 0.6f; hostileCasketX = 2.2f;
                     delveInfection = 0; puzzleDifficulty = 2; keycardX = 0.3f; nestDensity = 2.2f; startingColonists = 2;
                     drugFindX = 0.3f; securityEnabled = true; missionFocusLevel = 1;
+                    break;
+                case 4:
+                    // Not balanced to be won: a lone colonist, no medicine, vanilla infection, nests and sleepers everywhere,
+                    // no keycards, and the outside world switched back on (raids, threats, weather).
+                    supplyX = 0f; lootAmount = 0.4f; crateDensity = 0.4f; hostileCasketX = 3f;
+                    delveInfection = 0; puzzleDifficulty = 2; keycardX = 0f; nestDensity = 3f; startingColonists = 1;
+                    drugFindX = 0f; securityEnabled = true; missionFocusLevel = 0;
+                    delveAllowRaids = true; delveAllowOtherThreats = true; delveAllowWeather = true;
                     break;
             }
         }

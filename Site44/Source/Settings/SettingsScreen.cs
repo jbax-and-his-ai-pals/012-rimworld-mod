@@ -291,7 +291,8 @@ namespace Site44
         private static readonly string[] PresetFields =
         {
             "supplyX", "lootAmount", "crateDensity", "hostileCasketX", "delveInfection", "delveDressWounds", "puzzleDifficulty",
-            "keycardX", "nestDensity", "startingColonists", "drugFindX", "securityEnabled", "missionFocusLevel"
+            "keycardX", "nestDensity", "startingColonists", "drugFindX", "securityEnabled", "missionFocusLevel",
+            "delveAllowRaids", "delveAllowCaravanEvents", "delveAllowOtherThreats", "delveAllowOutsideVisitors", "delveAllowWeather"
         };
 
         private static readonly string[] VanillaFields =
@@ -753,7 +754,9 @@ namespace Site44
                 Rect button = new Rect(block.x + i * (buttonWidth + gap), block.y, buttonWidth, height);
                 TooltipHandler.TipRegion(button, i == 1
                     ? "Resets every setting in this mod to its default, including sizes and scenario choices."
-                    : "Sets loot, supplies, infection, puzzles, keycards, nests and party size to the " + name.ToLower() + " preset. Sizes and scenario choices are kept.");
+                    : i == 4
+                        ? "Not balanced to be won: one colonist, no medicine, vanilla infection, nests everywhere, no keycards, and raids, threats and weather switched on. Sizes and scenario choices are kept."
+                        : "Sets loot, supplies, infection, puzzles, keycards, nests and party size to the " + name.ToLower() + " preset. Sizes and scenario choices are kept.");
                 DrawPresetButton(button, name, current == name, () =>
                 {
                     if (i == 1) S.Reset(); else S.ApplyPreset(i);

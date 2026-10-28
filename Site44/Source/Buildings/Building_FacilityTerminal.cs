@@ -110,7 +110,7 @@ namespace Site44
             }
             else if (kind == TerminalKind.Gate)
             {
-                status = "Locked: " + KindLabel() + ". Needs clearance " + DirectorVoice.TierName(requiredTier) + ".";
+                status = "Locked: " + KindLabel() + ". Needs clearance " + DirectorVoice.TierName(requiredTier, Map) + ".";
             }
             else
             {
@@ -157,7 +157,7 @@ namespace Site44
             }
             else if (kind == TerminalKind.Gate && facility.Tier < requiredTier)
             {
-                yield return new FloatMenuOption(label + " (needs clearance " + DirectorVoice.TierName(requiredTier) + ")", null);
+                yield return new FloatMenuOption(label + " (needs clearance " + DirectorVoice.TierName(requiredTier, Map) + ")", null);
             }
             else if (!selPawn.CanReach(this, PathEndMode.Touch, Danger.Deadly))
             {
@@ -210,7 +210,7 @@ namespace Site44
             MapComponent_Facility facility = Map.GetComponent<MapComponent_Facility>();
             if (kind == TerminalKind.Gate && facility.Tier < requiredTier)
             {
-                Messages.Message("Access denied: clearance " + DirectorVoice.TierName(requiredTier) + " required.", this, MessageTypeDefOf.RejectInput, false);
+                Messages.Message("Access denied: clearance " + DirectorVoice.TierName(requiredTier, Map) + " required.", this, MessageTypeDefOf.RejectInput, false);
                 return;
             }
 

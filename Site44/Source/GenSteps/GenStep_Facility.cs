@@ -138,6 +138,7 @@ namespace Site44
             MapComponent_Facility facility = map.GetComponent<MapComponent_Facility>();
             facility.Initialize(width, height, planSeed, graphSeed, targetZones, hotAnchors);
             facility.startCell = startSpot;
+            facility.siteTypeDefName = siteType != null ? siteType.defName : null;
 
             FacilityFaction.ApplyTier(0);
 

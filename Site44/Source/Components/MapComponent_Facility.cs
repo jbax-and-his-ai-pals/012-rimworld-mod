@@ -15,6 +15,7 @@ namespace Site44
         private const float AlarmChance = 0.35f;
 
         public int points;
+        public string siteTypeDefName;   // which kind of complex this is; names the insider clearance rung
         public IntVec3 startCell = IntVec3.Invalid;
         public bool coolantLoopDiverted;
         public bool mainReactorOnline;
@@ -75,7 +76,7 @@ namespace Site44
         private void OnTierReached(int tier)
         {
             FacilityFaction.ApplyTier(tier);
-            Find.LetterStack.ReceiveLetter(DirectorVoice.TierLabel(tier), DirectorVoice.TierText(tier), LetterDefOf.PositiveEvent);
+            Find.LetterStack.ReceiveLetter(DirectorVoice.TierLabel(tier, map), DirectorVoice.TierText(tier, map), LetterDefOf.PositiveEvent);
         }
 
         // Replaces each sealed hatch of the sector with a plain door and lifts the fog behind it.
@@ -229,6 +230,7 @@ namespace Site44
         {
             base.ExposeData();
             Scribe_Values.Look(ref points, "points");
+            Scribe_Values.Look(ref siteTypeDefName, "siteTypeDefName");
             Scribe_Values.Look(ref startCell, "startCell", IntVec3.Invalid);
             Scribe_Values.Look(ref announcedTier, "announcedTier");
             Scribe_Values.Look(ref coolantLoopDiverted, "coolantLoopDiverted");

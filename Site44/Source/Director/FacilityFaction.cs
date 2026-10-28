@@ -4,7 +4,7 @@ using Verse;
 namespace Site44
 {
     // The facility's security units belong to a hidden faction whose relation to the player
-    // follows the clearance tier (hostile until MAINTENANCE, then allied).
+    // follows the clearance tier (hostile until the insider tier, then allied).
     public static class FacilityFaction
     {
         public const int AllyTier = 2;

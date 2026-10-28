@@ -372,7 +372,7 @@ namespace Site44
             list.Label("The biomes complexes are drawn from are chosen on the new game screen, right after the storyteller.");
 
             Section(list, "Delve rules (applied when a Delve run starts)");
-            list.Label("Delve mode disables raids, threats, and disasters by default. You can reenable them here. Best depth so far: " + s.bestDelveDepth + "."); unticked groups are switched off. This is for the Site-44 Delve scenario only; other scenarios are never touched. Best depth so far: " + s.bestDelveDepth + ".");
+            list.Label("Delve mode disables raids, threats, and disasters by default. You can reenable them here. Best depth so far: " + s.bestDelveDepth + ".");
             list.CheckboxLabeled("Enemy raids", ref s.delveAllowRaids,
                 "Ticked: ordinary enemy raids can happen during a run. Unticked (the default): none do.");
             list.CheckboxLabeled("Caravan events", ref s.delveAllowCaravanEvents,

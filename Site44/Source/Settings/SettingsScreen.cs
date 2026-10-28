@@ -766,6 +766,80 @@ namespace Site44
 
             list.Gap(8f);
             list.Label(Summary());
+            List<string> harsh = HarshnessWarnings();
+            if (harsh.Count > 0)
+            {
+                list.Gap(6f);
+                GUI.color = new Color(1f, 0.6f, 0.35f);
+                list.Label("Warning: this combination is very harsh. " + string.Join(" ", harsh.Take(3).ToArray()));
+                GUI.color = Color.white;
+            }
+        }
+
+        // Combinations that make a run close to unwinnable. They are allowed (nothing is ever blocked), but worth a warning.
+        private static List<string> HarshnessWarnings()
+        {
+            var reasons = new List<string>();
+            int score = 0;
+            bool noMedicine = Site44Tuning.SupplyShare <= 0.0001f;
+            if (noMedicine && S.delveInfection == 0)
+            {
+                reasons.Add("No medicine and vanilla wound infection means most serious wounds are fatal.");
+                score += 4;
+            }
+            else if (Site44Tuning.SupplyShare <= 0.05f)
+            {
+                reasons.Add("Medicine is almost absent.");
+                score += 2;
+            }
+
+            if (S.startingColonists == 1)
+            {
+                reasons.Add("A single colonist ends the run with the first death.");
+                score += 2;
+            }
+            else if (S.startingColonists == 2)
+            {
+                score += 1;
+            }
+
+            if (S.nestDensity >= 2.5f)
+            {
+                reasons.Add("Nests are in nearly every room.");
+                score += 2;
+            }
+            else if (S.nestDensity >= 1.5f)
+            {
+                score += 1;
+            }
+
+            if (S.delveAllowRaids)
+            {
+                reasons.Add("Raids are enabled" + (S.startingColonists <= 2 ? " against a very small party." : "."));
+                score += S.startingColonists <= 2 ? 3 : 1;
+            }
+
+            if (S.securityEnabled)
+            {
+                score += 1;
+            }
+
+            if (S.hostileCasketX >= 2f)
+            {
+                score += 1;
+            }
+
+            if (S.lootAmount <= 0.6f)
+            {
+                score += 1;
+            }
+
+            if (score >= 4 && reasons.Count == 0)
+            {
+                reasons.Add("Several difficulty settings stack up.");
+            }
+
+            return score >= 4 ? reasons : new List<string>();
         }
 
         // A button that stays lit while the settings match what it sets.

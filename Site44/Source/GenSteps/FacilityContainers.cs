@@ -159,9 +159,13 @@ namespace Site44
             {
                 def = Def("ComponentIndustrial");
             }
-            else
+            else if (roll < 95)
             {
                 def = Def("MedicineIndustrial");
+            }
+            else
+            {
+                def = Def("Site44_AntisepticInjector") ?? Def("MedicineIndustrial");
             }
 
             if (def == null)
@@ -267,6 +271,19 @@ namespace Site44
             }
 
             GenSpawn.Spawn(crate, spot, map, Rot4.North);
+            return true;
+        }
+
+        // One loose item set down in a room: the antiseptic injector kept in an advanced wing.
+        public bool TrySpawnItem(PlanRoom room, Thing item)
+        {
+            IntVec3 spot;
+            if (item == null || !TryFindSpot(room, IntVec2.One, out spot))
+            {
+                return false;
+            }
+
+            GenSpawn.Spawn(item, spot, map);
             return true;
         }
 

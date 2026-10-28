@@ -1790,6 +1790,19 @@ namespace Site44
                 }
             }
 
+            // Every advanced wing keeps an antiseptic injector somewhere inside.
+            ThingDef injector = DefDatabase<ThingDef>.GetNamedSilentFail("Site44_AntisepticInjector");
+            foreach (Zone wing in graph.Zones.Where(z => z.Restricted && lockedGateZones.Contains(z.Id)))
+            {
+                foreach (PlanRoom room in plan.Rooms.Where(r => graph.ZoneOfRoom(r.Id) == wing.Id && !r.IsCorridor).OrderBy(r => Rand.Value))
+                {
+                    if (injector != null && containers.TrySpawnItem(room, ThingMaker.MakeThing(injector)))
+                    {
+                        break;
+                    }
+                }
+            }
+
             // Caskets: survivors first, then hostile sleepers and remains by share, the rest just loot. Hostile sleepers
             // keep their old rules: deep inside, and well away from the start.
             int total = casketRooms.Count;

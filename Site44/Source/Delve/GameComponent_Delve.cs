@@ -21,6 +21,11 @@ namespace Site44
         {
         }
 
+        public override void FinalizeInit()
+        {
+            DelveHealth.Apply(IsDelve ? DelveHealth.InfectionFactor(Site44Settings.Current) : 1f);
+        }
+
         public static GameComponent_Delve Instance => Verse.Current.Game?.GetComponent<GameComponent_Delve>();
 
         // Delve mode is on once a run has started. Level 1 is generated before the run formally starts, so a Delve scenario
@@ -166,6 +171,12 @@ namespace Site44
                 pawn.jobs?.StopAll();
                 pawn.DeSpawn();
                 GenSpawn.Spawn(pawn, CellFinder.RandomClosewalkCellNear(spot, map, 6, c => c.Standable(map)), map);
+            }
+
+            int dressed = DelveHealth.TendParty(party);
+            if (dressed > 0)
+            {
+                Messages.Message("The lift's med bay dresses " + dressed + " wound(s) on the way down.", MessageTypeDefOf.PositiveEvent, false);
             }
 
             Verse.Current.Game.CurrentMap = map;

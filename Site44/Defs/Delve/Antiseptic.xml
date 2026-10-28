@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- A rare cure for the one thing a small crew cannot easily treat: a septic wound. -->
+  <ThingDef ParentName="DrugPillBase">
+    <defName>Site44_AntisepticInjector</defName>
+    <label>antiseptic injector</label>
+    <description>A single-use injector of broad-spectrum antiseptic. It clears wound infections outright and dresses the wounds that are left. Rare, because everyone who finds one wants it.</description>
+    <graphicData>
+      <texPath>Things/Item/Drug/Penoxycyline</texPath>
+      <graphicClass>Graphic_StackCount</graphicClass>
+      <color>(0.6,1,0.85)</color>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <statBases>
+      <MarketValue>90</MarketValue>
+      <Mass>0.02</Mass>
+    </statBases>
+    <techLevel>Spacer</techLevel>
+    <ingestible>
+      <drugCategory>Medical</drugCategory>
+      <outcomeDoers>
+        <li Class="Site44.IngestionOutcomeDoer_Antiseptic" />
+      </outcomeDoers>
+    </ingestible>
+    <comps>
+      <li Class="CompProperties_Drug">
+        <listOrder>1010</listOrder>
+      </li>
+    </comps>
+  </ThingDef>
+
+</Defs>

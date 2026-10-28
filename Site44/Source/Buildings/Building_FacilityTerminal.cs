@@ -48,7 +48,7 @@ namespace Site44
         public void LockOut(Pawn hacker)
         {
             // A failed attempt costs no waiting: the terminal accepts another try straight away.
-            Messages.Message(hacker.LabelShort + " fails to crack the terminal. It can be tried again at once.", this, MessageTypeDefOf.NegativeEvent, false);
+            Messages.Message(hacker.LabelShort + " fails to crack the terminal. Please try again.", this, MessageTypeDefOf.NegativeEvent, false);
             MapComponent_Facility facility = Map.GetComponent<MapComponent_Facility>();
             if (facility.Tier < FacilityFaction.AllyTier)
             {

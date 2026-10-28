@@ -445,6 +445,8 @@ namespace Site44
             changedOnly = changedBox;
             bool filtering = !query.NullOrEmpty() || changedOnly;
 
+            DrawContents(toc, filtering);
+
             Rect listRect = new Rect(main.x, main.y + 34f, main.width, main.height - 34f);
             Rect view = new Rect(0f, 0f, listRect.width - 20f, viewHeight);
             if (pendingScroll >= 0f)
@@ -457,6 +459,8 @@ namespace Site44
             Listing_Standard list = new Listing_Standard();
             list.Begin(view);
             sectionTop.Clear();
+            try
+            {
 
             if (!filtering)
             {
@@ -486,7 +490,7 @@ namespace Site44
                 list.GapLine(4f);
                 foreach (SettingRow row in rows)
                 {
-                    row.Draw(list);
+                    DrawRowSafely(list, row);
                     shown++;
                 }
             }
@@ -499,10 +503,40 @@ namespace Site44
             }
 
             viewHeight = Mathf.Max(200f, list.CurHeight + 30f);
-            list.End();
-            Widgets.EndScrollView();
+            }
+            catch (Exception e)
+            {
+                Log.ErrorOnce("[Site-44] settings screen failed to draw: " + e, 482113);
+            }
+            finally
+            {
+                GUI.color = Color.white;
+                list.End();
+                Widgets.EndScrollView();
+            }
+        }
 
-            DrawContents(toc, filtering);
+        private static readonly HashSet<string> reported = new HashSet<string>();
+
+        private static void DrawRowSafely(Listing_Standard list, SettingRow row)
+        {
+            try
+            {
+                row.Draw(list);
+            }
+            catch (Exception e)
+            {
+                if (reported.Add(row.Label))
+                {
+                    Log.Error("[Site-44] settings row '" + row.Label + "' failed to draw: " + e);
+                }
+
+                GUI.color = Color.white;
+                Text.Font = GameFont.Small;
+                GUI.color = new Color(1f, 0.5f, 0.4f);
+                list.Label(row.Label + ": this setting could not be drawn (see the log).");
+                GUI.color = Color.white;
+            }
         }
 
         private static bool Matches(SettingRow row)

@@ -108,7 +108,8 @@ namespace Site44
             List<BiomeDef> extreme = biomes.Where(IsExtreme).ToList();
             const float rowHeight = 30f;
             const float headerHeight = 34f;
-            float height = standard.Count * rowHeight + (extreme.Count > 0 ? headerHeight * 2f + extreme.Count * rowHeight : headerHeight);
+            const float extremeHeaderHeight = 58f;
+            float height = standard.Count * rowHeight + (extreme.Count > 0 ? headerHeight + extremeHeaderHeight + extreme.Count * rowHeight : headerHeight);
             Rect view = new Rect(0f, 0f, outer.width - 16f, height);
             Widgets.BeginScrollView(outer, ref scroll, view);
             float y = 0f;
@@ -117,21 +118,30 @@ namespace Site44
             DrawRows(s, biomes, standard, view.width, ref y, rowHeight);
             if (extreme.Count > 0)
             {
-                DrawHeader(new Rect(0f, y, view.width, headerHeight), "Extreme climates (opt-in, dangerous without preparation)");
-                y += headerHeight;
+                DrawHeader(new Rect(0f, y, view.width, extremeHeaderHeight), "Extreme climates", "Opt-in. Dangerous without preparation.");
+                y += extremeHeaderHeight;
                 DrawRows(s, biomes, extreme, view.width, ref y, rowHeight);
             }
 
             Widgets.EndScrollView();
         }
 
-        private static void DrawHeader(Rect rect, string label)
+        private static void DrawHeader(Rect rect, string label, string detail = null)
         {
+            float titleHeight = detail == null ? rect.height : rect.height - 22f;
             Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.LowerLeft;
-            Widgets.Label(new Rect(rect.x + 6f, rect.y, rect.width - 6f, rect.height), label);
-            Text.Anchor = TextAnchor.UpperLeft;
+            Widgets.Label(new Rect(rect.x + 6f, rect.y, rect.width - 6f, titleHeight), label);
             Text.Font = GameFont.Small;
+            if (detail != null)
+            {
+                Text.Anchor = TextAnchor.UpperLeft;
+                GUI.color = Color.gray;
+                Widgets.Label(new Rect(rect.x + 6f, rect.y + titleHeight, rect.width - 6f, 22f), detail);
+                GUI.color = Color.white;
+            }
+
+            Text.Anchor = TextAnchor.UpperLeft;
         }
 
         private static void DrawRows(Site44Settings s, List<BiomeDef> all, List<BiomeDef> group, float width, ref float y, float rowHeight)

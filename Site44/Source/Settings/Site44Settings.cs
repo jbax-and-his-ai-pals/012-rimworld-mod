@@ -239,8 +239,35 @@ namespace Site44
 
         private static float Multiplier(Listing_Standard list, string label, float value, float min, float max, string tip)
         {
-            list.Label(label + ":  x" + value.ToString("0.0#"), -1f, new TipSignal(tip));
-            return list.Slider(value, min, max);
+            return Editable(list, label, value, min, max, tip);
+        }
+
+        private static readonly Dictionary<string, string> editBuffers = new Dictionary<string, string>();
+
+        // A label, a typed value and a slider, kept in step: type a number, or drag the slider.
+        private static float Editable(Listing_Standard list, string label, float value, float min, float max, string tip)
+        {
+            Rect row = list.GetRect(Text.LineHeight + 2f);
+            Rect field = new Rect(row.xMax - 70f, row.y, 70f, row.height);
+            Widgets.Label(new Rect(row.x, row.y, row.width - 78f, row.height), label);
+            TooltipHandler.TipRegion(row, tip);
+            string buffer;
+            editBuffers.TryGetValue(label, out buffer);
+            float typed = value;
+            Widgets.TextFieldNumeric(field, ref typed, ref buffer, min, max);
+            editBuffers[label] = buffer;
+            float slid = list.Slider(typed, min, max);
+            if (!Mathf.Approximately(slid, typed))
+            {
+                editBuffers[label] = null;   // the slider moved: refresh the typed value from it
+            }
+
+            return slid;
+        }
+
+        private static int Count(Listing_Standard list, string label, int value, int min, int max, string tip)
+        {
+            return Mathf.RoundToInt(Editable(list, label, value, min, max, tip));
         }
 
         private static float Percent(Listing_Standard list, string label, float value, float min, float max, string tip)
@@ -319,9 +346,8 @@ namespace Site44
             Section(list, "People and containers");
             s.casketDensity = Multiplier(list, "Cryosleep caskets", s.casketDensity, 0f, 3f,
                 "How many sealed cryosleep caskets there are. Each holds a friendly survivor, a hostile sleeper, a body, or just loot.\nx0 = none, x1 = about one per 35 rooms.");
-            list.Label("Survivor caskets per complex:  " + s.survivorCaskets, -1f, new TipSignal(
-                "Caskets holding a friendly sleeper who joins you when opened. One stranded delver per complex keeps it believable."));
-            s.survivorCaskets = Mathf.RoundToInt(list.Slider(s.survivorCaskets, 0, 3));
+            s.survivorCaskets = Count(list, "Survivor caskets per complex", s.survivorCaskets, 0, 3,
+                "Caskets holding a friendly sleeper who joins you when opened. One stranded delver per complex keeps it believable.");
             s.hostileCasketX = Multiplier(list, "Hostile caskets", s.hostileCasketX, 0f, 3f,
                 "Share of the remaining caskets that hold a hostile sleeper. They only appear deep inside, never near the entrance.\nx1 is normal.");
             s.strayCorpseX = Multiplier(list, "Dried-out corpses", s.strayCorpseX, 0f, 6f,
@@ -358,9 +384,8 @@ namespace Site44
             list.CheckboxLabeled("No weather disasters", ref s.delveNoWeather,
                 "Switches off toxic fallout, volcanic winter, heat waves, cold snaps, flash storms, solar flares and eclipses.");
             Section(list, "Party");
-            list.Label("Starting colonists:  " + s.startingColonists, -1f, new TipSignal(
-                "How many colonists a new Site-44 game starts with, chosen from a larger pool on the character page. A larger party survives longer; a smaller one makes every loss count."));
-            s.startingColonists = Mathf.RoundToInt(list.Slider(s.startingColonists, 1f, 5f));
+            s.startingColonists = Count(list, "Starting colonists", s.startingColonists, 1, 5,
+                "How many colonists a new Site-44 game starts with, chosen from a larger pool on the character page. A larger party survives longer; a smaller one makes every loss count.");
             list.Label("The character page requires at least one colonist who can shoot and one who can do intellectual work, since fighting and hacking come up in every complex.");
 
             list.Label("Wound infection in Delve:  " + new[] { "vanilla", "reduced", "none" }[Mathf.Clamp(s.delveInfection, 0, 2)], -1f, new TipSignal(

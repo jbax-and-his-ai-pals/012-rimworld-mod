@@ -69,6 +69,35 @@ namespace Site44
         // Delivery
         public float questFrequency = 1f;
 
+        public static readonly string[] PresetNames = { "Easier", "Standard", "Harder", "Brutal" };
+
+        // Balance presets: only the difficulty settings change. Sizes, biomes, scenario choices and the event switches are kept.
+        public void ApplyPreset(int preset)
+        {
+            Site44Settings d = new Site44Settings();
+            scarcity = d.scarcity; lootAmount = d.lootAmount; crateDensity = d.crateDensity; hostileCasketShare = d.hostileCasketShare;
+            delveInfection = d.delveInfection; delveDressWounds = d.delveDressWounds; puzzleDifficulty = d.puzzleDifficulty;
+            keycardChance = d.keycardChance; nestDensity = d.nestDensity; startingColonists = d.startingColonists;
+            drugFindChance = d.drugFindChance; securityEnabled = d.securityEnabled; missionFocusLevel = d.missionFocusLevel;
+            switch (preset)
+            {
+                case 0:
+                    scarcity = 0.4f; lootAmount = 1.3f; crateDensity = 1.3f; hostileCasketShare = 0.1f;
+                    delveInfection = 2; delveDressWounds = true; puzzleDifficulty = 0; keycardChance = 0.7f;
+                    nestDensity = 0.5f; startingColonists = 4; drugFindChance = 0.25f; missionFocusLevel = 3;
+                    break;
+                case 2:
+                    scarcity = 0.9f; lootAmount = 0.8f; crateDensity = 0.8f; hostileCasketShare = 0.4f;
+                    delveInfection = 0; puzzleDifficulty = 2; keycardChance = 0.3f; nestDensity = 1.5f; drugFindChance = 0.1f;
+                    break;
+                case 3:
+                    scarcity = 1f; lootAmount = 0.6f; crateDensity = 0.6f; hostileCasketShare = 0.55f;
+                    delveInfection = 0; puzzleDifficulty = 2; keycardChance = 0.15f; nestDensity = 2.2f; startingColonists = 2;
+                    drugFindChance = 0.05f; securityEnabled = true; missionFocusLevel = 1;
+                    break;
+            }
+        }
+
         public void Reset()
         {
             Site44Settings defaults = new Site44Settings();
@@ -243,6 +272,19 @@ namespace Site44
             GUI.color = Color.gray;
             list.Label("Ruined complexes you find on the world map, and the Site-44 Breach scenario. Changes apply to complexes generated from now on; hover a setting for details.");
             GUI.color = Color.white;
+
+            Rect presetRow = list.GetRect(30f);
+            float buttonWidth = presetRow.width / Site44Settings.PresetNames.Length;
+            for (int i = 0; i < Site44Settings.PresetNames.Length; i++)
+            {
+                Rect button = new Rect(presetRow.x + i * buttonWidth + 2f, presetRow.y, buttonWidth - 4f, presetRow.height);
+                TooltipHandler.TipRegion(button, "Sets loot, scarcity, infection, puzzles, keycards, nests and party size to the " + Site44Settings.PresetNames[i].ToLower()
+                                                  + " preset. Sizes, biomes and scenario choices are kept. Adjust anything afterwards.");
+                if (Widgets.ButtonText(button, Site44Settings.PresetNames[i]))
+                {
+                    s.ApplyPreset(i);
+                }
+            }
 
             Section(list, "Treasure");
             s.scarcity = Multiplier(list, "Food and medicine scarcity", s.scarcity, 0f, 1f,

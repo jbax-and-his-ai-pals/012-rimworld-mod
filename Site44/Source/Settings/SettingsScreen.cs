@@ -172,11 +172,21 @@ namespace Site44
 
     internal static class SettingsScreen
     {
-        private static int tab;
-        private static bool showAdvanced;
+        private sealed class Section
+        {
+            public string Title;
+            public string Subtitle;
+            public List<SettingRow> Rows;
+        }
+
+        private static string query = "";
+        private static bool changedOnly;
         private static Vector2 scroll;
-        private static float viewHeight = 1400f;
-        private static List<KeyValuePair<string, List<SettingRow>>> tabs;
+        private static float viewHeight = 3000f;
+        private static float pendingScroll = -1f;
+        private static List<Section> sections;
+        private static List<SettingRow> allRows;
+        private static readonly Dictionary<string, float> sectionTop = new Dictionary<string, float>();
 
         private static Site44Settings S => Site44Settings.Current;
         private static readonly Site44Settings D = new Site44Settings();
@@ -386,91 +396,223 @@ namespace Site44
                     () => S.questFrequency, v => S.questFrequency = v, 3f, "Quest sites")
             };
 
-            tabs = new List<KeyValuePair<string, List<SettingRow>>>
+            allRows = delve.Concat(loot).Concat(hazards).Concat(looks).Concat(setup).ToList();
+            Func<string[], List<SettingRow>> pick = labels => labels.Select(l => allRows.First(r => r.Label == l)).ToList();
+
+            sections = new List<Section>
             {
-                new KeyValuePair<string, List<SettingRow>>("Quick start", new List<SettingRow>()),
-                new KeyValuePair<string, List<SettingRow>>("Delve", delve),
-                new KeyValuePair<string, List<SettingRow>>("Loot and people", loot),
-                new KeyValuePair<string, List<SettingRow>>("Hazards and hacking", hazards),
-                new KeyValuePair<string, List<SettingRow>>("Look and rooms", looks),
-                new KeyValuePair<string, List<SettingRow>>("Scenarios and sizes", setup)
+                new Section { Title = "The run", Subtitle = "Who goes in, what can happen to them from outside, and how wounds and moods behave.", Rows = pick(new[] {
+                    "Starting colonists", "Enable enemy raids", "Enable caravan events", "Enable other threats", "Enable visitors and outside arrivals", "Enable weather disasters",
+                    "Wound infection", "Dress wounds on descent", "Mission focus (mood bonus in a complex)", "Delvers ignore plain corpses" }) },
+                new Section { Title = "Loot and supplies", Subtitle = "What the ruins hold. Medicine and meals are scarce by default; everything else follows the loot amount.", Rows = pick(new[] {
+                    "Food and medicine supply", "Loot amount", "Loot crate density", "Focus tabs in loot", "Delver gear in rich loot", "Intact rooms" }) },
+                new Section { Title = "Creatures and survivors", Subtitle = "Nests, sleepers in cryosleep caskets, and the remains of earlier scavengers.", Rows = pick(new[] {
+                    "Creature nests", "Cryosleep caskets", "Survivor caskets per complex", "Hostile caskets", "Dried-out corpses" }) },
+                new Section { Title = "Hazards and security", Subtitle = "Things in the ruins that fight back.", Rows = pick(new[] {
+                    "Facility security (experimental)", "Overheated sectors", "Prototype droid guards" }) },
+                new Section { Title = "Hacking, keys and clearance", Subtitle = "How the party gets past sealed gates: hack the terminal, find a keycard, or earn clearance.", Rows = pick(new[] {
+                    "Cipher-lock hacking", "Puzzle difficulty", "Keycards for locked gates", "Clearance-gated wings", "Secure rooms" }) },
+                new Section { Title = "Complexes and sizes", Subtitle = "How a complex is laid out and how big it is.", Rows = pick(new[] {
+                    "Open layout (explore freely)", "Locked vaults", "Size of Delve complexes", "Complex used by the Breach scenario", "Size of the Breach scenario complex", "Size of quest-site complexes" }) },
+                new Section { Title = "Scenario setup", Subtitle = "How new games start.", Rows = pick(new[] { "Starting kit", "Skip world and site selection", "Ruin quest frequency" }) },
+                new Section { Title = "Look and fine detail", Subtitle = "Atmosphere and room variety. Safe to leave alone.", Rows = pick(new[] {
+                    "Dust and debris", "Outdoor props", "Furniture damage", "Rec rooms", "Specialty rooms" }) }
             };
         }
 
         // ------------------------------------------------------------------ drawing
 
+        private const float TocWidth = 190f;
+        private const string AboutTitle = "About this version";
+        private const string StartTitle = "Starting points";
+
         public static void Draw(Rect inRect)
         {
-            if (tabs == null)
+            if (sections == null)
             {
                 Build();
             }
 
-            Rect body = new Rect(inRect.x, inRect.y + 42f, inRect.width, inRect.height - 42f);
-            List<TabRecord> records = new List<TabRecord>();
-            for (int i = 0; i < tabs.Count; i++)
+            Rect toc = new Rect(inRect.x, inRect.y, TocWidth, inRect.height);
+            Rect main = new Rect(inRect.x + TocWidth + 12f, inRect.y, inRect.width - TocWidth - 12f, inRect.height);
+
+            // Search and filter, always at the top of the list.
+            Rect searchRow = new Rect(main.x, main.y, main.width, 28f);
+            Widgets.Label(new Rect(searchRow.x, searchRow.y + 3f, 60f, 24f), "Search");
+            query = Widgets.TextField(new Rect(searchRow.x + 62f, searchRow.y, searchRow.width - 62f - 190f, 26f), query);
+            bool changedBox = changedOnly;
+            Widgets.CheckboxLabeled(new Rect(searchRow.xMax - 184f, searchRow.y + 1f, 184f, 26f), "Changed settings only", ref changedBox);
+            changedOnly = changedBox;
+            bool filtering = !query.NullOrEmpty() || changedOnly;
+
+            Rect listRect = new Rect(main.x, main.y + 34f, main.width, main.height - 34f);
+            Rect view = new Rect(0f, 0f, listRect.width - 20f, viewHeight);
+            if (pendingScroll >= 0f)
             {
-                int index = i;
-                records.Add(new TabRecord(tabs[i].Key, () => { tab = index; scroll = Vector2.zero; }, tab == i));
+                scroll.y = pendingScroll;
+                pendingScroll = -1f;
             }
 
-            TabDrawer.DrawTabs(body, records);
-
-            Rect view = new Rect(0f, 0f, body.width - 20f, viewHeight);
-            Widgets.BeginScrollView(body.ContractedBy(2f), ref scroll, view);
+            Widgets.BeginScrollView(listRect, ref scroll, view);
             Listing_Standard list = new Listing_Standard();
             list.Begin(view);
+            sectionTop.Clear();
 
-            if (tab == 0)
+            if (!filtering)
             {
-                DrawQuickStart(list);
+                sectionTop[AboutTitle] = list.CurHeight;
+                DrawAbout(list);
+                sectionTop[StartTitle] = list.CurHeight;
+                DrawStartingPoints(list);
             }
-            else
+
+            int shown = 0;
+            foreach (Section section in sections)
+            {
+                List<SettingRow> rows = section.Rows.Where(r => Matches(r)).ToList();
+                if (rows.Count == 0)
+                {
+                    continue;
+                }
+
+                sectionTop[section.Title] = list.CurHeight;
+                list.Gap(10f);
+                Text.Font = GameFont.Medium;
+                list.Label(section.Title);
+                Text.Font = GameFont.Small;
+                GUI.color = Color.gray;
+                list.Label(section.Subtitle);
+                GUI.color = Color.white;
+                list.GapLine(4f);
+                foreach (SettingRow row in rows)
+                {
+                    row.Draw(list);
+                    shown++;
+                }
+            }
+
+            if (filtering && shown == 0)
             {
                 GUI.color = Color.gray;
-                list.Label("Hover a setting for details. Settings you have changed are shown in blue with a Reset button. Changes apply to complexes generated from now on.");
+                list.Label("No settings match.");
                 GUI.color = Color.white;
-                if (tab == 1)
-                {
-                    GUI.color = Color.gray;
-                    list.Label("Delve mode disables raids, threats, and disasters by default. You can reenable them here. Best depth so far: " + S.bestDelveDepth + ".");
-                    GUI.color = Color.white;
-                }
-
-                list.CheckboxLabeled("Show advanced settings", ref showAdvanced, "Reveals the finer controls for this mod. The headline settings are always shown.");
-                list.GapLine(6f);
-                foreach (SettingRow row in tabs[tab].Value)
-                {
-                    if (!row.Advanced || showAdvanced)
-                    {
-                        row.Draw(list);
-                    }
-                }
             }
 
             viewHeight = Mathf.Max(200f, list.CurHeight + 30f);
             list.End();
             Widgets.EndScrollView();
+
+            DrawContents(toc, filtering);
         }
 
-        private static void DrawQuickStart(Listing_Standard list)
+        private static bool Matches(SettingRow row)
+        {
+            if (changedOnly && row.IsDefault)
+            {
+                return false;
+            }
+
+            return query.NullOrEmpty() || row.Label.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 || (row.Tip != null && row.Tip.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0);
+        }
+
+        // The contents column: jump to a section, and see which one is showing.
+        private static void DrawContents(Rect toc, bool filtering)
         {
             Text.Font = GameFont.Medium;
-            list.Label("Ruined complexes");
+            Widgets.Label(new Rect(toc.x, toc.y, toc.width, 30f), "Contents");
+            Text.Font = GameFont.Small;
+            float y = toc.y + 34f;
+            List<string> titles = new List<string>();
+            if (!filtering)
+            {
+                titles.Add(AboutTitle);
+                titles.Add(StartTitle);
+            }
+
+            titles.AddRange(sections.Where(sec => sec.Rows.Any(Matches)).Select(sec => sec.Title));
+            string current = null;
+            foreach (string title in titles)
+            {
+                float top;
+                if (sectionTop.TryGetValue(title, out top) && top <= scroll.y + 24f)
+                {
+                    current = title;
+                }
+            }
+
+            foreach (string title in titles)
+            {
+                Rect entry = new Rect(toc.x, y, toc.width, 26f);
+                bool active = title == current;
+                if (active)
+                {
+                    Widgets.DrawHighlightSelected(entry);
+                }
+
+                if (Widgets.ButtonText(entry, title, false))
+                {
+                    float top;
+                    if (sectionTop.TryGetValue(title, out top))
+                    {
+                        pendingScroll = top;
+                    }
+                }
+
+                y += 27f;
+            }
+
+            if (!filtering)
+            {
+                y += 10f;
+                int changed = allRows.Count(r => !r.IsDefault);
+                GUI.color = Color.gray;
+                Widgets.Label(new Rect(toc.x, y, toc.width, 60f), changed == 0 ? "Every setting is at its default." : changed + " setting(s) changed from their defaults.");
+                GUI.color = Color.white;
+            }
+        }
+
+        private static void DrawAbout(Listing_Standard list)
+        {
+            Text.Font = GameFont.Medium;
+            list.Label(AboutTitle);
+            Text.Font = GameFont.Small;
+            list.GapLine(4f);
+            list.Label("Site-44 turns ruined complexes into places you explore, not places you build around. This page sets how hard that is. A few things work differently from ordinary RimWorld, so it helps to know them before you change anything:");
+            list.Gap(4f);
+            foreach (string line in new[]
+            {
+                "A run is a chain of complexes. In Delve, every complex is a level with an extraction gate to the next one, and the run ends when the whole party dies. There is no colony to build; only what your colonists carry goes down with them.",
+                "The outside world is switched off. Raids, caravans, visitors, traders and weather disasters are off by default during a Delve run. The danger comes from the ruins: creature nests, hostile sleepers, security and sealed doors. You can turn the outside world back on under \"The run\".",
+                "Supplies are scarce on purpose. Medicine and meals are rare, wounds can turn septic, and a small crew cannot treat everything. Expect to ration, and expect to find a rare antiseptic injector worth keeping.",
+                "Some jobs are not optional. Terminals need someone who can hack, and the ruins need someone who can shoot, so the character page requires at least one of each. Doors can be opened by hacking a terminal, finding a keycard, or earning clearance from a badge or a node.",
+                "Changes here apply to complexes generated from now on, and they follow you into every game mode. Settings tagged Delve, Breach or Quest sites affect only that mode."
+            })
+            {
+                list.Label("\u2022  " + line);
+                list.Gap(2f);
+            }
+
+            GUI.color = Color.gray;
+            list.Label("Use the contents list on the left to jump around, search to find a setting, and \"Changed settings only\" to see what you have altered. A changed setting turns blue and shows its own Reset button.");
+            GUI.color = Color.white;
+        }
+
+        private static void DrawStartingPoints(Listing_Standard list)
+        {
+            list.Gap(10f);
+            Text.Font = GameFont.Medium;
+            list.Label(StartTitle);
             Text.Font = GameFont.Small;
             GUI.color = Color.gray;
-            list.Label("Ruined complexes you find on the world map, the Site-44 Breach scenario and the Site-44 Delve scenario. Start with a preset, then fine-tune on the other tabs.");
+            list.Label("These buttons overwrite the balance settings below with a ready-made set of values. Pick one, then adjust anything you like. Sizes, biomes and scenario choices are kept.");
             GUI.color = Color.white;
-            list.GapLine(6f);
-
-            list.Label("Starting points: these buttons overwrite the balance settings with a ready-made set of values.");
+            list.GapLine(4f);
             Rect presetRow = list.GetRect(30f);
             float buttonWidth = presetRow.width / Site44Settings.PresetNames.Length;
             for (int i = 0; i < Site44Settings.PresetNames.Length; i++)
             {
                 Rect button = new Rect(presetRow.x + i * buttonWidth + 2f, presetRow.y, buttonWidth - 4f, presetRow.height);
-                TooltipHandler.TipRegion(button, "Sets loot, supplies, infection, puzzles, keycards, nests and party size to the " + Site44Settings.PresetNames[i].ToLower()
-                                                  + " preset. Sizes, biomes and scenario choices are kept. Adjust anything afterwards.");
+                TooltipHandler.TipRegion(button, "Sets loot, supplies, infection, puzzles, keycards, nests and party size to the " + Site44Settings.PresetNames[i].ToLower() + " preset.");
                 if (Widgets.ButtonText(button, Site44Settings.PresetNames[i]))
                 {
                     S.ApplyPreset(i);
@@ -483,17 +625,12 @@ namespace Site44
             }
 
             list.Gap(6f);
-            string current = CurrentBalance();
             Text.Font = GameFont.Medium;
-            list.Label("Current balance: " + current);
+            list.Label("Current balance: " + CurrentBalance());
             Text.Font = GameFont.Small;
             GUI.color = Color.gray;
             list.Label(Summary());
             GUI.color = Color.white;
-
-            int changed = tabs.Skip(1).SelectMany(t => t.Value).Count(r => !r.IsDefault);
-            list.Gap(6f);
-            list.Label(changed == 0 ? "Every setting is at its default." : changed + " setting(s) differ from their defaults (shown in blue on their tabs).");
             list.Gap(6f);
             if (list.ButtonText("Reset every setting to its default"))
             {

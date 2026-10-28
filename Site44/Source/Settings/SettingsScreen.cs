@@ -456,7 +456,7 @@ namespace Site44
             }
 
             Widgets.BeginScrollView(listRect, ref scroll, view);
-            Listing_Standard list = new Listing_Standard();
+            Listing_Standard list = new Listing_Standard { maxOneColumn = true };
             list.Begin(view);
             sectionTop.Clear();
             try

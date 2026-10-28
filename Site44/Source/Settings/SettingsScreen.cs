@@ -51,6 +51,12 @@ namespace Site44
             GUI.color = Color.white;
 
             string note = !enabled ? DisabledNote : (Effect != null ? Effect() : null);
+            if (enabled && this is FloatRow percentRow && !percentRow.Integer)
+            {
+                // A percentage here is a share of the normal amount, not a chance: say so on every such row.
+                note = (note.NullOrEmpty() ? "" : note + "  ") + "Percent of normal: 100% is the usual amount, 0% removes it.";
+            }
+
             if (!note.NullOrEmpty())
             {
                 GUI.color = Color.gray;
@@ -71,6 +77,8 @@ namespace Site44
         }
     }
 
+    // A number setting. Multipliers are shown and typed as whole percentages (100% is the mod's normal amount);
+    // counts are whole numbers. Both text boxes only accept digits, and an empty or out-of-range entry snaps back.
     internal sealed class FloatRow : SettingRow
     {
         public Func<float> Get;
@@ -86,23 +94,28 @@ namespace Site44
         {
             bool enabled = Enabled == null || Enabled();
             GUI.color = LabelColour(enabled);
-            Widgets.Label(new Rect(row.x, row.y, row.width - 78f, row.height), Title);
+            Widgets.Label(new Rect(row.x, row.y, row.width - 100f, row.height), Title);
             GUI.color = enabled ? Color.white : Color.gray;
-            float value = Get();
-            Rect field = new Rect(row.xMax - 70f, row.y, 70f, row.height);
-            Widgets.TextFieldNumeric(field, ref value, ref buffer, Min, Max);
-            float slid = list.Slider(Mathf.Clamp(value, Min, Max), Min, Max);
-            if (Integer)
+
+            float scale = Integer ? 1f : 100f;
+            float min = Min * scale, max = Max * scale;
+            int shown = Mathf.RoundToInt(Mathf.Clamp(Get() * scale, min, max));
+            Rect field = new Rect(row.xMax - (Integer ? 70f : 88f), row.y, 70f, row.height);
+            int typed = shown;
+            Widgets.TextFieldNumeric(field, ref typed, ref buffer, min, max);
+            if (!Integer)
             {
-                slid = Mathf.Round(slid);
+                Widgets.Label(new Rect(row.xMax - 16f, row.y, 16f, row.height), "%");
             }
 
-            if (!Mathf.Approximately(slid, Mathf.Clamp(value, Min, Max)))
+            int clamped = Mathf.Clamp(typed, Mathf.RoundToInt(min), Mathf.RoundToInt(max));
+            int slid = Mathf.RoundToInt(list.Slider(clamped, min, max));
+            if (slid != clamped)
             {
                 buffer = null;
             }
 
-            Set(slid);
+            Set(slid / scale);
         }
     }
 
@@ -314,23 +327,23 @@ namespace Site44
 
             var loot = new List<SettingRow>
             {
-                Mult("Food and medicine supply", "How often medicine and meals turn up in crates, caskets and on shelves, and how large their stacks are.\nx0 = almost none, x4 = plentiful. Packed supplies from the starting kit are unaffected.",
-                    () => S.supplyX, v => S.supplyX = v, 4f, null, false, () => "x1 keeps " + Pct(Site44Tuning.SupplyShare) + " of medicine and meal picks."),
+                Mult("Food and medicine supply", "How often medicine and meals turn up in crates, caskets and on shelves, and how large their stacks are.\n0% = almost none, 400% = plentiful. Packed supplies from the starting kit are unaffected.",
+                    () => S.supplyX, v => S.supplyX = v, 4f, null, false, () => "Keeps about " + Pct(Site44Tuning.SupplyShare) + " of medicine and meal picks."),
                 Mult("Loot amount", "Scales the size of every loot stack in a complex: crates, caskets, storerooms and intact rooms.", () => S.lootAmount, v => S.lootAmount = v, 3f, min: 0.1f),
-                Mult("Loot crate density", "How many sealed hermetic crates are scattered through the ruins. They hold a few stacks of loot each. x0 = none.", () => S.crateDensity, v => S.crateDensity = v, 3f),
+                Mult("Loot crate density", "How many sealed hermetic crates are scattered through the ruins. They hold a few stacks of loot each. 0% = none.", () => S.crateDensity, v => S.crateDensity = v, 3f),
                 Mult("Focus tabs in loot", "Chance that an ordinary loot item is a stack of focus tabs, a non-addictive stimulant that slows hunger and fatigue.",
                     () => S.drugFindX, v => S.drugFindX = v, 3f, null, true, () => "About " + Pct(Site44Tuning.DrugFindChance) + " of ordinary loot items."),
                 Mult("Delver gear in rich loot", "Chance that a rich loot item is a delver's cap or vest, which lower the chance of mental breaks.",
                     () => S.delverGearX, v => S.delverGearX = v, 4f, null, true, () => "About " + Pct(Site44Tuning.DelverGearChance) + " of rich loot items."),
                 Mult("Intact rooms", "Chance that an ordinary room survived intact: clean sterile floor, undamaged furniture and better loot. Storage, server and reactor wings always have at least one.",
                     () => S.preservedRoomX, v => S.preservedRoomX = v, 7f, null, true, () => "About " + Pct(Site44Tuning.PreservedRoomChance) + " of ordinary rooms."),
-                Mult("Cryosleep caskets", "How many sealed cryosleep caskets there are. Each holds a friendly survivor, a hostile sleeper, a body, or just loot. x0 = none.",
-                    () => S.casketDensity, v => S.casketDensity = v, 3f, null, false, () => "x1 is about one casket per 35 rooms."),
+                Mult("Cryosleep caskets", "How many sealed cryosleep caskets there are. Each holds a friendly survivor, a hostile sleeper, a body, or just loot. 0% = none.",
+                    () => S.casketDensity, v => S.casketDensity = v, 3f, null, false, () => "At 100%, about one casket per 35 rooms."),
                 Mult("Survivor caskets per complex", "Caskets holding a friendly sleeper who joins you when opened.", () => S.survivorCaskets, v => S.survivorCaskets = Mathf.RoundToInt(v), 3f, null, true, null,
-                    () => S.casketDensity > 0f, "Needs cryosleep caskets above x0.", 0f, 1f, true),
+                    () => S.casketDensity > 0f, "Needs cryosleep caskets above 0%.", 0f, 1f, true),
                 Mult("Hostile caskets", "Share of the remaining caskets that hold a hostile sleeper. They only appear deep inside, never near the entrance.",
                     () => S.hostileCasketX, v => S.hostileCasketX = v, 3f, null, true, () => "About " + Pct(0.25f * S.hostileCasketX) + " of the remaining caskets.",
-                    () => S.casketDensity > 0f, "Needs cryosleep caskets above x0."),
+                    () => S.casketDensity > 0f, "Needs cryosleep caskets above 0%."),
                 Mult("Dried-out corpses", "Chance that a room holds the remains of an earlier scavenger, sometimes with their loot.",
                     () => S.strayCorpseX, v => S.strayCorpseX = v, 6f, null, true, () => "About " + Pct(Site44Tuning.StrayCorpseChance) + " of rooms.")
             };
@@ -345,7 +358,7 @@ namespace Site44
                     () => S.keycardX, v => S.keycardX = v, 2f, null, false, () => "About " + Pct(Site44Tuning.KeycardChance) + " of locked gates."),
                 Mult("Clearance-gated wings", "Chance that a complex holds an advanced wing with better loot, behind a terminal that wants clearance. A badge or a granting node on the near side raises your clearance.",
                     () => S.restrictedWingX, v => S.restrictedWingX = v, 1.3f, null, false, () => "About " + Pct(Site44Tuning.RestrictedWingChance) + " of complexes."),
-                Mult("Creature nests", "How many rooms are guarded by a hostile nest. x0 = none.", () => S.nestDensity, v => S.nestDensity = v, 3f),
+                Mult("Creature nests", "How many rooms are guarded by a hostile nest. 0% = none.", () => S.nestDensity, v => S.nestDensity = v, 3f),
                 Toggle("Facility security (experimental)", "Turrets, patrol mechanoids and alarm squads inside the complex. Off by default so the first exploration is safe.",
                     () => S.securityEnabled, v => S.securityEnabled = v, false),
                 Toggle("Open layout (explore freely)", "On: every door is a plain door and the whole complex can be explored in any order.\nOff: sectors are sealed behind terminal gates and clearance levels.",
@@ -354,19 +367,19 @@ namespace Site44
                     () => S.lockedVaultX, v => S.lockedVaultX = v, 4f, null, true, () => "About " + Pct(Site44Tuning.OpenLayoutLockedShare) + " of gates.", open, "Needs the open layout."),
                 Toggle("Overheated sectors", "Some sectors in the gated layout are dangerously hot until the coolant valve is turned.",
                     () => S.hotZonesEnabled, v => S.hotZonesEnabled = v, true, null, true, gated, "Needs the open layout switched off."),
-                Mult("Secure rooms", "Locked dead-end rooms opened by hacking a nearby terminal. Each holds one surprise: a treasure vault, a prototype droid, or a volatile cache. x0 = none.",
+                Mult("Secure rooms", "Locked dead-end rooms opened by hacking a nearby terminal. Each holds one surprise: a treasure vault, a prototype droid, or a volatile cache. 0% = none.",
                     () => S.secureRoomDensity, v => S.secureRoomDensity = v, 3f, null, true),
                 Toggle("Prototype droid guards", "Lets a secure room hold a hostile prototype droid. It only wakes when you open the room, so it never ambushes the entrance.",
-                    () => S.droidGuards, v => S.droidGuards = v, true, null, true, () => S.secureRoomDensity > 0f, "Needs secure rooms above x0.")
+                    () => S.droidGuards, v => S.droidGuards = v, true, null, true, () => S.secureRoomDensity > 0f, "Needs secure rooms above 0%.")
             };
 
             var looks = new List<SettingRow>
             {
-                Mult("Dust and debris", "How much dust, trash and scattered paper covers the floors. x0 = spotless.", () => S.dustAmount, v => S.dustAmount = v, 2f, null, true),
-                Mult("Outdoor props", "Sandbags, barriers, silos, crates, planters and lamp posts scattered through the yards, different for each kind of complex. x0 = none.",
+                Mult("Dust and debris", "How much dust, trash and scattered paper covers the floors. 0% = spotless.", () => S.dustAmount, v => S.dustAmount = v, 2f, null, true),
+                Mult("Outdoor props", "Sandbags, barriers, silos, crates, planters and lamp posts scattered through the yards, different for each kind of complex. 0% = none.",
                     () => S.propDensity, v => S.propDensity = v, 3f, null, true),
-                Mult("Furniture damage", "How wrecked the furniture is. x0 = undamaged, higher = barely holding together.", () => S.ruinX, v => S.ruinX = v, 1.3f, null, true),
-                Mult("Rec rooms", "How often a break room or cafeteria turns out to be a rec room, with a billiards or card table, a television and couches. x0 = none.",
+                Mult("Furniture damage", "How wrecked the furniture is. 0% = undamaged, higher = barely holding together.", () => S.ruinX, v => S.ruinX = v, 1.3f, null, true),
+                Mult("Rec rooms", "How often a break room or cafeteria turns out to be a rec room, with a billiards or card table, a television and couches. 0% = none.",
                     () => S.recRoomFrequency, v => S.recRoomFrequency = v, 3f, null, true),
                 Mult("Specialty rooms", "How many ordinary rooms turn out to be something more specific: kitchens, dormitories, clinics, locker rooms, libraries, workshops, armories, comms rooms and classrooms.",
                     () => S.roomVariety, v => S.roomVariety = v, 3f, null, true)
@@ -392,7 +405,7 @@ namespace Site44
                 Toggle("Starting kit", "Starting colonists begin fed and rested, in good spirits, with survival meals and focus tabs.", () => S.startingKit, v => S.startingKit = v, true, "Breach"),
                 Toggle("Skip world and site selection", "The Site-44 scenarios use nothing from the world except the climate and biome, so a default world and a start tile are chosen for you. Turn off to use the ordinary world and landing-site pages. Not used when the Odyssey expansion is active.",
                     () => S.skipWorldSetup, v => S.skipWorldSetup = v, true),
-                Mult("Ruin quest frequency", "How often the storyteller offers a ruined-complex expedition. x0 = never. Takes effect after restarting the game.",
+                Mult("Ruin quest frequency", "How often the storyteller offers a ruined-complex expedition. 0% = never. Takes effect after restarting the game.",
                     () => S.questFrequency, v => S.questFrequency = v, 3f, "Quest sites")
             };
 

@@ -373,15 +373,15 @@ namespace Site44
 
             Section(list, "Delve rules (applied when a Delve run starts)");
             list.Label("Delve mode disables raids, threats, and disasters by default. You can reenable them here. Best depth so far: " + s.bestDelveDepth + ".");
-            list.CheckboxLabeled("Enemy raids", ref s.delveAllowRaids,
+            list.CheckboxLabeled("Enable enemy raids", ref s.delveAllowRaids,
                 "Ticked: ordinary enemy raids can happen during a run. Unticked (the default): none do.");
-            list.CheckboxLabeled("Caravan events", ref s.delveAllowCaravanEvents,
+            list.CheckboxLabeled("Enable caravan events", ref s.delveAllowCaravanEvents,
                 "Ticked: caravan ambushes, manhunter ambushes, caravan demands and caravan meetings can happen. Unticked (the default): none do.");
-            list.CheckboxLabeled("Other threats", ref s.delveAllowOtherThreats,
+            list.CheckboxLabeled("Enable other threats", ref s.delveAllowOtherThreats,
                 "Ticked: infestations, manhunter packs, animal insanity and crashed threat ship parts. The danger should come from the ruins. Unticked (the default): none happen.");
-            list.CheckboxLabeled("Visitors and outside arrivals", ref s.delveAllowOutsideVisitors,
+            list.CheckboxLabeled("Enable visitors and outside arrivals", ref s.delveAllowOutsideVisitors,
                 "Ticked: traders, visitors, travelers, wanderers, refugee and resource pods, migrating herds and similar arrivals can happen. Unticked (the default): none do.");
-            list.CheckboxLabeled("Weather disasters", ref s.delveAllowWeather,
+            list.CheckboxLabeled("Enable weather disasters", ref s.delveAllowWeather,
                 "Ticked: toxic fallout, volcanic winter, heat waves, cold snaps, flash storms, solar flares and eclipses can happen. Unticked (the default): none do.");
             Section(list, "Party");
             s.startingColonists = Count(list, "Starting colonists", s.startingColonists, 1, 5,

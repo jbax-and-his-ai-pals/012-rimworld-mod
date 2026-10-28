@@ -2119,11 +2119,42 @@ namespace Site44
                     Building_FacilityTerminal terminal = SpawnConsole(Site44DefOf.Site44_Terminal, spot, TerminalKind.Gate);
                     terminal.sectorId = child.Id.ToString();
                     terminal.requiredTier = child.RequiredTier;
+                    PlaceKeycard(child, parent, rooms, roomId);
                 }
                 else
                 {
                     Log.Warning("[Site-44] no room for a gate terminal in zone " + parent.Id);
                 }
+            }
+        }
+
+        // The other way past a sealed gate: a keycard lying in a room on the near side. It is usually guarded by a nest,
+        // so this route tends to be the more dangerous one.
+        private void PlaceKeycard(Zone gated, Zone parent, List<PlanRoom> rooms, int gateRoomId)
+        {
+            if (!Rand.Chance(Site44Tuning.KeycardChance))
+            {
+                return;
+            }
+
+            List<PlanRoom> options = rooms.Where(r => !r.IsCorridor && r.Cells.Count >= 9 && r.Id != gateRoomId && !IsEntryRoom(r)).ToList();
+            options.Shuffle();
+            ThingDef def = DefDatabase<ThingDef>.GetNamedSilentFail("Site44_Keycard");
+            foreach (PlanRoom room in options)
+            {
+                IntVec3 cell;
+                if (def == null || !TryFindFreeCell(room, out cell))
+                {
+                    continue;
+                }
+
+                Thing_Keycard card = (Thing_Keycard)ThingMaker.MakeThing(def);
+                card.sectorId = gated.Id.ToString();
+                card.mapId = map.uniqueID;
+                GenSpawn.Spawn(card, cell, map);
+                bool guarded = Rand.Chance(Site44Tuning.KeycardNestChance) && SpawnNest(room, parent.Depth);
+                Log.Message("[Site-44] keycard for sector " + gated.Id + " in room " + room.Id + (guarded ? ", guarded." : "."));
+                return;
             }
         }
 

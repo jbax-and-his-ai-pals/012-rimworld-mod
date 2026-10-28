@@ -31,6 +31,10 @@ namespace Site44
         // Delve levels up to this depth avoid extreme climates when the biome pool allows.
         public const int MildLevels = 3;
 
+        // Chance that a terminal-locked gate also has a keycard on the near side, and that the card is guarded by a nest.
+        public const float KeycardChance = 0.5f;
+        public const float KeycardNestChance = 0.7f;
+
         // Chance that a diagnostic or hatch node carries a bonus action.
         public const float NodeExtraChance = 0.2f;
 

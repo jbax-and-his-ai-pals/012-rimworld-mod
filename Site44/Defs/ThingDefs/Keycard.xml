@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <ThingDef ParentName="ResourceBase">
+    <defName>Site44_Keycard</defName>
+    <label>keycard</label>
+    <description>A worn access card. Swiped at a sealed hatch on this level, it opens the hatch without a hack. It is spent when used.</description>
+    <thingClass>Site44.Thing_Keycard</thingClass>
+    <graphicData>
+      <texPath>Things/Item/Resource/ComponentIndustrial</texPath>
+      <graphicClass>Graphic_StackCount</graphicClass>
+    </graphicData>
+    <stackLimit>1</stackLimit>
+    <statBases>
+      <MarketValue>10</MarketValue>
+      <Mass>0.05</Mass>
+    </statBases>
+    <thingCategories Inherit="False" />
+    <tradeability>None</tradeability>
+    <techLevel>Industrial</techLevel>
+  </ThingDef>
+
+</Defs>

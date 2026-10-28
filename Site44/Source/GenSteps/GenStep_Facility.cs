@@ -679,7 +679,8 @@ namespace Site44
             foreach (Zone gateZone in graph.Zones)
             {
                 if (gateZone.GateLink >= 0 && gateZone.Gate == GateKind.Terminal
-                    && (!Site44Tuning.OpenLayout || Rand.Chance(Site44Tuning.OpenLayoutLockedShare)))
+                    && (!Site44Tuning.OpenLayout || Rand.Chance(Site44Tuning.OpenLayoutLockedShare))
+                    && FacilityGraph.ExteriorRoom(plan, plan.Links[gateZone.GateLink]) < 0)   // a hatch only ever guards an internal door
                 {
                     lockedGateZones.Add(gateZone.Id);
                 }

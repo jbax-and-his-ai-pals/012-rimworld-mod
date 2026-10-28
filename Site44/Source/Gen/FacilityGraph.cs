@@ -286,7 +286,8 @@ namespace Site44.Gen
                 var all = new List<int>();
                 List<int> inter;
                 if (pairLinks.TryGetValue(PairKey(z.ParentId, z.Id), out inter)) all.AddRange(inter);
-                if (z.ParentId == 0) all.AddRange(extLinks[z.Id]);
+                // Gates sit on internal doors; an exterior door is only a fallback when a zone has no internal link.
+                if (z.ParentId == 0 && all.Count == 0) all.AddRange(extLinks[z.Id]);
                 if (all.Count == 0) { z.GateLink = -1; continue; }
                 bool preferCorridor = rng.Next(100) < 75;
                 List<int> pool = all;

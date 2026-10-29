@@ -369,6 +369,12 @@ namespace Site44
             return new LevelRow { Label = label, Tip = tip, Advanced = advanced, Effect = effect, Get = get, Set = set, Default = 1f, Names = names, Values = values };
         }
 
+        private static string StorytellerLabel(string defName)
+        {
+            StorytellerDef def = DefDatabase<StorytellerDef>.GetNamedSilentFail(defName);
+            return def != null ? def.label.CapitalizeFirst().ToString() : defName;
+        }
+
         // Settings read only while a new game is being set up are locked once a game is running.
         private static SettingRow NewGameOnly(SettingRow row)
         {
@@ -425,6 +431,18 @@ namespace Site44
                     () => S.delveAllowWeather, v => S.delveAllowWeather = v, false, "Delve"),
                 Mult("Starting colonists", "Your group needs at least one colonist who can fight and one who can do intellectual work.",
                     () => S.startingColonists, v => S.startingColonists = Mathf.RoundToInt(v), 5f, null, false, null, null, null, 1f, 3f, true),
+                Toggle("Commitment mode", "One save file that saves automatically, with no reloading an earlier one.",
+                    () => S.commitment, v => S.commitment = v, false),
+                new PickRow
+                {
+                    Label = "Storyteller", Button = "Change",
+                    Tip = "Decides when vanilla events arrive; with them switched off it hardly matters.",
+                    Get = () => StorytellerLabel(S.storyteller),
+                    Default = () => StorytellerLabel(D.storyteller),
+                    ResetValue = () => S.storyteller = D.storyteller,
+                    Pick = () => Find.WindowStack.Add(new FloatMenu(DefDatabase<StorytellerDef>.AllDefs.Where(d => d.listVisible && !d.tutorialMode)
+                        .Select(d => new FloatMenuOption(d.label.CapitalizeFirst(), () => S.storyteller = d.defName)).ToList()))
+                },
                 Choice("Wound infection risk", "Chance that a fresh wound becomes infected, compared with the base game.",
                     () => S.delveInfection, v => S.delveInfection = v, 1, new[] { "same as vanilla", "half of vanilla", "none" }, "Delve"),
                 Choice("Wounds on descent", "What the extraction gate does for the party's injuries on the way down.",
@@ -539,6 +557,8 @@ namespace Site44
             };
 
             NewGameOnly(delve.First(r => r.Label == "Starting colonists"));
+            NewGameOnly(delve.First(r => r.Label == "Commitment mode"));
+            NewGameOnly(delve.First(r => r.Label == "Storyteller"));
             NewGameOnly(setup.First(r => r.Label == "Starting kit"));
             NewGameOnly(setup.First(r => r.Label == "Skip world and site selection"));
             NewGameOnly(setup.First(r => r.Label == "Ruin quest frequency"));
@@ -550,7 +570,7 @@ namespace Site44
             sections = new List<Section>
             {
                 new Section { Title = "General settings", Subtitle = "", Rows = pick(new[] {
-                    "Starting colonists", "Vanilla enemy raids", "Vanilla caravan events", "Vanilla other threats", "Vanilla visitors and outside arrivals", "Vanilla weather disasters",
+                    "Starting colonists", "Commitment mode", "Storyteller", "Vanilla enemy raids", "Vanilla caravan events", "Vanilla other threats", "Vanilla visitors and outside arrivals", "Vanilla weather disasters",
                     "Wound infection risk", "Wounds on descent", "Restore hunger and rest on descent", "Mission focus (mood bonus in a complex)", "Delvers ignore plain corpses" }) },
                 new Section { Title = "Loot and supplies", Subtitle = "", Rows = pick(new[] {
                     "Food and medicine supply", "Number of loot crates", "Loot stack size", "Focus tabs in loot", "Delver gear in rich loot", "Intact rooms" }) },

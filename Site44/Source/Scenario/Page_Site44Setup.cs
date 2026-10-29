@@ -30,6 +30,23 @@ namespace Site44
 
         private bool IsDelve => Find.Scenario != null && Find.Scenario.AllParts.Any(p => p is ScenPart_Site44Delve);
 
+        // The storyteller page is skipped in this flow. The game still needs a storyteller and a saving mode, so they come from the
+        // settings: Cassandra by default, and vanilla's neutral difficulty so that this mod's own difficulty is the only scaling
+        // (vanilla's difficulty would otherwise multiply wound infection and mood a second time). Vanilla's difficulty and storyteller
+        // can still be changed during play from the game's own options.
+        protected override void DoNext()
+        {
+            Site44Settings settings = Site44Settings.Global;
+            StorytellerDef teller = DefDatabase<StorytellerDef>.GetNamedSilentFail(settings.storyteller)
+                                    ?? DefDatabase<StorytellerDef>.AllDefs.FirstOrDefault(d => d.listVisible && !d.tutorialMode)
+                                    ?? DefDatabase<StorytellerDef>.AllDefsListForReading.First();
+            DifficultyDef difficulty = DifficultyDefOf.Rough;
+            Current.Game.storyteller = new Storyteller(teller, difficulty, new Difficulty(difficulty));
+            Find.GameInitData.permadeathChosen = true;
+            Find.GameInitData.permadeath = settings.commitment;
+            base.DoNext();
+        }
+
         public override string PageTitle => IsDelve ? "Difficulty and pace" : "Difficulty";
 
         public override void DoWindowContents(Rect inRect)

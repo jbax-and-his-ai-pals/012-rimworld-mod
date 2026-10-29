@@ -44,6 +44,8 @@ namespace Site44
 
         // Treasure
         public float lootAmount = 1f;
+        public string storyteller = "Cassandra";             // used when the new-game pages skip the storyteller choice
+        public bool commitment;                               // commitment mode: one automatic save, no reloading
         public int startingColonists = 3;                     // 1-5
         public int puzzleDifficulty = 1;                      // 0 easy, 1 normal, 2 hard
         public float keycardX = 1f;                    // terminal gates that also have a keycard
@@ -173,6 +175,8 @@ namespace Site44
             Scribe_Values.Look(ref delveInfection, "delveInfection", 1);
             Scribe_Values.Look(ref delveDescentCare, "delveDescentCare");
             Scribe_Values.Look(ref delveDescentRest, "delveDescentRest");
+            Scribe_Values.Look(ref storyteller, "storyteller", "Cassandra");
+            Scribe_Values.Look(ref commitment, "commitment");
             Scribe_Values.Look(ref startingColonists, "startingColonists", 3);
             Scribe_Values.Look(ref puzzleDifficulty, "puzzleDifficulty", 1);
             Scribe_Values.Look(ref keycardX, "keycardX", 1f);

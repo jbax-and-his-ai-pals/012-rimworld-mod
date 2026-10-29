@@ -21,7 +21,7 @@ namespace Site44
                 return base.GetFirstConfigPage();
             }
 
-            List<Page> pages = new List<Page> { new Page_SelectStoryteller(), new Page_Site44Setup(), new Page_Site44Biomes(), new Page_Site44World(), new Page_Site44StartTile() };
+            List<Page> pages = new List<Page> { new Page_Site44Setup(), new Page_Site44Biomes(), new Page_Site44World(), new Page_Site44StartTile() };
             if (ModsConfig.IdeologyActive)
             {
                 pages.Add(new Page_ChooseIdeoPreset());

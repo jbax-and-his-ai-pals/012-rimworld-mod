@@ -180,6 +180,35 @@ namespace Site44
         }
     }
 
+    // Regrowth nanites: rebuild the most important missing part (the limb or organ whose loss hurts most). With nothing missing, they
+    // close the worst old scar instead.
+    public class IngestionOutcomeDoer_Regrowth : IngestionOutcomeDoer
+    {
+        protected override void DoIngestionOutcomeSpecial(Pawn pawn, Thing ingested, int ingestedCount)
+        {
+            Hediff_MissingPart missing = pawn.health.hediffSet.GetMissingPartsCommonAncestors()
+                .OrderByDescending(m => m.Part.def.GetMaxHealth(pawn) * m.Part.coverageAbs)
+                .FirstOrDefault();
+            if (missing != null)
+            {
+                BodyPartRecord part = missing.Part;
+                pawn.health.RestorePart(part);
+                Messages.Message(pawn.LabelShort + ": the nanites rebuild the " + part.Label + ".", pawn, MessageTypeDefOf.PositiveEvent, false);
+                return;
+            }
+
+            Hediff scar = pawn.health.hediffSet.hediffs.OfType<Hediff_Injury>().FirstOrDefault(h => h.IsPermanent());
+            if (scar != null)
+            {
+                pawn.health.RemoveHediff(scar);
+                Messages.Message(pawn.LabelShort + ": an old scar fades.", pawn, MessageTypeDefOf.PositiveEvent, false);
+                return;
+            }
+
+            Messages.Message(pawn.LabelShort + ": nothing for the nanites to rebuild.", pawn, MessageTypeDefOf.NeutralEvent, false);
+        }
+    }
+
     // The antiseptic injector: clears wound infections outright and dresses what is left.
     public class IngestionOutcomeDoer_Antiseptic : IngestionOutcomeDoer
     {

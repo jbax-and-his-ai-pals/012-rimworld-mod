@@ -188,7 +188,7 @@ namespace Site44
             }
             else
             {
-                def = Def("Site44_PanaceaPill") ?? Def("Site44_AntisepticInjector") ?? Def("MedicineIndustrial");
+                def = Def(Rand.Bool ? "Site44_PanaceaPill" : "Site44_RegrowthNanites") ?? Def("Site44_AntisepticInjector") ?? Def("MedicineIndustrial");
             }
 
             if (def == null)

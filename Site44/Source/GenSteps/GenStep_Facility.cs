@@ -1828,7 +1828,7 @@ namespace Site44
 
             // Advanced wings often hold a blood pack, and now and then a panacea pill.
             ThingDef bloodPack = DefDatabase<ThingDef>.GetNamedSilentFail("Site44_BloodPack");
-            ThingDef panacea = DefDatabase<ThingDef>.GetNamedSilentFail("Site44_PanaceaPill");
+            ThingDef panacea = DefDatabase<ThingDef>.GetNamedSilentFail(Rand.Chance(0.35f) ? "Site44_RegrowthNanites" : "Site44_PanaceaPill");
             foreach (Zone wing in graph.Zones.Where(z => z.Restricted && lockedGateZones.Contains(z.Id)))
             {
                 foreach (ThingDef extra in new[] { Rand.Chance(0.6f) ? bloodPack : null, Rand.Chance(0.25f) ? panacea : null })

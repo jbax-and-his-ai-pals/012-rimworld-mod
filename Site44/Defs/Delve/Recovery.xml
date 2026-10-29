@@ -78,4 +78,28 @@
     </ingestible>
   </ThingDef>
 
+  <!-- Regrowth nanites: rebuild a missing part. Rarer than the panacea. -->
+  <ThingDef ParentName="DrugPillBase">
+    <defName>Site44_RegrowthNanites</defName>
+    <label>regrowth nanites</label>
+    <description>A cold ampoule of grey suspension. Swallowed or injected, the nanites rebuild the most important part the colonist has lost. With nothing missing they close an old scar. Rarely found, and not made any more.</description>
+    <graphicData>
+      <texPath>Things/Item/Drug/Penoxycyline</texPath>
+      <graphicClass>Graphic_StackCount</graphicClass>
+      <color>(0.75,0.75,0.8)</color>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <statBases>
+      <MarketValue>550</MarketValue>
+      <Mass>0.02</Mass>
+    </statBases>
+    <techLevel>Spacer</techLevel>
+    <ingestible>
+      <drugCategory>None</drugCategory>
+      <outcomeDoers>
+        <li Class="Site44.IngestionOutcomeDoer_Regrowth" />
+      </outcomeDoers>
+    </ingestible>
+  </ThingDef>
+
 </Defs>

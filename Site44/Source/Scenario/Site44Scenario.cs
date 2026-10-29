@@ -27,11 +27,32 @@ namespace Site44
 
         // The pages after the first one. Just play: nothing extra. Tinker: a page of per-game choices and the biomes, plus
         // RimWorld's storyteller page if the player asked for it. Full vanilla: RimWorld's own pages.
+        // RimWorld's own difficulty also scales wound infection and mood, on top of this mod's difficulty. So its page opens on
+        // Rough, the neutral one; the player can still pick anything else.
+        private static void PreselectNeutralDifficulty(Page first)
+        {
+            for (Page page = first; page != null; page = page.next)
+            {
+                if (page is Page_SelectStoryteller)
+                {
+                    System.Reflection.FieldInfo difficulty = typeof(Page_SelectStoryteller).GetField("difficulty", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    System.Reflection.FieldInfo values = typeof(Page_SelectStoryteller).GetField("difficultyValues", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (difficulty != null && values != null)
+                    {
+                        difficulty.SetValue(page, DifficultyDefOf.Rough);
+                        values.SetValue(page, new Difficulty(DifficultyDefOf.Rough));
+                    }
+                }
+            }
+        }
+
         public Page BuildPages(int path)
         {
             if (path == Page_Site44Setup.FullVanilla)
             {
-                return base.GetFirstConfigPage();
+                Page vanilla = base.GetFirstConfigPage();
+                PreselectNeutralDifficulty(vanilla);
+                return vanilla;
             }
 
             List<Page> pages = new List<Page>();
@@ -58,6 +79,7 @@ namespace Site44
             }
 
             Page first = PageUtility.StitchedPages(pages);
+            PreselectNeutralDifficulty(first);
             if (first != null)
             {
                 Page last = first;

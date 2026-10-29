@@ -37,7 +37,7 @@ namespace Site44
         {
             "Start with these choices. The rest has sensible defaults.",
             "One more page for the party, events, biomes and saving mode.",
-            "RimWorld's own pages for storyteller, difficulty, world and landing site. Its difficulty adds to this mod's."
+            "RimWorld's own pages for storyteller, difficulty, world and landing site. They open on its neutral difficulty."
         };
 
         public override string PageTitle => "Difficulty and pace";

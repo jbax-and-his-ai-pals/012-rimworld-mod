@@ -456,6 +456,10 @@ namespace Site44
         // The frozen sectors stay frozen until the main reactor is back; on a level with no overheated sector the coolant valve ends them too.
         private bool ColdEnded => mainReactorOnline || (coolantLoopDiverted && hotAnchors.Count == 0);
 
+        // The hottest and the coldest room still in force, if any: the temperatures a colonist has to be ready for.
+        public float? WorstHotTemperature => hotTemps.Count > 0 && !coolantLoopDiverted ? (float?)hotTemps.Max() : null;
+        public float? WorstColdTemperature => coldTemps.Count > 0 && !ColdEnded ? (float?)coldTemps.Min() : null;
+
         // What temperature hazards this level has, in words, for the Run tab and the arrival message.
         public string HazardSummary
         {

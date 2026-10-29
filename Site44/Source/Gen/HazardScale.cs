@@ -7,10 +7,10 @@ namespace Site44.Gen
     // produce mild rooms now and then ("breather" rooms) and the hardest rooms only start to appear in the deeper tiers.
     public static class HazardScale
     {
-        // Insulation points that keep a colonist comfortable in the hardest possible room: the best dedicated set in the catalogue.
-        // Today that is the polar shell plus thermal leggings (67) for cold and the heat shell plus vest and leggings (82) for heat,
-        // so the cap is the lower of the two. Raise it only when better gear exists.
-        public const float CapRequirement = 65f;
+        // Insulation points that keep a colonist comfortable in the hardest possible room. The best full set in the gear catalogue (shell,
+        // torso piece, leggings and hood, 122 points for either kind) covers it, and no single piece comes near it. Raise it only when
+        // better gear exists (GearCatalogTests checks this).
+        public const float CapRequirement = 100f;
         public const float MinRequirement = 4f;      // barely outside normal tolerance
         public const float BreatherChance = 0.12f;   // a room drawn from the first tier's spread, whatever the depth
 
@@ -47,6 +47,42 @@ namespace Site44.Gen
             double normal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Cos(2.0 * Math.PI * u2);
             float s = Mean(tier) + Spread(tier) * (float)normal;
             return Math.Max(0.05f, Math.Min(Upper(tier), s));
+        }
+
+        // Harm starts this far beyond the comfortable range, and builds every second from then on (the base game's own rules).
+        public const float SafeMargin = 10f;
+        public const float SeriousSeverity = 0.35f;
+
+        private static readonly float[][] HeatCurve =
+        {
+            new[] { 0f, 0f }, new[] { 25f, 25f }, new[] { 50f, 40f }, new[] { 100f, 60f }, new[] { 200f, 80f }, new[] { 400f, 100f }, new[] { 4000f, 1000f }
+        };
+
+        private static float Curve(float x)
+        {
+            for (int i = 1; i < HeatCurve.Length; i++)
+            {
+                if (x <= HeatCurve[i][0])
+                {
+                    float t = (x - HeatCurve[i - 1][0]) / (HeatCurve[i][0] - HeatCurve[i - 1][0]);
+                    return HeatCurve[i - 1][1] + t * (HeatCurve[i][1] - HeatCurve[i - 1][1]);
+                }
+            }
+
+            return HeatCurve[HeatCurve.Length - 1][1];
+        }
+
+        // How long a colonist can stand in a room before the illness becomes serious, in hours; infinity when the room does no harm.
+        public static float HoursUntilSerious(float ambient, float comfortMin, float comfortMax, bool cold)
+        {
+            float gap = cold ? (comfortMin - SafeMargin) - ambient : ambient - (comfortMax + SafeMargin);
+            if (gap <= 0f)
+            {
+                return float.PositiveInfinity;
+            }
+
+            float perSecond = cold ? Math.Max(gap * 6.45E-05f, 0.00075f) : Math.Max(Curve(gap) * 6.45E-05f, 0.000375f);
+            return SeriousSeverity / perSecond * 60f / 2500f;
         }
 
         public static float RequiredInsulation(float severity)

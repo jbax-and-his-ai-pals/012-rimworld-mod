@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- Higher tiers of temperature protection, and mixed pieces. The best full set reaches the hardest room that can be generated. -->
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_ThermalVest</defName>
+    <label>thermal vest</label>
+    <description>A padded vest worn under a coat. It keeps the chest warm.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Duster/Duster</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>3</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <Mass>1.0</Mass>
+      <Flammability>0.3</Flammability>
+      <Insulation_Cold>22</Insulation_Cold>
+      <EquipDelay>3</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Torso</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Duster/Duster</wornGraphicPath>
+      <layers>
+        <li>Middle</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.45,0.5,0.55)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_ThermalHood</defName>
+    <label>thermal hood</label>
+    <description>A quilted hood that keeps the head and neck warm.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>2</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>50</MaxHitPoints>
+      <Mass>0.3</Mass>
+      <Flammability>0.3</Flammability>
+      <Insulation_Cold>10</Insulation_Cold>
+      <EquipDelay>1</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>UpperHead</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</wornGraphicPath>
+      <layers>
+        <li>Overhead</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.45,0.5,0.55)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_CoolingHood</defName>
+    <label>cooling hood</label>
+    <description>A light reflective hood with a thin coolant line.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>2</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>50</MaxHitPoints>
+      <Mass>0.3</Mass>
+      <Flammability>0.3</Flammability>
+      <Insulation_Heat>10</Insulation_Heat>
+      <EquipDelay>1</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>UpperHead</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</wornGraphicPath>
+      <layers>
+        <li>Overhead</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.75,0.8,0.85)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_CryoShell</defName>
+    <label>cryo shell</label>
+    <description>A sealed, heated shell built for cold stores that never warmed back up. The best cold protection for the torso, arms and legs.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Parka/Parka</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>9</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>140</MaxHitPoints>
+      <Mass>4.0</Mass>
+      <Flammability>0.3</Flammability>
+      <Insulation_Cold>62</Insulation_Cold>
+      <EquipDelay>3</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Torso</li>
+        <li>Arms</li>
+        <li>Legs</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Parka/Parka</wornGraphicPath>
+      <layers>
+        <li>Shell</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.35,0.55,0.8)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_FrostLeggings</defName>
+    <label>frost leggings</label>
+    <description>Heated leggings with a thin power cell. They replace ordinary thermal leggings.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Pants/Pants</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>4</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>90</MaxHitPoints>
+      <Mass>1.0</Mass>
+      <Flammability>0.3</Flammability>
+      <Insulation_Cold>22</Insulation_Cold>
+      <EquipDelay>3</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Legs</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Pants/Pants</wornGraphicPath>
+      <layers>
+        <li>Middle</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.35,0.55,0.8)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_FrostHood</defName>
+    <label>frost hood</label>
+    <description>A sealed, heated hood with a face guard.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>3</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>60</MaxHitPoints>
+      <Mass>0.5</Mass>
+      <Flammability>0.3</Flammability>
+      <Insulation_Cold>16</Insulation_Cold>
+      <EquipDelay>1</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>UpperHead</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</wornGraphicPath>
+      <layers>
+        <li>Overhead</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.35,0.55,0.8)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_FurnaceShell</defName>
+    <label>furnace shell</label>
+    <description>A heavy reflective shell with its own coolant loop, built for the hottest floors. The best heat protection for the torso, arms and legs.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Duster/Duster</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>9</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>140</MaxHitPoints>
+      <Mass>4.0</Mass>
+      <Flammability>0.3</Flammability>
+      <Insulation_Heat>62</Insulation_Heat>
+      <EquipDelay>3</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Torso</li>
+        <li>Arms</li>
+        <li>Legs</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Duster/Duster</wornGraphicPath>
+      <layers>
+        <li>Shell</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.95,0.6,0.3)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_EmberLeggings</defName>
+    <label>ember leggings</label>
+    <description>Reflective, cooled leggings. They replace ordinary cooling leggings.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Pants/Pants</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>4</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>90</MaxHitPoints>
+      <Mass>1.0</Mass>
+      <Flammability>0.3</Flammability>
+      <Insulation_Heat>22</Insulation_Heat>
+      <EquipDelay>3</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Legs</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Pants/Pants</wornGraphicPath>
+      <layers>
+        <li>OnSkin</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.95,0.6,0.3)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_VentHood</defName>
+    <label>vent hood</label>
+    <description>A sealed hood with a built-in cooling vent.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>3</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>60</MaxHitPoints>
+      <Mass>0.5</Mass>
+      <Flammability>0.3</Flammability>
+      <Insulation_Heat>16</Insulation_Heat>
+      <EquipDelay>1</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>UpperHead</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</wornGraphicPath>
+      <layers>
+        <li>Overhead</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.95,0.6,0.3)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_AegisShell</defName>
+    <label>delver aegis</label>
+    <description>A rare composite shell that covers heat and cold both, and turns a little of a blow. Nothing in it is the best of its kind, but it is never the wrong coat.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Duster/Duster</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>9</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>160</MaxHitPoints>
+      <Mass>3.5</Mass>
+      <Flammability>0.3</Flammability>
+      <Insulation_Cold>30</Insulation_Cold>
+      <Insulation_Heat>30</Insulation_Heat>
+      <ArmorRating_Sharp>0.35</ArmorRating_Sharp>
+      <ArmorRating_Blunt>0.2</ArmorRating_Blunt>
+      <EquipDelay>4</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Torso</li>
+        <li>Arms</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Duster/Duster</wornGraphicPath>
+      <layers>
+        <li>Shell</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.7,0.7,0.75)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_AegisHood</defName>
+    <label>aegis hood</label>
+    <description>A rare composite hood with a little of every protection.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>3</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>70</MaxHitPoints>
+      <Mass>0.6</Mass>
+      <Flammability>0.3</Flammability>
+      <Insulation_Cold>12</Insulation_Cold>
+      <Insulation_Heat>12</Insulation_Heat>
+      <ArmorRating_Sharp>0.2</ArmorRating_Sharp>
+      <EquipDelay>1</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>UpperHead</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Tuque/Tuque</wornGraphicPath>
+      <layers>
+        <li>Overhead</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.7,0.7,0.75)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+</Defs>

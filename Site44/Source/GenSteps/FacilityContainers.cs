@@ -147,20 +147,26 @@ namespace Site44
         private static ThingDef ColdGear()
         {
             int depth = GameComponent_Delve.IsDelve ? (GameComponent_Delve.Instance?.depth ?? 1) : 1;
-            string[] pool = depth >= 3
-                ? new[] { "Site44_ThermalWrap", "Site44_ThermalLeggings", "Site44_PolarShell" }
-                : new[] { "Site44_ThermalWrap", "Site44_ThermalLeggings" };
-            return Def(pool.RandomElement());
+            return Def(GearPool(false, depth).RandomElement());
+        }
+
+        // Every piece of this kind that can exist at this depth, and from depth 5 a rare mixed piece that covers both.
+        public static List<string> GearPool(bool hot, int depth)
+        {
+            List<string> pool = GearCatalog.For(hot).Where(p => p.MinDepth <= depth).Select(p => p.Name).ToList();
+            if (depth >= 5 && Rand.Chance(0.08f))
+            {
+                pool.Add(Rand.Bool ? "Site44_AegisShell" : "Site44_AegisHood");
+            }
+
+            return pool;
         }
 
         // Protection against the heat, in the same tiers. Wanted in hot climates and wherever overheated sectors are switched on.
         private static ThingDef HeatGear()
         {
             int depth = GameComponent_Delve.IsDelve ? (GameComponent_Delve.Instance?.depth ?? 1) : 1;
-            string[] pool = depth >= 3
-                ? new[] { "Site44_CoolingVest", "Site44_CoolingLeggings", "Site44_HeatShell" }
-                : new[] { "Site44_CoolingVest", "Site44_CoolingLeggings" };
-            return Def(pool.RandomElement());
+            return Def(GearPool(true, depth).RandomElement());
         }
 
         // One thing a delver would want: gear, a stim, a weapon, parts. Medicine is only an occasional headline.

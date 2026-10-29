@@ -54,6 +54,31 @@ namespace Site44.Tests
         }
 
         [Fact]
+        public void RoomsWithinToleranceDoNoHarm()
+        {
+            Assert.True(float.IsPositiveInfinity(HazardScale.HoursUntilSerious(30f, 16f, 26f, false)));
+            Assert.True(float.IsPositiveInfinity(HazardScale.HoursUntilSerious(10f, 16f, 26f, true)));
+        }
+
+        [Fact]
+        public void HotterRoomsAreDeadlierSooner()
+        {
+            float mild = HazardScale.HoursUntilSerious(45f, 16f, 26f, false);
+            float harsh = HazardScale.HoursUntilSerious(90f, 16f, 26f, false);
+            Assert.True(harsh < mild);
+            Assert.True(harsh > 0f);
+        }
+
+        [Fact]
+        public void BetterGearBuysTime()
+        {
+            // A colonist with 30 more points of insulation has a comfort range 30 wider on the hot side.
+            float bare = HazardScale.HoursUntilSerious(90f, 16f, 26f, false);
+            float geared = HazardScale.HoursUntilSerious(90f, 16f, 56f, false);
+            Assert.True(geared > bare);
+        }
+
+        [Fact]
         public void TheHardestRoomIsExactlyWhatTheBestSetCovers()
         {
             Assert.Equal(HazardScale.CapRequirement, HazardScale.RequiredInsulation(1f));

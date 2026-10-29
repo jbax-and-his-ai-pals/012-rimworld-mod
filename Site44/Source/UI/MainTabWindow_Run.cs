@@ -114,6 +114,17 @@ namespace Site44
             return list;
         }
 
+        // How long a colonist can stay in a room before the illness turns serious, in words.
+        private static string Stay(float hours)
+        {
+            if (float.IsInfinity(hours))
+            {
+                return "no harm";
+            }
+
+            return hours < 1f ? "under an hour" : "about " + Mathf.RoundToInt(hours) + (Mathf.RoundToInt(hours) == 1 ? " hour" : " hours");
+        }
+
         private static List<KeyValuePair<string, string>> Party(Map map)
         {
             var list = new List<KeyValuePair<string, string>>();
@@ -122,11 +133,30 @@ namespace Site44
                 return list;
             }
 
+            MapComponent_Facility facility = map.GetComponent<MapComponent_Facility>();
+            float? hot = facility != null ? facility.WorstHotTemperature : null;
+            float? cold = facility != null ? facility.WorstColdTemperature : null;
             foreach (Pawn pawn in map.mapPawns.FreeColonists)
             {
                 string state = pawn.Dead ? "dead" : pawn.Downed ? "down" : pawn.health.summaryHealth.SummaryHealthPercent < 0.7f ? "hurt" : "well";
                 list.Add(new KeyValuePair<string, string>(pawn.LabelShortCap, state + " (" + Mathf.RoundToInt(pawn.health.summaryHealth.SummaryHealthPercent * 100f) + "% health), heat insulation "
                     + Mathf.RoundToInt(pawn.GetStatValue(StatDefOf.Insulation_Heat)) + ", cold insulation " + Mathf.RoundToInt(pawn.GetStatValue(StatDefOf.Insulation_Cold))));
+                if (hot.HasValue || cold.HasValue)
+                {
+                    FloatRange comfort = pawn.ComfortableTemperatureRange();
+                    string exposure = "";
+                    if (hot.HasValue)
+                    {
+                        exposure += "hottest room: " + Stay(HazardScale.HoursUntilSerious(hot.Value, comfort.min, comfort.max, false));
+                    }
+
+                    if (cold.HasValue)
+                    {
+                        exposure += (exposure.Length > 0 ? "; " : "") + "coldest room: " + Stay(HazardScale.HoursUntilSerious(cold.Value, comfort.min, comfort.max, true));
+                    }
+
+                    list.Add(new KeyValuePair<string, string>("", exposure));
+                }
             }
 
             return list;

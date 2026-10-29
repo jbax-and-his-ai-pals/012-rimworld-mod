@@ -2797,19 +2797,20 @@ namespace Site44
                 .OrderBy(r => Mathf.Abs(r.Anchor.X - plan.Start.X) + Mathf.Abs(r.Anchor.Y - plan.Start.Y))
                 .Take(6)
                 .ToList();
-            string[] hot = { "Site44_CoolingVest", "Site44_CoolingLeggings" };
-            string[] cold = { "Site44_ThermalWrap", "Site44_ThermalLeggings" };
             int placed = 0;
-            foreach (string[] set in new[] { hotAnchors.Count > 0 ? hot : null, coldAnchors.Count > 0 ? cold : null })
+            float neededHot = hotTemps.Count > 0 ? hotTemps.Max() - HazardScale.ComfortMax : 0f;
+            float neededCold = coldTemps.Count > 0 ? HazardScale.ComfortMin - coldTemps.Min() : 0f;
+            foreach (bool isHot in new[] { true, false })
             {
-                if (set == null)
+                float needed = isHot ? neededHot : neededCold;
+                if (needed <= 0f)
                 {
                     continue;
                 }
 
-                foreach (string defName in set)
+                foreach (GearPiece piece in GearCatalog.Entry(isHot, threatDepth, needed, 0.6f))
                 {
-                    ThingDef def = DefDatabase<ThingDef>.GetNamedSilentFail(defName);
+                    ThingDef def = DefDatabase<ThingDef>.GetNamedSilentFail(piece.Name);
                     foreach (PlanRoom room in rooms.OrderBy(r => Rand.Value))
                     {
                         if (def != null && containers.TrySpawnItem(room, ThingMaker.MakeThing(def, def.MadeFromStuff ? GenStuff.DefaultStuffFor(def) : null)))
@@ -2879,6 +2880,16 @@ namespace Site44
 
             ThingDef rare = DefDatabase<ThingDef>.GetNamedSilentFail(WingRareFind());
             bool rareLeft = rare != null && containers.TrySpawnItem(room, ThingMaker.MakeThing(rare));
+
+            // And a piece of temperature gear from the best this depth can offer, or now and then a mixed one.
+            bool gearHot = Rand.Bool;
+            List<GearPiece> top = GearCatalog.For(gearHot).Where(p => p.MinDepth <= threatDepth).OrderByDescending(p => p.Value).Take(3).ToList();
+            string prize = Rand.Chance(0.25f) ? (Rand.Bool ? "Site44_AegisShell" : "Site44_AegisHood") : (top.Count > 0 ? top.RandomElement().Name : null);
+            ThingDef prizeDef = prize != null ? DefDatabase<ThingDef>.GetNamedSilentFail(prize) : null;
+            if (prizeDef != null)
+            {
+                containers.TrySpawnItem(room, ThingMaker.MakeThing(prizeDef));
+            }
             Log.Message("[Site-44] guardian: " + guards.Count + " mechanoid(s) in room " + room.Id + ", " + crates + " crate(s)" + (rareLeft ? " and a rare find." : "."));
         }
 

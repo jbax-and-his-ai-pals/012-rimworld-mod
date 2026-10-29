@@ -17,6 +17,8 @@ namespace Site44
         public string siteTypeDefName;   // which kind of complex this is; names the insider clearance rung
         public IntVec3 startCell = IntVec3.Invalid;
         public bool securityAnnounced;
+        public string storyThread;   // the thread this complex is telling; its documents are revealed in order
+        public int storyIndex;       // how many of its documents have been read
         private Dictionary<string, int> keyColours = new Dictionary<string, int>();
         public bool coolantLoopDiverted;
         public bool mainReactorOnline;
@@ -221,6 +223,46 @@ namespace Site44
             }
         }
 
+        // The next document this complex has to tell. A new thread starts when the last one has been read to its end.
+        public bool NextStory(out StoryThreadDef thread, out int index)
+        {
+            thread = storyThread == null ? null : DefDatabase<StoryThreadDef>.GetNamedSilentFail(storyThread);
+            if (thread == null || storyIndex >= thread.entries.Count)
+            {
+                GameComponent_Delve run = GameComponent_Delve.Instance;
+                List<string> used = run != null ? run.usedStories : new List<string>();
+                List<StoryCandidate> pool = DefDatabase<StoryThreadDef>.AllDefsListForReading
+                    .Where(d => d.entries.Count > 0)
+                    .Select(d => new StoryCandidate { Name = d.defName, SiteTypes = d.siteTypes })
+                    .ToList();
+                bool reset;
+                string pick = StoryPicker.Pick(pool, used, siteTypeDefName, Rand.Int, out reset);
+                if (pick == null)
+                {
+                    index = 0;
+                    return false;
+                }
+
+                if (reset)
+                {
+                    used.Clear();
+                }
+
+                used.Add(pick);
+                storyThread = pick;
+                storyIndex = 0;
+                thread = DefDatabase<StoryThreadDef>.GetNamed(pick);
+            }
+
+            index = storyIndex++;
+            if (GameComponent_Delve.Instance != null)
+            {
+                GameComponent_Delve.Instance.recordsRead++;
+            }
+
+            return true;
+        }
+
         // The colour of the lock for a sector: hatch and keycard ask for the same one.
         public int KeyColourIndex(string sectorId)
         {
@@ -358,6 +400,8 @@ namespace Site44
             base.ExposeData();
             Scribe_Values.Look(ref clearance, "clearance");
             Scribe_Values.Look(ref securityAnnounced, "securityAnnounced");
+            Scribe_Values.Look(ref storyThread, "storyThread");
+            Scribe_Values.Look(ref storyIndex, "storyIndex");
             Scribe_Collections.Look(ref keyColours, "keyColours", LookMode.Value, LookMode.Value);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {

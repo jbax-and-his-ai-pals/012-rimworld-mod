@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_ShiftHandover</defName>
+    <label>Shift handover</label>
+    <siteTypes><li>Site44_Type_Industrial</li></siteTypes>
+    <entries>
+      <li>
+        <kind>Handover note</kind>
+        <header>Day shift to night shift, line 3</header>
+        <title>Pipe 7</title>
+        <body>All good except pipe 7. It knocks every few minutes. I put a hand on it and it is warm, which it should not be, as the line is off. I have logged it. Probably just settling.\n\nCoffee is in the usual place. Mind the wet floor by the gantry.</body>
+      </li>
+      <li>
+        <kind>Handover note</kind>
+        <header>Night shift to day shift, line 3</header>
+        <title>Pipe 7, still</title>
+        <body>The knock on pipe 7 has a pattern. Three, a gap, three. We tapped back. It took a while to answer and then it did.\n\nI am not putting that in the log. I am putting it here, where the next shift will find it and the supervisor will not. Do not tap back. Whatever it is learned something from us.</body>
+      </li>
+      <li>
+        <kind>Handover note</kind>
+        <header>Day shift to nobody, line 3</header>
+        <title>Pipe 7, solved</title>
+        <body>I opened the junction. It was not pipe. It was a conduit that the original plans do not show, running down into the plant from somewhere under the site, and the knocking is something using the pipe the way you use a corridor.\n\nI have shut the valve. The knock has stopped. That is the only good news in this note. The conduit is still warm, and the next shift has not arrived.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_SafetyBoard</defName>
+    <label>Days without incident</label>
+    <siteTypes><li>Site44_Type_Industrial</li></siteTypes>
+    <entries>
+      <li>
+        <kind>Safety board, transcribed</kind>
+        <header>Main gate. Counter and comments</header>
+        <title>Days since last incident: 400</title>
+        <body>DAYS SINCE LAST INCIDENT: 400.\n\nComment, in marker: "BEER FRIDAY."\nComment, below: "Not before the audit."\nComment, below that, in a different hand: "We had one in the break room last week. Does it count?"\nComment: "Is a ghost an incident."</body>
+      </li>
+      <li>
+        <kind>Safety board, transcribed</kind>
+        <header>Main gate. Counter and comments</header>
+        <title>Days since last incident: 0</title>
+        <body>DAYS SINCE LAST INCIDENT: 0.\nDAYS SINCE LAST INCIDENT: 0.\nDAYS SINCE LAST INCIDENT: 0.\n\nThe board has been reset eleven times in a day, by a hand no one has seen. Beneath the number someone has written "that's fine", and under it, much smaller, "this is fine", and under that, in the same cold grey as the shop floor lamps: "STOP SAYING THAT."</body>
+      </li>
+      <li>
+        <kind>Safety board, transcribed</kind>
+        <header>Main gate. Counter, final</header>
+        <title>Days since last incident: 1</title>
+        <body>DAYS SINCE LAST INCIDENT: 1.\n\nThere is a new line of text under it, in chalk: "We were tired. We stopped. Nobody got hurt."\n\nBelow, in a thinner hand: "Someone should leave the board at one."</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+</Defs>

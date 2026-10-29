@@ -14,6 +14,8 @@ namespace Site44
     public class GameComponent_Delve : GameComponent
     {
         public bool active;
+        public List<string> usedStories = new List<string>();   // threads already told in this run
+        public int recordsRead;
         public int depth = 1;
         public List<string> biomePool = new List<string>();   // fixed when the run starts; empty = every biome
         private int lastCheckTick;
@@ -97,6 +99,8 @@ namespace Site44
             delve.runSeed = Rand.Int;
             delve.startTick = Find.TickManager.TicksGame;
             delve.sizeByDepth.Clear();
+            delve.usedStories.Clear();
+            delve.recordsRead = 0;
             BiomeChoice.EnsureDefault(Site44Settings.Current);
             delve.biomePool = new List<string>(Site44Settings.Current.biomePool);
             DelveRules.Apply();
@@ -108,12 +112,15 @@ namespace Site44
             Scribe_Values.Look(ref active, "active");
             Scribe_Values.Look(ref depth, "depth", 1);
             Scribe_Values.Look(ref runSeed, "runSeed");
+            Scribe_Collections.Look(ref usedStories, "usedStories", LookMode.Value);
+            Scribe_Values.Look(ref recordsRead, "recordsRead");
             Scribe_Values.Look(ref startTick, "startTick");
             Scribe_Collections.Look(ref sizeByDepth, "sizeByDepth", LookMode.Value, LookMode.Value);
             Scribe_Collections.Look(ref biomePool, "biomePool", LookMode.Value);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 biomePool = biomePool ?? new List<string>();
+                usedStories = usedStories ?? new List<string>();
                 sizeByDepth = sizeByDepth ?? new Dictionary<int, string>();
             }
         }
@@ -153,6 +160,7 @@ namespace Site44
                 new KeyValuePair<string, string>("Levels completed", Mathf.Max(0, depth - 1).ToString()),
                 new KeyValuePair<string, string>("Best depth", settings.bestDelveDepth + (newBest ? " (a new best)" : "")),
                 new KeyValuePair<string, string>("Time in the ruins", (survived / 60000) + " days, " + ((survived % 60000) / 2500) + " hours"),
+                new KeyValuePair<string, string>("Records read", recordsRead.ToString()),
                 new KeyValuePair<string, string>("Difficulty", SettingsScreen.CurrentBalance()),
                 new KeyValuePair<string, string>("Pace", run.delveSize == "Grows with depth" ? "Steady" : run.delveSize),
                 new KeyValuePair<string, string>("Focus", new[] { "Balanced", "Explorer", "Power trip" }[Mathf.Clamp(run.focus, 0, 2)])

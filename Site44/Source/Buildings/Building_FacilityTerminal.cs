@@ -264,6 +264,13 @@ namespace Site44
                     {
                         Messages.Message(hacker.LabelShort + " completes the diagnostic.", new LookTargets(Position, Map), MessageTypeDefOf.PositiveEvent);
                     }
+
+                    StoryThreadDef thread;
+                    int entry;
+                    if (facility.NextStory(out thread, out entry))
+                    {
+                        Find.WindowStack.Add(new Dialog_TerminalLog(thread, entry));
+                    }
                     break;
                 case TerminalKind.Valve:
                     facility.DivertCoolant();

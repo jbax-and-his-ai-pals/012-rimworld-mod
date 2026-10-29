@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_SampleFourteen</defName>
+    <label>Sample 14</label>
+    <siteTypes><li>Site44_Type_Research</li></siteTypes>
+    <entries>
+      <li>
+        <kind>Lab notebook</kind>
+        <header>Dr. Hallam, bench 3</header>
+        <title>Sample 14, day 1</title>
+        <body>Sample 14 arrived in an unlabelled case. Mass 212 g. Inert under every probe I own. I have put it on the bench under a cloth and written the date on the cloth, which is not procedure, but I wanted to know whether it would be there tomorrow.\n\nIt was.</body>
+      </li>
+      <li>
+        <kind>Lab notebook</kind>
+        <header>Dr. Hallam, bench 3</header>
+        <title>Sample 14, day 19</title>
+        <body>Mass 212 g. Mass 212 g. Mass 212 g. The reading has not changed to the last decimal in nineteen days, which should be impossible, because air does not weigh the same twice.\n\nColleagues have started leaving small things next to it. A pen. A coin. A photograph. In the morning, the things are warm.\n\nI took the cloth off today. I do not recommend it. I do not recommend leaving it on.</body>
+      </li>
+      <li>
+        <kind>Oversight order</kind>
+        <header>FROM: Programme oversight\nTO: Hallam, Dr.\nCLASSIFICATION: Restricted</header>
+        <title>Cessation</title>
+        <body>You are directed to cease all work on Sample 14, to surrender your notebook, and to leave the wing. No explanation will be given. Your access has been reduced accordingly.\n\nThe wing is being sealed. It will be reopened by someone with a higher clearance than yours. Please do not attempt to be that person.\n\nYour contribution is appreciated.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_PeerReview</defName>
+    <label>Peer review</label>
+    <siteTypes><li>Site44_Type_Research</li></siteTypes>
+    <entries>
+      <li>
+        <kind>Email</kind>
+        <header>From: Dr. Iwu\nTo: Dr. Brandt\nSubject: Power fluctuations</header>
+        <title>It is not the grid</title>
+        <body>Jonas, the fluctuations are not the grid. I have spent a week on this. They line up with the corridor lights, not the generators, and the corridor lights line up with something walking.\n\nI know how that sounds. Please take the data seriously and not the sentence.</body>
+      </li>
+      <li>
+        <kind>Email</kind>
+        <header>From: Dr. Brandt\nTo: Dr. Iwu\nSubject: Re: Power fluctuations</header>
+        <title>It is the grid</title>
+        <body>Amara, I have read your data. I read it twice. It is a very handsome fit. It is also a fit to an alternating current drawn by a thing that does not exist, and I will not put my name to a paper that begins "something is walking."\n\nIf you are right, then the site needs a different kind of scientist than either of us, and I would rather be wrong in the ordinary way. I am sorry. I am going to keep the lights on.</body>
+      </li>
+      <li>
+        <kind>Resignation, unsent</kind>
+        <header>From: Dr. Iwu\nTo: Programme office</header>
+        <title>Effective immediately</title>
+        <body>I resign from the Programme, effective at once. I am not leaving because I was told I was wrong. I am leaving because Jonas was right, and I have been standing in a corridor all evening listening to it be right, in steps, getting nearer.\n\nIf Jonas asks, tell him I was glad to have been argued with. Tell him I left the lights on for him. Tell him not to follow me out.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+</Defs>

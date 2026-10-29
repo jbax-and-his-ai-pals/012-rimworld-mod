@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_Reorg</defName>
+    <label>Reorganisation</label>
+    <siteTypes><li>Site44_Type_Office</li></siteTypes>
+    <entries>
+      <li>
+        <kind>All-hands memo</kind>
+        <header>FROM: Office of the Deputy Director\nTO: All staff</header>
+        <title>Streamlining</title>
+        <body>I am pleased to announce a review of how this site is organised. In the spirit of clarity, several departments will be merged, renamed, or retired. No one will lose their post. Some of you will be reassigned to a team whose name you have not heard before. That is normal.\n\nPlease direct questions to the Deputy Director's office, which will be moving to the basement.</body>
+      </li>
+      <li>
+        <kind>Email</kind>
+        <header>From: Okonkwo, I.\nTo: Records\nSubject: Where is Continuity?</header>
+        <title>Re: Re: Re: Where is Continuity?</title>
+        <body>Records, I have now been told by three managers that Continuity is a department, a project, and a typo. My badge lists me as assigned to it. My salary arrives from it. I cannot find its office on any floor plan.\n\nI did find a door on level two with its name on it. Behind the door was a room with one chair and a desk, and on the desk a cup of tea, still warm. I did not wait to see who it belonged to.\n\nPlease tell me what I am a member of.</body>
+      </li>
+      <li>
+        <kind>Email, unsent draft</kind>
+        <header>From: Okonkwo, I.\nTo: (blank)</header>
+        <title>Continuity</title>
+        <body>I think I understand now. Continuity is whoever stays. It has no staff because staff are whoever the building is still using, and no budget because the building pays for it. Nobody reorganised the site. The site reorganised us, one reassignment at a time, until the people who were left were the ones that fit.\n\nThe tea is still warm. I would like to go home, but the stairwell I came down has been renamed, and I do not recognise the new name.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_Variance</defName>
+    <label>Quarterly variance</label>
+    <siteTypes><li>Site44_Type_Office</li></siteTypes>
+    <entries>
+      <li>
+        <kind>Spreadsheet note</kind>
+        <header>Finance, working file. Cell comment on row 212</header>
+        <title>Unexplained variance</title>
+        <body>Catering for the site is invoiced for four hundred occupants. Badge data shows a hundred and sixty. I have flagged this to Procurement three times and been told it is a rounding convention.\n\nRounding does not produce two hundred and forty lunches.</body>
+      </li>
+      <li>
+        <kind>Spreadsheet note</kind>
+        <header>Finance, working file. Cell comment on row 212, reply</header>
+        <title>The extra lunches</title>
+        <body>I asked the kitchen. They said the extra lunches go to level four. I asked what is on level four. The kitchen said it did not know, only that the trays come back empty and washed, and that there is a note each week asking for more.\n\nThe note is always the same. It says "thank you" and nothing else.\n\nI have decided this is not in my remit.</body>
+      </li>
+      <li>
+        <kind>Spreadsheet note</kind>
+        <header>Finance, working file. Cell comment on row 212, final</header>
+        <title>Reconciled</title>
+        <body>Row 212 reconciled. Variance explained.\n\nI went to level four. There was a corridor of beds, and in each bed a person who looked like the photograph in an old badge. The nurse said they were staff, kept comfortable, and that the site was grateful for their service. I asked how long. She said she had stopped counting.\n\nThe lunches are not extra. They were always the correct number. I had only ever counted the ones who could walk.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+</Defs>

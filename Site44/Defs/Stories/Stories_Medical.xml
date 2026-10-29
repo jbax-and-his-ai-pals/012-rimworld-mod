@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_WardC</defName>
+    <label>Ward C</label>
+    <siteTypes><li>Site44_Type_Medical</li></siteTypes>
+    <entries>
+      <li>
+        <kind>Nursing note</kind>
+        <header>Night shift, Ward C, bed 6</header>
+        <title>Recovery faster than expected</title>
+        <body>Patient admitted with a compound fracture and signs of deep infection. By morning the infection markers were normal. By the second day the bone had set. I have written "good progress" on the chart because there is no box for the rest.\n\nI have nursed for twenty-two years. People do not mend like this. They mend like they are being hurried.</body>
+      </li>
+      <li>
+        <kind>Nursing note</kind>
+        <header>Night shift, Ward C, beds 1 to 12</header>
+        <title>Discharge refused</title>
+        <body>Every patient on the ward is now fit to leave. I have prepared the papers. The administrator has declined to sign them, citing "continued observation". The beds are full, the waiting room is full, and Ward C is empty of illness.\n\nI asked what they are observing. The administrator said it would be inappropriate to say.\n\nThe patients are not asking to go home. I find that the strangest part.</body>
+      </li>
+      <li>
+        <kind>Nursing note, last page</kind>
+        <header>Pinned inside the dispensary door</header>
+        <title>If you are not staff</title>
+        <body>If you are reading this and you are not staff: the dispensary holds a small number of single-use injectors. They are what the ward was built around. They are the only thing in the building I would trust.\n\nTake one if you are hurt. Do not take two. I do not know why that matters, only that every person who ever took two stopped being a person who needed one.\n\nGo carefully. The ward is quiet, and it is not asleep.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_ColdChain</defName>
+    <label>Cold chain</label>
+    <siteTypes><li>Site44_Type_Medical</li></siteTypes>
+    <entries>
+      <li>
+        <kind>Maintenance ticket</kind>
+        <header>TICKET 7731, Pharmacy cold store</header>
+        <title>Temperature alarm</title>
+        <body>Cold store 2 reporting 9 degrees. Setpoint is 4. Compressor running normally. Door seal intact. Alarm acknowledged and silenced by Pharmacy.\n\nNote from pharmacist: stock is within tolerance for the next eight hours. Please do not dispatch a technician until morning.</body>
+      </li>
+      <li>
+        <kind>Maintenance ticket</kind>
+        <header>TICKET 7731, update</header>
+        <title>Temperature alarm, continued</title>
+        <body>Cold store 2 reporting 14 degrees. Setpoint is 4. Technician dispatched. Technician reports the compressor is running and the evaporator is frosted over, which cannot be reconciled with the reading.\n\nTechnician reports that the thermometer is correct. The cold store is warm, and the frost is not cold.\n\nTechnician has asked to be moved to another site.</body>
+      </li>
+      <li>
+        <kind>Handwritten apology</kind>
+        <header>Taped to cold store 2</header>
+        <title>To whoever opens this</title>
+        <body>I am sorry about the stock. I know what was in here. I moved it myself, a few boxes at a time, to the room under the stairs where it is still cold, because I did not trust the building to keep it that way.\n\nThe room is behind the wall that does not match the floor plan. You will know it by the smell of clean cardboard.\n\nI tried to do one useful thing before I left. Please let it have been useful.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+</Defs>

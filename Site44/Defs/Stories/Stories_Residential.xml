@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_BlockCommittee</defName>
+    <label>Block committee</label>
+    <siteTypes><li>Site44_Type_Residential</li></siteTypes>
+    <entries>
+      <li>
+        <kind>Committee minutes</kind>
+        <header>Residents' committee, block 3, item list</header>
+        <title>Minutes of the monthly meeting</title>
+        <body>Item 1: the laundry rota. Mr. Pell on floor 2 has been using the machine during other people's slots. Mr. Pell stated that he does not sleep and has nothing else to do. The committee expressed sympathy and asked him to use the machine at night.\n\nItem 2: the lift. Not working. Again.\nItem 3: the new neighbour in 4C. No one has met them. Rent is paid.\n\nMeeting closed.</body>
+      </li>
+      <li>
+        <kind>Committee minutes</kind>
+        <header>Residents' committee, block 3, emergency session</header>
+        <title>Minutes of an additional meeting</title>
+        <body>Item 1: the supply trucks have stopped. The committee has agreed to pool food and lock the stairwell doors until deliveries resume.\n\nItem 2: Mr. Pell has offered to stay on the ground floor. The committee thanked him and noted that, as before, he does not sleep.\n\nItem 3: the new neighbour in 4C has now been heard, and is saying our names. The committee voted not to answer. Passed seven to two.\n\nMeeting closed. Tea was served.</body>
+      </li>
+      <li>
+        <kind>Committee minutes, last</kind>
+        <header>Residents' committee, block 3, a quiet meeting</header>
+        <title>Minutes</title>
+        <body>Present: four. The rest are asleep or elsewhere.\n\nItem 1: the food is nearly gone, but the cupboard in 2B is full. The committee voted to leave it for whoever comes next.\n\nItem 2: Mr. Pell has lit the stairwell lamps every evening since the lights went. It has become the one rule we all keep.\n\nItem 3: whoever comes next, we hope you are kind, and we hope you are hungry enough to eat the soup. It is good soup.\n\nMeeting closed.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_LettersHome</defName>
+    <label>Letters home</label>
+    <siteTypes><li>Site44_Type_Residential</li></siteTypes>
+    <entries>
+      <li>
+        <kind>Personal letter, unsent</kind>
+        <header>To: Tamsin, from your sister</header>
+        <title>The flat</title>
+        <body>Tam, the flat is fine. Smaller than the photographs. The neighbours are polite in the way people are when they are listening through a wall. There is a garden on the roof where everyone grows tomatoes and nobody eats them.\n\nI think you would like it here. I don't think you should come. I haven't worked out how to say both in the same letter.</body>
+      </li>
+      <li>
+        <kind>Personal letter, unsent</kind>
+        <header>To: Tamsin, from your sister</header>
+        <title>The tomatoes</title>
+        <body>I ate one of the tomatoes. They are the best I have ever had. Everyone watched me do it and no one said anything, and then they all smiled, and I felt the way you feel when you have agreed to something in a language you do not speak.\n\nI don't feel different. I feel very well. I have not been so well in years, and the not-being-different is the thing I keep checking.</body>
+      </li>
+      <li>
+        <kind>Personal letter, unsent</kind>
+        <header>To: Tamsin, from your sister</header>
+        <title>Don't come</title>
+        <body>Tam, don't come. I know I said it before and then spent a page saying the opposite. I mean it now.\n\nI am writing from the roof. The garden is lovely tonight. Everyone is out here. We are not doing anything, we are only standing among the tomatoes in the last of the light, being very well.\n\nI love you. If you read this, the tomatoes are ripe, and I'd rather you didn't eat one.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+</Defs>

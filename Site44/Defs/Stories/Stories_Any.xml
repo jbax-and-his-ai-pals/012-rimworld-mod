@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- Threads that suit any complex. Each is written out in full; nothing is assembled from parts. -->
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_LastShuttle</defName>
+    <label>The last shuttle</label>
+    <entries>
+      <li>
+        <kind>Evacuation notice</kind>
+        <header>FROM: Site Coordination\nTO: All occupants\nPRIORITY: Immediate</header>
+        <title>Orderly departure</title>
+        <body>Transport will call at the east apron in three waves. Bring identification, one carried item each, and any medication you take daily. Do not bring equipment, samples, or anything that was issued to you.\n\nSeating is by the list posted in the foyer. If your name is not on the list, speak to your supervisor, not to the pilots.\n\nThis is a precaution. Normal operations will resume.</body>
+      </li>
+      <li>
+        <kind>Handwritten note, scanned</kind>
+        <header>Pencil, on the back of a seating list</header>
+        <title>Wave two</title>
+        <body>They changed the order. Wave one was supposed to be the clinic and the children, and it was the managers and their files. I counted forty-one people on the apron when the second shuttle left with eleven seats empty.\n\nThe pilot said the manifest was locked. I believe him. I think everyone on that list believed it too, which is how it got that far.\n\nI am going back for Dessa. If this note is the only thing left of me, it says: the east apron, the third wave, nobody came.</body>
+      </li>
+      <li>
+        <kind>Transport log</kind>
+        <header>Flight deck, final entry</header>
+        <title>Wave three: cancelled</title>
+        <body>Wave three cancelled at the operator's request. Reason code: none given. Fuel state nominal. Crew standing by.\n\nCrew released at the end of the shift. Hangar doors left open for returning personnel.\n\nThe doors are no longer open.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_CoffeeMachine</defName>
+    <label>The coffee machine</label>
+    <entries>
+      <li>
+        <kind>Facilities memo</kind>
+        <header>FROM: Facilities\nTO: All staff\nRE: Item 4 on the agenda, again</header>
+        <title>The machine on the second floor</title>
+        <body>It has been brought to our attention that the machine on the second floor is "making a noise". It is a coffee machine. It makes a noise. Please stop submitting this as a safety concern.\n\nIt has also been brought to our attention that the noise is "words". Facilities has listened. It is not words.</body>
+      </li>
+      <li>
+        <kind>Facilities memo</kind>
+        <header>FROM: Facilities\nTO: All staff\nRE: The machine on the second floor</header>
+        <title>It is words</title>
+        <body>Apologies. It is a few words. The word is "yes", and it says it after the cup is empty and before anyone has touched a button. Facilities does not consider this a fault, as the coffee is of acceptable quality.\n\nPlease do not ask it questions. Three people have, and the answers were specific.\n\nThe machine will remain in service.</body>
+      </li>
+      <li>
+        <kind>Facilities memo, last of its folder</kind>
+        <header>FROM: Facilities\nTO: Whoever is still here</header>
+        <title>Item 4</title>
+        <body>I have unplugged the machine on the second floor and I want it on record that it made no objection, which is worse.\n\nThere are forty cups on the tray. I did not pour them.\n\nIf you find this, the kitchen has dried goods in the left cupboard. Take them. I never understood why it was kept so well stocked, and I do not want to find out.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_QuietHours</defName>
+    <label>Quiet hours</label>
+    <entries>
+      <li>
+        <kind>System log</kind>
+        <header>Building management, night cycle</header>
+        <title>Door cycling, corridor B</title>
+        <body>02:14 corridor B door 3 opened. No badge read.\n02:14 corridor B door 3 closed.\n02:41 corridor B door 3 opened. No badge read.\n02:41 corridor B door 3 closed.\n03:08 corridor B door 3 opened. No badge read.\n\nOccupancy sensors report zero persons in the corridor. Maintenance ticket raised. Door actuator reported healthy on three consecutive tests.</body>
+      </li>
+      <li>
+        <kind>System log</kind>
+        <header>Building management, night cycle, three weeks later</header>
+        <title>Door cycling, whole level</title>
+        <body>Door events now exceed the level's sensor capacity. Actuators healthy. Occupancy zero.\n\nPattern analysis: openings travel in a line, one door each twenty seconds, from the reactor stair towards the foyer. Speed consistent with a person walking. No person is present.\n\nPattern analysis note: the line has stopped at the foyer every night for twelve nights. Tonight it did not.</body>
+      </li>
+      <li>
+        <kind>System log</kind>
+        <header>Building management, last entry before the gap</header>
+        <title>Occupancy: unresolved</title>
+        <body>04:02 foyer door opened. Badge read: no badge.\n04:02 occupancy sensors: 1.\n04:03 occupancy sensors: 0.\n04:03 occupancy sensors: 1.\n\nQuery: who is this? The system has no record of an employee by this description. The system has asked this question forty times. The system will keep asking.\n\n[log continues after a gap of 11 years]</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+</Defs>

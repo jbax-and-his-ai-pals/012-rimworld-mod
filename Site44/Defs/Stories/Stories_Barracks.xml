@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_NightWatch</defName>
+    <label>Night watch</label>
+    <siteTypes><li>Site44_Type_Barracks</li></siteTypes>
+    <entries>
+      <li>
+        <kind>Guard log</kind>
+        <header>Night watch, Cpl. Aldous, roll call</header>
+        <title>Headcount</title>
+        <body>0600 roll call. Garrison strength 48. Present 49.\n\nRecounted. 49. Recounted by the sergeant. 49. Everybody answered to a name, and every name was ours. I have gone through the bunk list twice and there is no extra bed.\n\nNoted for the commander. He said not to make a fuss over a clerical error.</body>
+      </li>
+      <li>
+        <kind>Guard log</kind>
+        <header>Night watch, Cpl. Aldous, roll call, ten days on</header>
+        <title>Headcount, again</title>
+        <body>0600 roll call. Garrison strength 48. Present 50.\n\nThe extra one is never at the end of the line. I looked for a face I did not know and every face is one I do. That is the problem. They are all ours. We simply have more of us than we did, and nobody remembers it being different.\n\nThe sergeant has stopped counting out loud. I have started writing my own name on my hand each morning.</body>
+      </li>
+      <li>
+        <kind>Guard log</kind>
+        <header>Night watch, unsigned</header>
+        <title>Roll call</title>
+        <body>0600 roll call. Garrison strength: unknown. Present: enough.\n\nI wrote my name on my hand this morning and it was already there in handwriting that was not mine. I read it to the line and the line answered. I do not know which of us I am.\n\nIf you are a stranger reading this, you are the only person I am certain of. Please count yourselves and tell me the number.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+  <Site44.StoryThreadDef>
+    <defName>Site44_Story_OrdersOfTheDay</defName>
+    <label>Orders of the day</label>
+    <siteTypes><li>Site44_Type_Barracks</li></siteTypes>
+    <entries>
+      <li>
+        <kind>Standing orders</kind>
+        <header>FROM: Garrison command\nTO: All ranks</header>
+        <title>Orders of the day</title>
+        <body>1. The perimeter is to be held at all times.\n2. No personnel are to leave the site without written authority.\n3. Personnel who report unusual sightings are to report them to command only.\n4. Rations will be issued as normal.\n\nCommand thanks you for your discipline.</body>
+      </li>
+      <li>
+        <kind>Standing orders, amended</kind>
+        <header>FROM: Garrison command\nTO: All ranks</header>
+        <title>Orders of the day, revised</title>
+        <body>1. The perimeter is to be held at all times, including from the inside.\n2. Disregard order 2 of the previous version.\n3. Do not report unusual sightings to command. Command is not presently able to read them.\n4. Rations are to be issued, and then not eaten until further orders.\n\nCommand regrets any confusion.</body>
+      </li>
+      <li>
+        <kind>Handwritten, on the back of a ration card</kind>
+        <header>Sgt. Verhoeven, to whoever relieves us</header>
+        <title>Last order</title>
+        <body>You are relieved. I do not know who by, but you are relieved, and I do not care whether you were ordered to be.\n\nThe perimeter holds. It always held. What it kept in was never us.\n\nIf you can read this, the armoury and the quartermaster are both open to you, and I would be glad for them to be used.</body>
+      </li>
+    </entries>
+  </Site44.StoryThreadDef>
+
+</Defs>

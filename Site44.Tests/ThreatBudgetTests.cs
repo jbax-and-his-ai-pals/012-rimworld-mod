@@ -111,6 +111,32 @@ namespace Site44.Tests
         }
 
         [Fact]
+        public void SmallComplexesStillGetHarderWithDepth()
+        {
+            Assert.True(ThreatBudget.BudgetFor(10, 25, 1f) - ThreatBudget.BudgetFor(1, 25, 1f) >= 8f);
+        }
+
+        [Fact]
+        public void AnyLevelThatCanAffordAThreatGetsOne()
+        {
+            for (int seed = 0; seed < 50; seed++)
+            {
+                // Only security sites and a budget whose security share is too small: it is funded anyway.
+                var onlySecurity = ThreatBudget.Plan(seed, Sites(0, 2), Settings(1, 4f));
+                Assert.Single(onlySecurity);
+                Assert.Equal(ThreatKind.Security, onlySecurity[0].Kind);
+
+                // A budget just above the cheapest nest.
+                var nest = ThreatBudget.Plan(seed, Sites(12, 0), Settings(1, 2.6f));
+                Assert.Single(nest);
+                Assert.Equal(ThreatKind.Nest, nest[0].Kind);
+
+                // Too poor for anything.
+                Assert.Empty(ThreatBudget.Plan(seed, Sites(12, 2), Settings(1, 2.0f)));
+            }
+        }
+
+        [Fact]
         public void BudgetGrowsWithDepthDangerAndSize()
         {
             Assert.True(ThreatBudget.BudgetFor(4, 40, 1f) > ThreatBudget.BudgetFor(1, 40, 1f));

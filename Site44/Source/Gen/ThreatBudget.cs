@@ -46,6 +46,8 @@ namespace Site44.Gen
         private const float NestShare = 0.4f;
         private const float SecurityShare = 0.6f;
 
+        public const float FlatPerDepth = 1f;
+
         public static float PointsPerRoom(int depth)
         {
             return Math.Min(0.55f, 0.2f + 0.03f * (Math.Max(1, depth) - 1));
@@ -53,7 +55,8 @@ namespace Site44.Gen
 
         public static float BudgetFor(int depth, int rooms, float danger)
         {
-            return Math.Max(0, rooms) * PointsPerRoom(depth) * Math.Max(0f, danger);
+            // A per-room share that grows with depth, plus a flat step per depth so small complexes still get harder.
+            return (Math.Max(0, rooms) * PointsPerRoom(depth) + FlatPerDepth * (Math.Max(1, depth) - 1)) * Math.Max(0f, danger);
         }
 
         public static int NestTierCap(int depth)
@@ -144,6 +147,21 @@ namespace Site44.Gen
                     picks.Add(new ThreatPick { SiteId = site.Id, Kind = ThreatKind.Nest, Tier = tier, Cost = NestCosts[tier - 1] });
                     chosen.Add(site.Id);
                     perZone[site.ZoneId] = inZone + 1;
+                }
+            }
+
+            // A level that can afford a threat at all gets at least one: a nest if nests are wanted, otherwise a security sector.
+            if (picks.Count == 0)
+            {
+                List<ThreatSite> nestSites = Shuffled(sites.Where(s => s.Kind == ThreatKind.Nest).ToList(), rng);
+                List<ThreatSite> securitySites = Shuffled(sites.Where(s => s.Kind == ThreatKind.Security).ToList(), rng);
+                if (shareN > 0f && nestSites.Count > 0 && settings.Budget >= NestCosts[0])
+                {
+                    picks.Add(new ThreatPick { SiteId = nestSites[0].Id, Kind = ThreatKind.Nest, Tier = 1, Cost = NestCosts[0] });
+                }
+                else if (shareS > 0f && securitySites.Count > 0 && settings.Budget >= SecurityCosts[0])
+                {
+                    picks.Add(new ThreatPick { SiteId = securitySites[0].Id, Kind = ThreatKind.Security, Tier = 1, Cost = SecurityCosts[0] });
                 }
             }
 

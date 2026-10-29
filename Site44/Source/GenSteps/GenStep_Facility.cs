@@ -2523,6 +2523,8 @@ namespace Site44
                 }
             }
 
+            int roomCount = plan.Rooms.Count(r => !r.IsCorridor);
+            int minNestHops = roomCount < 60 ? 2 : 4;   // small complexes have few rooms far from the start
             HashSet<int> secureIds = new HashSet<int>(secureRooms.Select(v => v.room.Id).Concat(secureRooms.Select(v => v.outer.Id)));
             Dictionary<int, ThreatSite> nestSites = new Dictionary<int, ThreatSite>();
             foreach (PlanRoom room in plan.Rooms)
@@ -2530,7 +2532,7 @@ namespace Site44
                 Zone zone = graph.Zones[graph.ZoneOfRoom(room.Id)];
                 int roomHops;
                 if (room.IsCorridor || room.Cells.Count < 9 || IsEntryRoom(room) || secureIds.Contains(room.Id) || zone.Kind == SectorKind.Security
-                    || !hops.TryGetValue(room.Id, out roomHops) || roomHops < 4)
+                    || !hops.TryGetValue(room.Id, out roomHops) || roomHops < minNestHops)
                 {
                     continue;
                 }
@@ -2562,7 +2564,6 @@ namespace Site44
                 }
             }
 
-            int roomCount = plan.Rooms.Count(r => !r.IsCorridor);
             ThreatSettings threat = new ThreatSettings
             {
                 Depth = threatDepth,

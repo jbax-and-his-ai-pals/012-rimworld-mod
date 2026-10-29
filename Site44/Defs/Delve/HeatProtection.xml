@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- Heat protection, the other half of the cold gear: found as loot. Basic pieces first, a heavy shell deeper down. -->
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_CoolingVest</defName>
+    <label>cooling vest</label>
+    <description>A vest lined with thin coolant tubes and a dead battery's worth of habit. It keeps the worst of the heat off the chest and arms.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Duster/Duster</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>4</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>90</MaxHitPoints>
+      <Mass>1.2</Mass>
+      <Flammability>0.4</Flammability>
+      <Insulation_Heat>22</Insulation_Heat>
+      <EquipDelay>3</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Torso</li>
+        <li>Arms</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Duster/Duster</wornGraphicPath>
+      <layers>
+        <li>Shell</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.75,0.8,0.85)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_CoolingLeggings</defName>
+    <label>cooling leggings</label>
+    <description>Light reflective leggings, worn over ordinary trousers.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Pants/Pants</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>3</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <Mass>0.9</Mass>
+      <Flammability>0.4</Flammability>
+      <Insulation_Heat>15</Insulation_Heat>
+      <EquipDelay>2</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Legs</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Pants/Pants</wornGraphicPath>
+      <layers>
+        <li>Middle</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.75,0.8,0.85)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+  <ThingDef ParentName="ApparelBase">
+    <defName>Site44_HeatShell</defName>
+    <label>heat shell</label>
+    <description>A heavy reflective shell with its own coolant loop, built for furnace floors. Bulky, and the best protection from heat that a delver is likely to find.</description>
+    <techLevel>Industrial</techLevel>
+    <graphicData>
+      <texPath>Things/Pawn/Humanlike/Apparel/Duster/Duster</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <smeltProducts>
+      <Steel>8</Steel>
+    </smeltProducts>
+    <statBases>
+      <MaxHitPoints>120</MaxHitPoints>
+      <Mass>3.5</Mass>
+      <Flammability>0.2</Flammability>
+      <Insulation_Heat>45</Insulation_Heat>
+      <EquipDelay>5</EquipDelay>
+    </statBases>
+    <thingCategories>
+      <li>ApparelMisc</li>
+    </thingCategories>
+    <apparel>
+      <bodyPartGroups>
+        <li>Torso</li>
+        <li>Arms</li>
+        <li>Legs</li>
+      </bodyPartGroups>
+      <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Duster/Duster</wornGraphicPath>
+      <layers>
+        <li>Shell</li>
+      </layers>
+      <tags />
+    </apparel>
+    <colorGenerator Class="ColorGenerator_Options">
+      <options>
+        <li>
+          <only>(0.9,0.75,0.4)</only>
+        </li>
+      </options>
+    </colorGenerator>
+  </ThingDef>
+
+</Defs>

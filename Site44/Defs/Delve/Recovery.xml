@@ -102,4 +102,28 @@
     </ingestible>
   </ThingDef>
 
+  <!-- Upgrade nanites: swap a natural part for a bionic one. Only found deeper. -->
+  <ThingDef ParentName="DrugPillBase">
+    <defName>Site44_UpgradeNanites</defName>
+    <label>upgrade nanites</label>
+    <description>A sealed ampoule of bright silver suspension. The nanites strip one natural part down and rebuild it as a bionic one: arm, leg, eye, heart, spine, stomach or ear, in that order, whichever is still natural. No surgery is needed. They do nothing for a colonist who is already fully upgraded.</description>
+    <graphicData>
+      <texPath>Things/Item/Drug/Penoxycyline</texPath>
+      <graphicClass>Graphic_StackCount</graphicClass>
+      <color>(0.55,0.85,1)</color>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <statBases>
+      <MarketValue>900</MarketValue>
+      <Mass>0.02</Mass>
+    </statBases>
+    <techLevel>Spacer</techLevel>
+    <ingestible>
+      <drugCategory>None</drugCategory>
+      <outcomeDoers>
+        <li Class="Site44.IngestionOutcomeDoer_BionicUpgrade" />
+      </outcomeDoers>
+    </ingestible>
+  </ThingDef>
+
 </Defs>

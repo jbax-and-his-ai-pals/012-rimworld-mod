@@ -209,6 +209,63 @@ namespace Site44
         }
     }
 
+    // Upgrade nanites: replace one natural part with its bionic version, no surgery needed. The part is the first of arm, leg, eye, heart,
+    // spine, stomach and ear that is still natural and whole; a colonist with all of them already bionic gets nothing from it.
+    public class IngestionOutcomeDoer_BionicUpgrade : IngestionOutcomeDoer
+    {
+        private static readonly string[][] Upgrades =
+        {
+            new[] { "Shoulder", "BionicArm" },
+            new[] { "Leg", "BionicLeg" },
+            new[] { "Eye", "BionicEye" },
+            new[] { "Heart", "BionicHeart" },
+            new[] { "Spine", "BionicSpine" },
+            new[] { "Stomach", "BionicStomach" },
+            new[] { "Ear", "BionicEar" }
+        };
+
+        // True when part is the other part or sits somewhere beneath it.
+        private static bool Within(BodyPartRecord part, BodyPartRecord other)
+        {
+            for (BodyPartRecord p = part; p != null; p = p.parent)
+            {
+                if (p == other)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected override void DoIngestionOutcomeSpecial(Pawn pawn, Thing ingested, int ingestedCount)
+        {
+            List<Hediff_AddedPart> added = pawn.health.hediffSet.hediffs.OfType<Hediff_AddedPart>().ToList();
+            foreach (string[] upgrade in Upgrades)
+            {
+                HediffDef bionic = DefDatabase<HediffDef>.GetNamedSilentFail(upgrade[1]);
+                if (bionic == null)
+                {
+                    continue;
+                }
+
+                BodyPartRecord part = pawn.health.hediffSet.GetNotMissingParts()
+                    .FirstOrDefault(p => p.def.defName == upgrade[0] && !added.Any(h => Within(p, h.Part) || Within(h.Part, p)));
+                if (part == null)
+                {
+                    continue;
+                }
+
+                pawn.health.RestorePart(part);
+                pawn.health.AddHediff(bionic, part);
+                Messages.Message(pawn.LabelShort + ": the nanites replace the " + part.Label + " with a bionic one.", pawn, MessageTypeDefOf.PositiveEvent, false);
+                return;
+            }
+
+            Messages.Message(pawn.LabelShort + ": nothing left for the nanites to upgrade.", pawn, MessageTypeDefOf.NeutralEvent, false);
+        }
+    }
+
     // The antiseptic injector: clears wound infections outright and dresses what is left.
     public class IngestionOutcomeDoer_Antiseptic : IngestionOutcomeDoer
     {

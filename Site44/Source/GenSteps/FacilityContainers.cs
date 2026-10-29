@@ -73,6 +73,14 @@ namespace Site44
             return Def((rich ? RichTable : LootTable).RandomElement());
         }
 
+        // The rarest finds: from depth 5 an upgrade nanite can take the place of a panacea or regrowth find.
+        private static string DeepFind(string ordinary)
+        {
+            GameComponent_Delve run = GameComponent_Delve.Instance;
+            bool deep = run != null && run.active && run.depth >= 5;
+            return deep && Rand.Chance(0.4f) ? "Site44_UpgradeNanites" : ordinary;
+        }
+
         // Makes a loot item; weapons and clothing come worn and of ordinary or poor quality.
         private static Thing MakeLoot(ThingDef def)
         {
@@ -145,6 +153,16 @@ namespace Site44
             return Def(pool.RandomElement());
         }
 
+        // Protection against the heat, in the same tiers. Wanted in hot climates and wherever overheated sectors are switched on.
+        private static ThingDef HeatGear()
+        {
+            int depth = GameComponent_Delve.IsDelve ? (GameComponent_Delve.Instance?.depth ?? 1) : 1;
+            string[] pool = depth >= 3
+                ? new[] { "Site44_CoolingVest", "Site44_CoolingLeggings", "Site44_HeatShell" }
+                : new[] { "Site44_CoolingVest", "Site44_CoolingLeggings" };
+            return Def(pool.RandomElement());
+        }
+
         // One thing a delver would want: gear, a stim, a weapon, parts. Medicine is only an occasional headline.
         public Thing HeadlineLoot()
         {
@@ -153,6 +171,10 @@ namespace Site44
             if (BiomeChoice.PoolHasCold(Site44Settings.Current) && Rand.Chance(0.16f))
             {
                 def = ColdGear();
+            }
+            else if ((BiomeChoice.PoolHasHot(Site44Settings.Current) || Site44Tuning.HotZonesEnabled) && Rand.Chance(0.12f))
+            {
+                def = HeatGear();
             }
             else if (roll < 20)
             {
@@ -188,7 +210,7 @@ namespace Site44
             }
             else
             {
-                def = Def(Rand.Bool ? "Site44_PanaceaPill" : "Site44_RegrowthNanites") ?? Def("Site44_AntisepticInjector") ?? Def("MedicineIndustrial");
+                def = Def(DeepFind(Rand.Bool ? "Site44_PanaceaPill" : "Site44_RegrowthNanites")) ?? Def("Site44_AntisepticInjector") ?? Def("MedicineIndustrial");
             }
 
             if (def == null)

@@ -597,6 +597,19 @@ namespace Site44
 
         // Delve levels are the complex and nothing else: everything beyond a margin around the buildings, the paved
         // paths and a small yard at the start is solid rock under a thick roof, so the map has no outside to wander.
+        // The rare slot of an advanced wing: a panacea pill, regrowth nanites, and from depth 5 sometimes upgrade nanites.
+        private static string WingRareFind()
+        {
+            GameComponent_Delve run = GameComponent_Delve.Instance;
+            bool deep = run != null && run.active && run.depth >= 5;
+            if (deep && Rand.Chance(0.3f))
+            {
+                return "Site44_UpgradeNanites";
+            }
+
+            return Rand.Chance(0.35f) ? "Site44_RegrowthNanites" : "Site44_PanaceaPill";
+        }
+
         private void SurroundWithRock()
         {
             ThingDef rock = Find.World.NaturalRockTypesIn(map.Tile).FirstOrDefault() ?? DefDatabase<ThingDef>.GetNamedSilentFail("Granite");
@@ -1828,7 +1841,7 @@ namespace Site44
 
             // Advanced wings often hold a blood pack, and now and then a panacea pill.
             ThingDef bloodPack = DefDatabase<ThingDef>.GetNamedSilentFail("Site44_BloodPack");
-            ThingDef panacea = DefDatabase<ThingDef>.GetNamedSilentFail(Rand.Chance(0.35f) ? "Site44_RegrowthNanites" : "Site44_PanaceaPill");
+            ThingDef panacea = DefDatabase<ThingDef>.GetNamedSilentFail(WingRareFind());
             foreach (Zone wing in graph.Zones.Where(z => z.Restricted && lockedGateZones.Contains(z.Id)))
             {
                 foreach (ThingDef extra in new[] { Rand.Chance(0.6f) ? bloodPack : null, Rand.Chance(0.25f) ? panacea : null })

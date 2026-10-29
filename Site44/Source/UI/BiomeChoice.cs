@@ -32,6 +32,18 @@ namespace Site44
             return Verse.Rand.Chance(0.66f);
         }
 
+        private static readonly string[] Hot = { "Desert", "AridShrubland", "ExtremeDesert", "TropicalRainforest", "TropicalSwamp" };
+
+        public static bool IsHot(BiomeDef biome)
+        {
+            return biome != null && System.Array.IndexOf(Hot, biome.defName) >= 0;
+        }
+
+        public static bool PoolHasHot(Site44Settings s)
+        {
+            return Candidates().Any(b => IsAllowed(s, b) && IsHot(b));
+        }
+
         public static bool IsCold(BiomeDef biome)
         {
             return biome != null && System.Array.IndexOf(Cold, biome.defName) >= 0;

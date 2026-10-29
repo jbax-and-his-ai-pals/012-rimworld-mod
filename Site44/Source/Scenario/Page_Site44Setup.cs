@@ -37,7 +37,7 @@ namespace Site44
         {
             "",
             "Party size, events, healing, saving mode and biomes.",
-            "Choose storyteller, difficulty, world, and landing site."
+            "Choose storyteller, difficulty, world, and landing site. Site-44 doesn't need any of these, so skip this unless you want to customize them."
         };
 
         // Said only when the full setup is picked: RimWorld's own difficulty is a separate scale from this mod's.

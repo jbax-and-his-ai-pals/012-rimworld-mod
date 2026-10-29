@@ -181,7 +181,10 @@ namespace Site44
             // has a chance to find protection before it needs it.
             bool early = depth <= Site44Tuning.MildLevels && BiomeChoice.PoolHasMild(Site44Settings.Current);
             Predicate<PlanetTile> mildPool = t => inPool(t) && !BiomeChoice.IsExtreme(Find.WorldGrid[t].PrimaryBiome);
-            if (!(early && TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false, validator: mildPool))
+            Predicate<PlanetTile> favoured = t => inPool(t) && BiomeChoice.Favoured(Site44Settings.Current, Find.WorldGrid[t].PrimaryBiome);
+            if (!(early && TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false, validator: t => mildPool(t) && favoured(t)))
+                && !(early && TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false, validator: mildPool))
+                && !TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false, validator: favoured)
                 && !TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false, validator: inPool)
                 && !TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 24, false, validator: inPool)
                 && !TileFinder.TryFindNewSiteTile(out tile, from.Tile, 2, 12, false))

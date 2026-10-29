@@ -80,6 +80,7 @@ namespace Site44
         public bool skipWorldSetup = true;
         public bool biomePoolV2;                              // false until the default pool (everything but the extremes) has been applied
         public List<string> biomePool = new List<string>();   // biomes for later complexes in a run; empty = every biome
+        public bool variedLandscapes = true;                  // lush biomes (forest, jungle) come up a little more often
         public bool delveAllowRaids = false;
         public bool delveAllowCaravanEvents = false;
         public bool delveAllowOtherThreats = false;

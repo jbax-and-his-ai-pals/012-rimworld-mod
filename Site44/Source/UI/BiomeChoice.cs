@@ -18,6 +18,20 @@ namespace Site44
             return biome != null && System.Array.IndexOf(Extreme, biome.defName) >= 0;
         }
 
+        private static readonly string[] Lush = { "TropicalRainforest", "TemperateForest", "BorealForest", "TropicalSwamp", "TemperateSwamp" };
+
+        // A random draw used while picking tiles: lush biomes always pass, the rest pass about two times in three,
+        // so forests and jungles turn up roughly half as often again without ever being forced.
+        public static bool Favoured(Site44Settings s, BiomeDef biome)
+        {
+            if (!s.variedLandscapes || biome == null || System.Array.IndexOf(Lush, biome.defName) >= 0)
+            {
+                return true;
+            }
+
+            return Verse.Rand.Chance(0.66f);
+        }
+
         public static bool IsCold(BiomeDef biome)
         {
             return biome != null && System.Array.IndexOf(Cold, biome.defName) >= 0;

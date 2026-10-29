@@ -233,7 +233,7 @@ namespace Site44
                     continue;
                 }
 
-                if (BiomeChoice.IsInPool(biome.defName) && !(preferMild && BiomeChoice.IsExtreme(biome)))
+                if (BiomeChoice.IsInPool(biome.defName) && !(preferMild && BiomeChoice.IsExtreme(biome)) && BiomeChoice.Favoured(settings, biome))
                 {
                     return candidate;
                 }

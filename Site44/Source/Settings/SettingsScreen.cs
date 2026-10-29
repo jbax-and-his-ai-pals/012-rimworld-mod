@@ -419,6 +419,8 @@ namespace Site44
 
             var delve = new List<SettingRow>
             {
+                Toggle("Favour striking landscapes", "Forests and jungles come up somewhat more often, which makes the most of the surrounding mountain.",
+                    () => S.variedLandscapes, v => S.variedLandscapes = v, true, "Delve"),
                 Toggle("Vanilla enemy raids", "",
                     () => S.delveAllowRaids, v => S.delveAllowRaids = v, false, "Delve"),
                 Toggle("Vanilla caravan events", "Caravan ambushes, manhunter ambushes, caravan demands, and caravan meetings.",

@@ -17,6 +17,7 @@ namespace Site44
         public string siteTypeDefName;   // which kind of complex this is; names the insider clearance rung
         public IntVec3 startCell = IntVec3.Invalid;
         public bool securityAnnounced;
+        private Dictionary<string, int> keyColours = new Dictionary<string, int>();
         public bool coolantLoopDiverted;
         public bool mainReactorOnline;
         public float facilityAiIntegrity = 1f;
@@ -207,6 +208,7 @@ namespace Site44
                 ScanBadges();
                 AnnounceSecurity();
                 ApplyFocus();
+                TeachNearby();
             }
 
             if (!IsFacilityMap || coolantLoopDiverted || !Site44Tuning.HotZonesEnabled)
@@ -216,6 +218,54 @@ namespace Site44
             if (Find.TickManager.TicksGame % HeatCadenceTicks == 0)
             {
                 ApplyHeat(HotZoneTemperature);
+            }
+        }
+
+        // The colour of the lock for a sector: hatch and keycard ask for the same one.
+        public int KeyColourIndex(string sectorId)
+        {
+            int index;
+            if (!keyColours.TryGetValue(sectorId, out index))
+            {
+                index = keyColours.Count;
+                keyColours[sectorId] = index;
+            }
+
+            return index;
+        }
+
+        // One-time tips: the first time a colonist is near a gate, a terminal, a hatch, a keycard or a badge, the learning helper
+        // gets a lesson about it. It does nothing when the player has turned the learning helper off, and never repeats.
+        private void TeachNearby()
+        {
+            List<Pawn> colonists = map.mapPawns.FreeColonistsSpawned;
+            if (colonists.Count == 0)
+            {
+                return;
+            }
+
+            Teach("Site44_ConceptGate", Site44DefOf.Site44_ExtractionGate, colonists);
+            Teach("Site44_ConceptTerminal", Site44DefOf.Site44_Terminal, colonists);
+            Teach("Site44_ConceptHatch", Site44DefOf.Site44_SealedHatch, colonists);
+            Teach("Site44_ConceptKeycard", DefDatabase<ThingDef>.GetNamedSilentFail("Site44_Keycard"), colonists);
+            Teach("Site44_ConceptBadge", DefDatabase<ThingDef>.GetNamedSilentFail("Site44_ClearanceBadge"), colonists);
+        }
+
+        private void Teach(string conceptName, ThingDef thingDef, List<Pawn> colonists)
+        {
+            ConceptDef concept = DefDatabase<ConceptDef>.GetNamedSilentFail(conceptName);
+            if (concept == null || thingDef == null || PlayerKnowledgeDatabase.IsComplete(concept))
+            {
+                return;
+            }
+
+            foreach (Thing thing in map.listerThings.ThingsOfDef(thingDef))
+            {
+                if (colonists.Any(p => p.Position.DistanceTo(thing.Position) <= 14f))
+                {
+                    LessonAutoActivator.TeachOpportunity(concept, thing, OpportunityType.Important);
+                    return;
+                }
             }
         }
 
@@ -308,6 +358,11 @@ namespace Site44
             base.ExposeData();
             Scribe_Values.Look(ref clearance, "clearance");
             Scribe_Values.Look(ref securityAnnounced, "securityAnnounced");
+            Scribe_Collections.Look(ref keyColours, "keyColours", LookMode.Value, LookMode.Value);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                keyColours = keyColours ?? new Dictionary<string, int>();
+            }
             Scribe_Values.Look(ref siteTypeDefName, "siteTypeDefName");
             Scribe_Values.Look(ref startCell, "startCell", IntVec3.Invalid);
             Scribe_Values.Look(ref announcedTier, "announcedTier");

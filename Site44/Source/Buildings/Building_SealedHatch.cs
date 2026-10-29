@@ -20,6 +20,36 @@ namespace Site44
 
         private const float SwipeRange = 6f;
 
+        // A hatch opened by a keycard has a colour, shared with its card. Restricted wings and secure rooms have none.
+        private bool Keyed => sectorId != null && !sectorId.StartsWith("vault") && requiredTier <= 0;
+
+        private int KeyIndex
+        {
+            get
+            {
+                MapComponent_Facility facility = Map != null ? Map.GetComponent<MapComponent_Facility>() : null;
+                return facility != null ? facility.KeyColourIndex(sectorId) : -1;
+            }
+        }
+
+        public override Color DrawColor
+        {
+            get
+            {
+                int index = Keyed ? KeyIndex : -1;
+                return index >= 0 ? KeyColours.Colour(index) : base.DrawColor;
+            }
+        }
+
+        public override string LabelNoCount
+        {
+            get
+            {
+                int index = Keyed ? KeyIndex : -1;
+                return index >= 0 ? base.LabelNoCount + " (" + KeyColours.Name(index) + ")" : base.LabelNoCount;
+            }
+        }
+
         public override IEnumerable<Gizmo> GetGizmos()
         {
             foreach (Gizmo gizmo in base.GetGizmos())
@@ -27,12 +57,12 @@ namespace Site44
                 yield return gizmo;
             }
 
-            if (sectorId != null && !sectorId.StartsWith("vault"))
+            if (Keyed)
             {
                 yield return new Command_Action
                 {
                     defaultLabel = "Swipe keycard",
-                    defaultDesc = "Open this hatch with a keycard carried by a colonist standing nearby. The card is spent.",
+                    defaultDesc = "Open this hatch with its " + KeyColours.Name(Mathf.Max(0, KeyIndex)) + " keycard, carried by a colonist standing nearby. The card is spent.",
                     icon = TexCommand.ForbidOff,
                     action = SwipeKeycard
                 };
@@ -56,7 +86,7 @@ namespace Site44
                 return;
             }
 
-            Messages.Message("No colonist near the hatch is carrying a keycard for it.", this, MessageTypeDefOf.RejectInput, false);
+            Messages.Message("No colonist near the hatch is carrying its " + KeyColours.Name(Mathf.Max(0, KeyIndex)) + " keycard.", this, MessageTypeDefOf.RejectInput, false);
         }
 
         public override string GetInspectString()
@@ -64,7 +94,7 @@ namespace Site44
             string text = base.GetInspectString();
             string status = sectorId != null && sectorId.StartsWith("vault")
                 ? "Secure room. Sealed until a nearby terminal is hacked."
-                : requiredTier > 0 ? "Restricted wing. Needs clearance " + DirectorVoice.TierName(requiredTier, Map) + " at its terminal." : "Sealed. Needs a terminal override or a keycard.";
+                : requiredTier > 0 ? "Restricted wing. Needs clearance " + DirectorVoice.TierName(requiredTier, Map) + " at its terminal." : "Sealed. Needs a terminal override or the " + KeyColours.Name(Mathf.Max(0, KeyIndex)) + " keycard.";
             return text.NullOrEmpty() ? status : text + "\n" + status;
         }
     }

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- One-time tips for the learning helper. They appear once, the first time a colonist is near the thing, and not at all when the
+       player has turned the learning helper off. -->
+
+  <ConceptDef>
+    <defName>Site44_ConceptGate</defName>
+    <label>The extraction gate</label>
+    <priority>60</priority>
+    <needsOpportunity>true</needsOpportunity>
+    <helpText>The gate leads down to the next level. It stays sealed until its terminal is hacked. Then send the party through: colonists bring what they carry, and nothing else comes along.</helpText>
+  </ConceptDef>
+
+  <ConceptDef>
+    <defName>Site44_ConceptTerminal</defName>
+    <label>Terminals</label>
+    <priority>61</priority>
+    <needsOpportunity>true</needsOpportunity>
+    <helpText>A colonist hacks a terminal by solving a code puzzle: pick the right access code from look-alikes. A higher Intellectual skill gives more attempts.</helpText>
+  </ConceptDef>
+
+  <ConceptDef>
+    <defName>Site44_ConceptHatch</defName>
+    <label>Sealed hatches</label>
+    <priority>62</priority>
+    <needsOpportunity>true</needsOpportunity>
+    <helpText>A coloured hatch opens from its terminal, or with the keycard of the same colour. A hatch with no colour belongs to a restricted wing and needs enough clearance at its terminal.</helpText>
+  </ConceptDef>
+
+  <ConceptDef>
+    <defName>Site44_ConceptKeycard</defName>
+    <label>Keycards</label>
+    <priority>63</priority>
+    <needsOpportunity>true</needsOpportunity>
+    <helpText>A keycard opens the hatch of the same colour. A colonist has to carry it: right-click the card to pick it up, then select the hatch and use Swipe keycard.</helpText>
+  </ConceptDef>
+
+  <ConceptDef>
+    <defName>Site44_ConceptBadge</defName>
+    <label>Clearance badges</label>
+    <priority>64</priority>
+    <needsOpportunity>true</needsOpportunity>
+    <helpText>A colonist who carries a clearance badge raises the party's clearance on this level. Higher clearance opens restricted wings, and staff clearance makes the facility's defences friendly.</helpText>
+  </ConceptDef>
+
+</Defs>

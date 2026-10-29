@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- Keycards and clearance badges can be picked up and carried like medicine and drugs. -->
+  <OrderedTakeGroupDef>
+    <defName>Site44_Keys</defName>
+    <label>keys</label>
+    <max>5</max>
+  </OrderedTakeGroupDef>
+
+</Defs>

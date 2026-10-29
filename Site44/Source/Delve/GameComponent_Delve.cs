@@ -4,6 +4,7 @@ using System.Linq;
 using RimWorld;
 using RimWorld.Planet;
 using Site44.Gen;
+using UnityEngine;
 using Verse;
 
 namespace Site44
@@ -17,6 +18,7 @@ namespace Site44
         public List<string> biomePool = new List<string>();   // fixed when the run starts; empty = every biome
         private int lastCheckTick;
         private int runSeed;
+        private int startTick;
         private Dictionary<int, string> sizeByDepth = new Dictionary<int, string>();
 
         public GameComponent_Delve(Game game)
@@ -93,6 +95,7 @@ namespace Site44
             delve.active = true;
             delve.depth = 1;
             delve.runSeed = Rand.Int;
+            delve.startTick = Find.TickManager.TicksGame;
             delve.sizeByDepth.Clear();
             BiomeChoice.EnsureDefault(Site44Settings.Current);
             delve.biomePool = new List<string>(Site44Settings.Current.biomePool);
@@ -105,6 +108,7 @@ namespace Site44
             Scribe_Values.Look(ref active, "active");
             Scribe_Values.Look(ref depth, "depth", 1);
             Scribe_Values.Look(ref runSeed, "runSeed");
+            Scribe_Values.Look(ref startTick, "startTick");
             Scribe_Collections.Look(ref sizeByDepth, "sizeByDepth", LookMode.Value, LookMode.Value);
             Scribe_Collections.Look(ref biomePool, "biomePool", LookMode.Value);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
@@ -140,7 +144,20 @@ namespace Site44
                 Site44Settings.SaveGlobal();
             }
 
-            Messages.Message("The run ends at depth " + depth + ". Best so far: " + settings.bestDelveDepth + ".", MessageTypeDefOf.NeutralEvent, false);
+            bool newBest = depth >= settings.bestDelveDepth && depth > 1;
+            int survived = Find.TickManager.TicksGame - startTick;
+            Site44Settings run = Site44Settings.Current;
+            List<KeyValuePair<string, string>> lines = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("Depth reached", depth.ToString()),
+                new KeyValuePair<string, string>("Levels completed", Mathf.Max(0, depth - 1).ToString()),
+                new KeyValuePair<string, string>("Best depth", settings.bestDelveDepth + (newBest ? " (a new best)" : "")),
+                new KeyValuePair<string, string>("Time in the ruins", (survived / 60000) + " days, " + ((survived % 60000) / 2500) + " hours"),
+                new KeyValuePair<string, string>("Difficulty", SettingsScreen.CurrentBalance()),
+                new KeyValuePair<string, string>("Pace", run.delveSize == "Grows with depth" ? "Steady" : run.delveSize),
+                new KeyValuePair<string, string>("Focus", new[] { "Balanced", "Explorer", "Power trip" }[Mathf.Clamp(run.focus, 0, 2)])
+            };
+            Find.WindowStack.Add(new Dialog_RunSummary(lines));
         }
 
         // Carries the party, and the loot stacked beside the gate, down to the next complex.

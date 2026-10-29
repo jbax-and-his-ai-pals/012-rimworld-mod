@@ -11,6 +11,7 @@
       <graphicClass>Graphic_StackCount</graphicClass>
     </graphicData>
     <stackLimit>1</stackLimit>
+    <orderedTakeGroup>Site44_Keys</orderedTakeGroup>
     <statBases>
       <MarketValue>10</MarketValue>
       <Mass>0.05</Mass>

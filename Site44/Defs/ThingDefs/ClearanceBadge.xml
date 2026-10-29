@@ -12,6 +12,7 @@
       <color>(0.45,0.7,1)</color>
     </graphicData>
     <stackLimit>1</stackLimit>
+    <orderedTakeGroup>Site44_Keys</orderedTakeGroup>
     <statBases>
       <MarketValue>40</MarketValue>
       <Mass>0.05</Mass>

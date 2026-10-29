@@ -18,16 +18,12 @@
     </statBases>
     <techLevel>Spacer</techLevel>
     <ingestible>
-      <drugCategory>Medical</drugCategory>
+      <!-- Not a drug as far as the game is concerned: a drug that is not on a colonist's drug policy cannot be picked up on a home map. -->
+      <drugCategory>None</drugCategory>
       <outcomeDoers>
         <li Class="Site44.IngestionOutcomeDoer_Antiseptic" />
       </outcomeDoers>
     </ingestible>
-    <comps>
-      <li Class="CompProperties_Drug">
-        <listOrder>1010</listOrder>
-      </li>
-    </comps>
   </ThingDef>
 
 </Defs>

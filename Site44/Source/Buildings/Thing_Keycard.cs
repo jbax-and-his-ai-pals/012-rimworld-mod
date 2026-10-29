@@ -1,3 +1,5 @@
+using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace Site44
@@ -13,9 +15,32 @@ namespace Site44
             return hatch.Map != null && mapId == hatch.Map.uniqueID && sectorId == hatch.sectorId;
         }
 
+        private int KeyIndex
+        {
+            get
+            {
+                Map home = Map ?? Find.Maps.FirstOrDefault(m => m.uniqueID == mapId);
+                MapComponent_Facility facility = home != null ? home.GetComponent<MapComponent_Facility>() : null;
+                return facility != null && !sectorId.NullOrEmpty() ? facility.KeyColourIndex(sectorId) : -1;
+            }
+        }
+
+        public override Color DrawColor
+        {
+            get
+            {
+                int index = KeyIndex;
+                return index >= 0 ? KeyColours.Colour(index) : base.DrawColor;
+            }
+        }
+
         public override string LabelNoCount
         {
-            get { return base.LabelNoCount + (sectorId.NullOrEmpty() ? "" : " (sector " + sectorId + ")"); }
+            get
+            {
+                int index = KeyIndex;
+                return index >= 0 ? KeyColours.Name(index) + " " + base.LabelNoCount : base.LabelNoCount;
+            }
         }
 
         public override void ExposeData()

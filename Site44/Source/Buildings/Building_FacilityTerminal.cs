@@ -184,6 +184,18 @@ namespace Site44
             }
         }
 
+        // With several colonists selected the game asks for the multi-select list instead: offer the action once, for the
+        // most skilled colonist who can do it (or the first one, so the menu can say why nobody can).
+        public override IEnumerable<FloatMenuOption> GetMultiSelectFloatMenuOptions(IEnumerable<Pawn> selPawns)
+        {
+            List<Pawn> pawns = selPawns.ToList();
+            Pawn best = pawns
+                .Where(p => p.skills != null && !p.skills.GetSkill(PrimarySkill).TotallyDisabled && p.CanReach(this, PathEndMode.Touch, Danger.Deadly))
+                .OrderByDescending(p => p.skills.GetSkill(PrimarySkill).Level)
+                .FirstOrDefault() ?? pawns.FirstOrDefault();
+            return best == null ? Enumerable.Empty<FloatMenuOption>() : GetFloatMenuOptions(best);
+        }
+
         private void OpenSecurityMenu(Pawn hacker)
         {
             MapComponent_Facility facility = Map.GetComponent<MapComponent_Facility>();

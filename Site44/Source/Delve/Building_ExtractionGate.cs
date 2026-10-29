@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using RimWorld;
 using Verse;
 using Verse.AI;
@@ -23,6 +24,13 @@ namespace Site44
                 ? "Open. The party goes down carrying only what it holds."
                 : "Sealed. The extraction terminal controls it.";
             return text.NullOrEmpty() ? status : text + "\n" + status;
+        }
+
+        public override IEnumerable<FloatMenuOption> GetMultiSelectFloatMenuOptions(IEnumerable<Pawn> selPawns)
+        {
+            List<Pawn> pawns = selPawns.ToList();
+            Pawn best = pawns.FirstOrDefault(p => p.CanReach(this, PathEndMode.InteractionCell, Danger.Deadly)) ?? pawns.FirstOrDefault();
+            return best == null ? Enumerable.Empty<FloatMenuOption>() : GetFloatMenuOptions(best);
         }
 
         public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn selPawn)

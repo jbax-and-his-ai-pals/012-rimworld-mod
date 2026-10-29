@@ -17,7 +17,6 @@ It needs only the base game (no DLC) and adds no Harmony patches.
 - **A safe start.** Nothing hostile is placed near where you arrive, and stray hostiles from other map generation steps are removed.
 - **Terminals and security.** Gate and diagnostic terminals open a cipher-lock puzzle (pick the access code from look-alikes; skill gives more attempts and fewer decoys). Security consoles let you seize or shut down a group of turrets and droids.
 - **Delve mode.** The *Site-44 Delve* scenario chains complexes as levels: hack the extraction terminal, step through the gate with your party and the loot stacked beside it, and arrive somewhere a little bigger and harder. Losing the whole party ends the run.
-- **A friendly enclave.** A settlement of residents who grow their town as your standing with them rises.
 - **Mission focus and delver kit.** A gentle mood lift inside complexes, a non-addictive focus tab, delver gear, and a starting kit so a run does not begin with chores.
 - **Settings.** Options, Mod settings, Site-44: loot amount, crate and casket density, survivors, hostile share, dust, furniture damage, outdoor props, room variety, secure rooms, rec rooms, layout openness, complex type and size, quest frequency.
 

@@ -49,7 +49,8 @@
 
   <QuestScriptDef>
     <defName>OpportunitySite_Site44Enclave</defName>
-    <rootSelectionWeight>0.35</rootSelectionWeight>
+    <!-- Archived: the enclave is not offered to players (see ARCHIVE.md). The debug tools can still generate it. -->
+    <rootSelectionWeight>0</rootSelectionWeight>
     <rootMinPoints>0</rootMinPoints>
     <autoAccept>true</autoAccept>
     <questNameRules>

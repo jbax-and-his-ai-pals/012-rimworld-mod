@@ -39,7 +39,7 @@ namespace Site44
 
             if (!unlocked)
             {
-                yield return new FloatMenuOption("Descend (sealed)", null);
+                yield return new FloatMenuOption("Descend (sealed: hack the extraction terminal first)", null);
             }
             else if (!selPawn.CanReach(this, PathEndMode.InteractionCell, Danger.Deadly))
             {

@@ -33,7 +33,7 @@ namespace Site44
                 {
                     defaultLabel = "Swipe keycard",
                     defaultDesc = "Open this hatch with a keycard carried by a colonist standing nearby. The card is spent.",
-                    icon = ContentFinder<Texture2D>.Get("UI/Commands/Open", false),
+                    icon = TexCommand.ForbidOff,
                     action = SwipeKeycard
                 };
             }

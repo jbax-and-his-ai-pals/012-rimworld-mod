@@ -142,7 +142,7 @@ namespace Site44
             if (detail != null)
             {
                 Text.Anchor = TextAnchor.UpperLeft;
-                GUI.color = Color.gray;
+                GUI.color = Ui.Muted;
                 Widgets.Label(new Rect(rect.x + 6f, rect.y + titleHeight, rect.width - 6f, 22f), detail);
                 GUI.color = Color.white;
             }

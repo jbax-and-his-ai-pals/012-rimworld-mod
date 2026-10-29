@@ -51,8 +51,8 @@ namespace Site44
             Widgets.Label(new Rect(0f, 0f, inRect.width, 32f), title);
             Text.Font = GameFont.Small;
 
-            string status = "Select the access code. Each wrong code reports how many characters sit in the correct position.\n"
-                + "Attempts left: " + puzzle.AttemptsLeft + "    Purges left: " + puzzle.PurgesLeft;
+            string status = "Select the access code. Each wrong code reports how many of its letters are in the right place.\n"
+                + "Attempts left: " + puzzle.AttemptsLeft + (puzzle.AttemptsLeft == 1 ? " (last one)" : "") + "    Purges left: " + puzzle.PurgesLeft;
             Widgets.Label(new Rect(0f, 38f, inRect.width, 62f), status);
 
             float top = 106f;
@@ -95,7 +95,7 @@ namespace Site44
             StringBuilder sb = new StringBuilder();
             foreach (CipherGuessResult g in puzzle.History)
             {
-                sb.AppendLine(g.Code + "   " + g.Matches + "/" + puzzle.CodeLength);
+                sb.AppendLine(g.Code + "   " + g.Matches + " of " + puzzle.CodeLength + " in place");
             }
 
             if (puzzle.State == CipherOutcome.Solved)
@@ -104,7 +104,7 @@ namespace Site44
             }
             else if (puzzle.State == CipherOutcome.Failed)
             {
-                sb.AppendLine().AppendLine("LOCKED OUT");
+                sb.AppendLine().AppendLine("OUT OF ATTEMPTS");
                 sb.AppendLine("Code was " + puzzle.Answer);
             }
 

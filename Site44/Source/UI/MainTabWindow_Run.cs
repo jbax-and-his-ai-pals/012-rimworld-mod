@@ -78,6 +78,11 @@ namespace Site44
             if (facility != null)
             {
                 list.Add(new KeyValuePair<string, string>("Clearance", DirectorVoice.TierName(facility.Tier, map)));
+                string hazards = facility.HazardSummary;
+                if (hazards != null)
+                {
+                    list.Add(new KeyValuePair<string, string>("Hazards", hazards));
+                }
             }
 
             return list;

@@ -32,7 +32,7 @@
       </bodyPartGroups>
       <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Duster/Duster</wornGraphicPath>
       <layers>
-        <li>Shell</li>
+        <li>Middle</li>
       </layers>
       <tags />
     </apparel>
@@ -73,7 +73,7 @@
       </bodyPartGroups>
       <wornGraphicPath>Things/Pawn/Humanlike/Apparel/Pants/Pants</wornGraphicPath>
       <layers>
-        <li>Middle</li>
+        <li>OnSkin</li>
       </layers>
       <tags />
     </apparel>

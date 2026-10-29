@@ -26,6 +26,8 @@ namespace Site44
         private IntVec3 startSpot;
         private readonly HashSet<IntVec3> reserved = new HashSet<IntVec3>();
         private readonly List<IntVec3> hotAnchors = new List<IntVec3>();
+        private readonly List<IntVec3> coldAnchors = new List<IntVec3>();
+        private bool? levelFrozen;
         private int preservedTotal;
         private readonly List<KeyValuePair<PlanRoom, Zone>> containerRooms = new List<KeyValuePair<PlanRoom, Zone>>();
         private string containerSummary = "";
@@ -62,6 +64,8 @@ namespace Site44
             SiteTypes.Current = siteType;
             reserved.Clear();
             hotAnchors.Clear();
+            coldAnchors.Clear();
+            levelFrozen = null;
             containerRooms.Clear();
             containerSummary = "";
             waterFlattened = 0;
@@ -130,6 +134,7 @@ namespace Site44
             PlaceContainers();
             PlaceExtraction();
             PlaceGuardian();
+            PlaceHazardGear();
             PlaceInsiderSource();
             PopulateSecureRooms();
             MarkEntrances();
@@ -148,7 +153,7 @@ namespace Site44
             MapGenerator.PlayerStartSpot = startSpot;
 
             MapComponent_Facility facility = map.GetComponent<MapComponent_Facility>();
-            facility.Initialize(width, height, planSeed, graphSeed, targetZones, hotAnchors);
+            facility.Initialize(width, height, planSeed, graphSeed, targetZones, hotAnchors, coldAnchors);
             facility.startCell = startSpot;
             facility.siteTypeDefName = siteType != null ? siteType.defName : null;
 
@@ -1658,9 +1663,10 @@ namespace Site44
                     SpawnSecurity(rooms, zone, main);
                     break;
                 case SectorKind.HotZone:
+                    List<IntVec3> anchors = ZoneIsFrozen() ? coldAnchors : hotAnchors;
                     foreach (PlanRoom room in rooms)
                     {
-                        hotAnchors.Add(World(room.Anchor));
+                        anchors.Add(World(room.Anchor));
                     }
                     break;
             }
@@ -2742,6 +2748,68 @@ namespace Site44
             }
 
             Log.Message("[Site-44] delve: extraction gate at " + gateSpot + ".");
+        }
+
+        // Temperature sectors are overheated or frozen. Cold suits medical and research complexes. Up to depth 10 a level has one kind of
+        // them throughout; from the first deep tier each sector is decided on its own, so a level can ask for both kinds of gear.
+        private bool ZoneIsFrozen()
+        {
+            string type = SiteTypes.Current != null ? SiteTypes.Current.defName : "";
+            float chance = type.EndsWith("Medical") || type.EndsWith("Research") ? 0.7f : type.EndsWith("Residential") ? 0.35f : 0.2f;
+            if (threatDepth > DelveTiers.BaseLevels)
+            {
+                return Rand.Chance(chance);
+            }
+
+            if (levelFrozen == null)
+            {
+                levelFrozen = Rand.Chance(chance);
+            }
+
+            return levelFrozen.Value;
+        }
+
+        // Gear for each kind of temperature sector is left in the entry zone, so the party can be ready without a search.
+        private void PlaceHazardGear()
+        {
+            if (!GameComponent_Delve.IsDelve || (hotAnchors.Count == 0 && coldAnchors.Count == 0))
+            {
+                return;
+            }
+
+            FacilityContainers containers = new FacilityContainers(map, plan, origin, IsFree);
+            int start = StartRoomId();
+            List<PlanRoom> rooms = plan.Rooms
+                .Where(r => !r.IsCorridor && r.Cells.Count >= 9 && r.Id != extractionRoomId && !graph.Zones[graph.ZoneOfRoom(r.Id)].Restricted
+                            && graph.Zones[graph.ZoneOfRoom(r.Id)].Kind != SectorKind.HotZone)
+                .OrderBy(r => Mathf.Abs(r.Anchor.X - plan.Start.X) + Mathf.Abs(r.Anchor.Y - plan.Start.Y))
+                .Take(6)
+                .ToList();
+            string[] hot = { "Site44_CoolingVest", "Site44_CoolingLeggings" };
+            string[] cold = { "Site44_ThermalWrap", "Site44_ThermalLeggings" };
+            int placed = 0;
+            foreach (string[] set in new[] { hotAnchors.Count > 0 ? hot : null, coldAnchors.Count > 0 ? cold : null })
+            {
+                if (set == null)
+                {
+                    continue;
+                }
+
+                foreach (string defName in set)
+                {
+                    ThingDef def = DefDatabase<ThingDef>.GetNamedSilentFail(defName);
+                    foreach (PlanRoom room in rooms.OrderBy(r => Rand.Value))
+                    {
+                        if (def != null && containers.TrySpawnItem(room, ThingMaker.MakeThing(def, def.MadeFromStuff ? GenStuff.DefaultStuffFor(def) : null)))
+                        {
+                            placed++;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            Log.Message("[Site-44] temperature sectors: " + (hotAnchors.Count > 0 ? "overheated " : "") + (coldAnchors.Count > 0 ? "frozen " : "") + "- " + placed + " piece(s) of gear left near the entrance.");
         }
 
         // The last level of a tier holds a guardian: a mechanoid squad, bigger in the deeper tiers, in a far room. It previews what the

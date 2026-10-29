@@ -516,7 +516,7 @@ namespace Site44
                     () => S.openLayout, v => S.openLayout = v, true),
                 Mult("Locked vaults", "In the open layout, the share of terminal gates that stay locked as optional vaults, opened by hacking a terminal.",
                     () => S.lockedVaultX, v => S.lockedVaultX = v, 4f, null, true, () => "About " + Pct(Site44Tuning.OpenLayoutLockedShare) + " of gates.", open, "Needs the open layout."),
-                Toggle("Overheated sectors", "Some sectors in the gated layout are dangerously hot until the coolant valve is turned.",
+                Toggle("Extreme-temperature sectors", "Some sectors in the gated layout are dangerously hot or frozen. The coolant valve cools the hot ones and the main reactor warms the frozen ones. Heat and cold gear is left near the entrance.",
                     () => S.hotZonesEnabled, v => S.hotZonesEnabled = v, true, null, true, gated, "Needs the open layout switched off."),
                 Mult("Secure rooms", "Locked dead-end rooms opened by hacking a nearby terminal. Each holds one surprise: a treasure vault, a prototype droid, or a volatile cache. 0% = none.",
                     () => S.secureRoomDensity, v => S.secureRoomDensity = v, 3f, null, true),

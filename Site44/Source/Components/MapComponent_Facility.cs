@@ -11,6 +11,7 @@ namespace Site44
     {
         private const int HeatCadenceTicks = 150;
         private const float HotZoneTemperature = 90f;
+        private const float ColdZoneTemperature = -60f;
         private const float SafeTemperature = 21f;
 
         public int clearance;
@@ -33,6 +34,7 @@ namespace Site44
 
         private List<string> unlockedSectors = new List<string>();
         private List<int> hotAnchors = new List<int>();
+        private List<int> coldAnchors = new List<int>();
         public List<SecurityGroup> securityGroups = new List<SecurityGroup>();
 
         public MapComponent_Facility(Map map) : base(map)
@@ -48,7 +50,7 @@ namespace Site44
         public int TargetZones => targetZones;
 
         // gridNx/gridNy hold the plan width and height; gridSeed the plan seed.
-        public void Initialize(int width, int height, int planSeed, int graphSeedValue, int targetZoneCount, List<IntVec3> hotRoomAnchors)
+        public void Initialize(int width, int height, int planSeed, int graphSeedValue, int targetZoneCount, List<IntVec3> hotRoomAnchors, List<IntVec3> coldRoomAnchors)
         {
             gridNx = width;
             gridNy = height;
@@ -60,6 +62,13 @@ namespace Site44
             {
                 hotAnchors.Add(anchor.x);
                 hotAnchors.Add(anchor.z);
+            }
+
+            coldAnchors.Clear();
+            foreach (IntVec3 anchor in coldRoomAnchors)
+            {
+                coldAnchors.Add(anchor.x);
+                coldAnchors.Add(anchor.z);
             }
         }
 
@@ -125,7 +134,12 @@ namespace Site44
             }
 
             coolantLoopDiverted = true;
-            ApplyHeat(SafeTemperature);
+            ApplyTemperature(hotAnchors, SafeTemperature);
+            if (hotAnchors.Count == 0)
+            {
+                ApplyTemperature(coldAnchors, SafeTemperature);
+            }
+
             Find.LetterStack.ReceiveLetter(DirectorVoice.CoolantLabel, DirectorVoice.CoolantText, LetterDefOf.PositiveEvent);
         }
 
@@ -137,6 +151,7 @@ namespace Site44
             }
 
             mainReactorOnline = true;
+            ApplyTemperature(coldAnchors, SafeTemperature);
             List<Thing> lamps = map.listerThings.ThingsOfDef(Site44DefOf.Site44_LampEmergency).ToList();
             foreach (Thing lamp in lamps)
             {
@@ -214,13 +229,22 @@ namespace Site44
                 TeachNearby();
             }
 
-            if (!IsFacilityMap || coolantLoopDiverted || !Site44Tuning.HotZonesEnabled)
+            if (!IsFacilityMap || !Site44Tuning.HotZonesEnabled)
             {
                 return;
             }
+
             if (Find.TickManager.TicksGame % HeatCadenceTicks == 0)
             {
-                ApplyHeat(HotZoneTemperature);
+                if (!coolantLoopDiverted)
+                {
+                    ApplyTemperature(hotAnchors, HotZoneTemperature);
+                }
+
+                if (!ColdEnded)
+                {
+                    ApplyTemperature(coldAnchors, ColdZoneTemperature);
+                }
             }
         }
 
@@ -424,12 +448,40 @@ namespace Site44
             }
         }
 
-        private void ApplyHeat(float temperature)
+        // The frozen sectors stay frozen until the main reactor is back; on a level with no overheated sector the coolant valve ends them too.
+        private bool ColdEnded => mainReactorOnline || (coolantLoopDiverted && hotAnchors.Count == 0);
+
+        // What temperature hazards this level has, in words, for the Run tab and the arrival message.
+        public string HazardSummary
+        {
+            get
+            {
+                if (!Site44Tuning.HotZonesEnabled)
+                {
+                    return null;
+                }
+
+                List<string> parts = new List<string>();
+                if (hotAnchors.Count > 0)
+                {
+                    parts.Add(coolantLoopDiverted ? "overheated sectors (cooled)" : "overheated sectors");
+                }
+
+                if (coldAnchors.Count > 0)
+                {
+                    parts.Add(ColdEnded ? "frozen sectors (warmed)" : "frozen sectors");
+                }
+
+                return parts.Count == 0 ? null : string.Join(" and ", parts.ToArray());
+            }
+        }
+
+        private void ApplyTemperature(List<int> anchors, float temperature)
         {
             HashSet<Room> done = new HashSet<Room>();
-            for (int i = 0; i + 1 < hotAnchors.Count; i += 2)
+            for (int i = 0; i + 1 < anchors.Count; i += 2)
             {
-                Room room = new IntVec3(hotAnchors[i], 0, hotAnchors[i + 1]).GetRoom(map);
+                Room room = new IntVec3(anchors[i], 0, anchors[i + 1]).GetRoom(map);
                 if (room != null && !room.UsesOutdoorTemperature && done.Add(room))
                 {
                     room.Temperature = temperature;
@@ -463,11 +515,13 @@ namespace Site44
             Scribe_Values.Look(ref targetZones, "targetZones");
             Scribe_Collections.Look(ref unlockedSectors, "unlockedSectors", LookMode.Value);
             Scribe_Collections.Look(ref hotAnchors, "hotAnchors", LookMode.Value);
+            Scribe_Collections.Look(ref coldAnchors, "coldAnchors", LookMode.Value);
             Scribe_Collections.Look(ref securityGroups, "securityGroups", LookMode.Deep);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 unlockedSectors = unlockedSectors ?? new List<string>();
                 hotAnchors = hotAnchors ?? new List<int>();
+                coldAnchors = coldAnchors ?? new List<int>();
                 securityGroups = securityGroups ?? new List<SecurityGroup>();
             }
         }

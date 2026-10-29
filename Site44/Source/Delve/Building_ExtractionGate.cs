@@ -20,9 +20,12 @@ namespace Site44
         public override string GetInspectString()
         {
             string text = base.GetInspectString();
-            string status = unlocked
-                ? "Open. The party goes down carrying only what it holds."
-                : "Sealed. The extraction terminal controls it.";
+            if (unlocked)
+            {
+                return text;
+            }
+
+            string status = "Sealed. The extraction terminal controls it.";
             return text.NullOrEmpty() ? status : text + "\n" + status;
         }
 

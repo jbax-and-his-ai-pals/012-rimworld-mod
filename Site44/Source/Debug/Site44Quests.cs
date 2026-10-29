@@ -29,6 +29,7 @@ namespace Site44
             return site;
         }
 
+#if ENCLAVE
         public static Site GenerateEnclaveQuest()
         {
             System.Collections.Generic.HashSet<Site> existing = new System.Collections.Generic.HashSet<Site>(
@@ -38,6 +39,7 @@ namespace Site44
             Log.Message("[Site-44] enclave quest generated: " + (quest == null ? "none" : quest.name) + ", site tile " + (site == null ? "none" : site.Tile.ToString()) + ".");
             return site;
         }
+#endif
 
         // Debug: move the whole colony to a freshly generated complex, as if it were the starting tile of an excursion.
         public static void WarpColoniesTo(Map target)

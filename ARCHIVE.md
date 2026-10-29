@@ -29,3 +29,7 @@ Work set aside while Delve goes to beta (see BETA.md). Nothing here is deleted; 
 
 - Relocated enclave projects are lost on load.
 - Villagers do not yet walk to build sites; guards and daily routines are unfinished; deliveries, ranks and a standing readout are unfinished.
+
+## Building with the archived enclave
+
+The enclave code is kept in the repository but left out of the build and the packaged mod. To build it back in, copy `archive/enclave/Site44_Enclave.xml` into `Site44/Defs/Sites/` and build with `dotnet build -c Release -p:IncludeEnclave=true`, which compiles `Source/Enclave`, `GenStep_Enclave.cs`, `Gen/TownPlan.cs` and the debug entries that depend on them. The town plan tests still run in every build.

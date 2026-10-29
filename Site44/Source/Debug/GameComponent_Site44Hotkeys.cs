@@ -14,7 +14,9 @@ namespace Site44
     {
         private readonly Queue<SiteTypeDef> questQueue = new Queue<SiteTypeDef>();
         private float nextQuestAt = -1f;
+#if ENCLAVE
         private float enclaveAt = -1f;
+#endif
         private float descendAt = -1f;
         private int descendLeft;
         private float heroAt = -1f;
@@ -88,11 +90,13 @@ namespace Site44
             if (GenCommandLine.CommandLineArgPassed("site44quest") || SiteTypes.CommandLineValue("site44quest") != null)
             {
                 string wanted = SiteTypes.CommandLineValue("site44quest");
+#if ENCLAVE
                 if (wanted == "Enclave")
                 {
                     enclaveAt = Time.realtimeSinceStartup + 6f;
                     return;
                 }
+#endif
 
                 IEnumerable<SiteTypeDef> types = SiteTypes.All;
                 if (string.IsNullOrEmpty(wanted))
@@ -148,6 +152,7 @@ namespace Site44
                 }
             }
 
+#if ENCLAVE
             if (enclaveAt > 0f && Time.realtimeSinceStartup >= enclaveAt)
             {
                 enclaveAt = -1f;
@@ -170,6 +175,7 @@ namespace Site44
                     }
                 }
             }
+#endif
 
             if (questQueue.Count > 0 && nextQuestAt > 0f && Time.realtimeSinceStartup >= nextQuestAt)
             {

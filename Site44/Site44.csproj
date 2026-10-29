@@ -14,6 +14,15 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
+  <!-- The enclave work is archived (see ARCHIVE.md). It stays in the repository but is left out of the build unless
+       -p:IncludeEnclave=true is passed; its defs live in archive/enclave and must be copied into Defs for that build. -->
+  <PropertyGroup Condition="'$(IncludeEnclave)' == 'true'">
+    <DefineConstants>$(DefineConstants);ENCLAVE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(IncludeEnclave)' != 'true'">
+    <Compile Remove="Source\Enclave\**;Source\GenSteps\GenStep_Enclave.cs;Source\Gen\TownPlan.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <Reference Include="Assembly-CSharp">

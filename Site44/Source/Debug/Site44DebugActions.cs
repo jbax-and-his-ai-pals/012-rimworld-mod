@@ -20,6 +20,7 @@ namespace Site44
             return facility;
         }
 
+#if ENCLAVE
         [DebugAction("Site-44", "Enclave: add 100 standing", allowedGameStates = AllowedGameStates.Playing)]
         private static void EnclaveStanding()
         {
@@ -33,6 +34,7 @@ namespace Site44
             enclave.AddStanding(100);
             Messages.Message("[Site-44] standing now " + enclave.standing + ".", MessageTypeDefOf.NeutralEvent, false);
         }
+#endif
 
         [DebugAction("Site-44", "Generate ruin quest (choose type)", allowedGameStates = AllowedGameStates.Playing)]
         private static void GenerateRuinQuest()

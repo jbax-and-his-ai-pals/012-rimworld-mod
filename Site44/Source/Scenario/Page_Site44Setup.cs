@@ -48,6 +48,13 @@ namespace Site44
         // The rest of the pages depend on the choice made here, so they are put together when the player moves on.
         protected override void DoNext()
         {
+            // Later pages (the ideoligion page, the colonists) need a storyteller to exist, so the default one is set now. A storyteller
+            // page chosen later replaces it, and the saving mode is applied at the end.
+            if (!Full)
+            {
+                ApplyDefaultStoryteller();
+            }
+
             Site44Scenario scenario = Find.Scenario as Site44Scenario;
             if (scenario != null)
             {
@@ -123,8 +130,12 @@ namespace Site44
                                     ?? DefDatabase<StorytellerDef>.AllDefsListForReading.First();
             DifficultyDef difficulty = DifficultyDefOf.Rough;
             Current.Game.storyteller = new Storyteller(teller, difficulty, new Difficulty(difficulty));
+        }
+
+        public static void ApplyDefaultSaveMode()
+        {
             Find.GameInitData.permadeathChosen = true;
-            Find.GameInitData.permadeath = settings.commitment;
+            Find.GameInitData.permadeath = Site44Settings.Global.commitment;
         }
 
         public static float DrawColumn(Rect rect, string title, string subtitle, string[] names, string[] text, int selected, System.Action<int> choose, string selectedNote = null)

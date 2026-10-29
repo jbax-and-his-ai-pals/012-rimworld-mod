@@ -89,7 +89,8 @@ namespace Site44
             pages.Add(new Page_Site44StartTile());
             if (ModsConfig.IdeologyActive)
             {
-                pages.Add(new Page_ChooseIdeoPreset());
+                // Classic (no precepts) is chosen without a page, unless the player asked to choose their own.
+                pages.Add(customize && Page_Site44Customize.ChooseIdeo ? (Page)new Page_ChooseIdeoPreset() : new Page_Site44AutoIdeo());
             }
 
             foreach (Page page in AllParts.SelectMany(p => p.GetConfigPages()))
@@ -112,7 +113,7 @@ namespace Site44
                 {
                     if (!askedForStoryteller)
                     {
-                        Page_Site44Setup.ApplyDefaultStoryteller();
+                        Page_Site44Setup.ApplyDefaultSaveMode();
                     }
 
                     PageUtility.InitGameStart();
@@ -120,6 +121,20 @@ namespace Site44
             }
 
             return first;
+        }
+    }
+
+    // Chooses the Classic ideoligion (no precepts) and moves on, so a delving party is never asked to keep altars and rituals.
+    public class Page_Site44AutoIdeo : Page_ChooseIdeoPreset
+    {
+        public override void PostOpen()
+        {
+            base.PostOpen();   // sets up the Classic ideoligion for the player, as the ordinary page does
+            DoNext();
+        }
+
+        public override void DoWindowContents(Rect inRect)
+        {
         }
     }
 

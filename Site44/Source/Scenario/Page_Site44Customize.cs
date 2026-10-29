@@ -9,6 +9,7 @@ namespace Site44
     public class Page_Site44Customize : Page
     {
         public static bool ChooseStoryteller;
+        public static bool ChooseIdeo;
 
         public override string PageTitle => "Customize Site-44 settings";
 
@@ -47,6 +48,14 @@ namespace Site44
                 right.Label("Adds RimWorld's storyteller page after the biomes. Its difficulty adds to this mod's, and its saving mode replaces the one above.");
                 GUI.color = Color.white;
             }
+            if (ModsConfig.IdeologyActive && !Page_Site44Setup.Full)
+            {
+                right.CheckboxLabeled("Choose my own ideoligion", ref ChooseIdeo);
+                GUI.color = Ui.Muted;
+                right.Label("Otherwise the Classic ideoligion is used, which has no precepts, so a delving party never fails an altar or ritual demand.");
+                GUI.color = Color.white;
+            }
+
             right.End();
 
             Rect all = new Rect(x + (total - 260f) / 2f, main.yMax - 40f, 260f, 36f);

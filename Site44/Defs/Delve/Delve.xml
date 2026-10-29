@@ -52,7 +52,7 @@
     <label>Site-44 Delve</label>
     <description>A professional crew, one complex after another. Each extraction gate leads to a deeper, harder ruin. Keep the crew alive; the run ends with the last of them.
 
-Playing with Ideology? Choose the Classic ideoligion on the ideoligion page: a delving party cannot meet altar, ritual or building demands. Outside-world events (raids, caravan events, visitors, weather) are switched off by default; each group has a switch in the mod settings.</description>
+Playing with Ideology? The Classic ideoligion is chosen for you, because a delving party cannot meet altar, ritual or building demands; you can choose your own under Customize Site-44 settings. Outside-world events (raids, caravan events, visitors, weather) are switched off by default; each group has a switch in the mod settings.</description>
     <scenario Class="Site44.Site44Scenario">
       <summary>Descend through a chain of ruined complexes.</summary>
       <parts>

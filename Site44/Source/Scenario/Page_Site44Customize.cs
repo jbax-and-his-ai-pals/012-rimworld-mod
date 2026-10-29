@@ -39,10 +39,14 @@ namespace Site44
             right.GapLine(4f);
             right.Gap(6f);
             SettingsScreen.DrawRows(right, "Wound infection risk", "Wounds on descent", "Restore hunger and rest on descent", "Commitment mode");
-            right.CheckboxLabeled("Choose my own storyteller and difficulty", ref ChooseStoryteller);
-            GUI.color = Ui.Muted;
-            right.Label("Adds RimWorld's storyteller page after the biomes. Its difficulty adds to this mod's, and its saving mode replaces the one above.");
-            GUI.color = Color.white;
+            if (!Page_Site44Setup.Full)
+            {
+                // With the full setup ticked, RimWorld's own storyteller page comes up anyway.
+                right.CheckboxLabeled("Choose my own storyteller and difficulty", ref ChooseStoryteller);
+                GUI.color = Ui.Muted;
+                right.Label("Adds RimWorld's storyteller page after the biomes. Its difficulty adds to this mod's, and its saving mode replaces the one above.");
+                GUI.color = Color.white;
+            }
             right.End();
 
             Rect all = new Rect(x + (total - 260f) / 2f, main.yMax - 40f, 260f, 36f);

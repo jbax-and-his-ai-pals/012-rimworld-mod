@@ -10,9 +10,9 @@ namespace Site44
     // Everything not asked here has a sensible default and lives in the settings.
     public class Page_Site44Setup : Page
     {
-        public const int JustPlay = 0, Tinker = 1, FullVanilla = 2;
-
-        private static int path;
+        // More setup: neither box ticked is just play; either or both can be ticked.
+        public static bool Customize;
+        public static bool Full;
 
         private static readonly string[] DifficultyNames = { "Easier", "Default", "Harder", "Brutal", "Unfair" };
         private static readonly string[] DifficultyText =
@@ -51,7 +51,7 @@ namespace Site44
             Site44Scenario scenario = Find.Scenario as Site44Scenario;
             if (scenario != null)
             {
-                next = scenario.BuildPages(path);
+                next = scenario.BuildPages(Customize, Full);
                 if (next != null)
                 {
                     next.prev = this;
@@ -105,7 +105,7 @@ namespace Site44
                 settings.focus = index;
             }));
 
-            float bottom = DrawRow(new Rect(0f, top + 24f, width, 4000f), "More setup", PathNames, PathText, path, index => path = index, path == FullVanilla ? FullSetupNote : null);
+            float bottom = DrawMoreSetup(new Rect(0f, top + 24f, width, 4000f));
             contentHeight = top + 24f + bottom + 16f;
             Widgets.EndScrollView();
 
@@ -174,6 +174,64 @@ namespace Site44
 
             float used = list.CurHeight;
             list.End();
+            return used;
+        }
+
+        // Customizing the Site-44 settings and using RimWorld's own setup pages are independent; with neither, the game just starts.
+        private static float DrawMoreSetup(Rect rect)
+        {
+            Text.Font = GameFont.Medium;
+            Widgets.Label(new Rect(rect.x, rect.y, rect.width, 32f), "More setup");
+            Text.Font = GameFont.Small;
+            Widgets.DrawLineHorizontal(rect.x, rect.y + 34f, rect.width);
+            float gap = 24f;
+            float cell = (rect.width - gap * 2f) / 3f;
+            float tallest = 0f;
+            for (int i = 0; i < 3; i++)
+            {
+                Listing_Standard list = new Listing_Standard { maxOneColumn = true };
+                list.Begin(new Rect(rect.x + i * (cell + gap), rect.y + 44f, cell, 4000f));
+                bool on = i == 0 ? !Customize && !Full : i == 1 ? Customize : Full;
+                bool value = on;
+                Widgets.CheckboxLabeled(list.GetRect(28f), PathNames[i], ref value);
+                if (value != on)
+                {
+                    if (i == 0)
+                    {
+                        Customize = false;
+                        Full = false;
+                    }
+                    else if (i == 1)
+                    {
+                        Customize = value;
+                    }
+                    else
+                    {
+                        Full = value;
+                    }
+                }
+
+                GUI.color = Ui.Muted;
+                if (!PathText[i].NullOrEmpty())
+                {
+                    list.Label(PathText[i]);
+                }
+
+                GUI.color = Color.white;
+                tallest = Mathf.Max(tallest, list.CurHeight);
+                list.End();
+            }
+
+            float used = 44f + tallest;
+            if (Full)
+            {
+                GUI.color = Ui.Muted;
+                float noteHeight = Text.CalcHeight(FullSetupNote, rect.width);
+                Widgets.Label(new Rect(rect.x, rect.y + used + 6f, rect.width, noteHeight), FullSetupNote);
+                GUI.color = Color.white;
+                used += noteHeight + 6f;
+            }
+
             return used;
         }
 

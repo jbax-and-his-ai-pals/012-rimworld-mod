@@ -46,24 +46,43 @@ namespace Site44
             }
         }
 
-        public Page BuildPages(int path)
+        public Page BuildPages(bool customize, bool full)
         {
-            if (path == Page_Site44Setup.FullVanilla)
+            Page vanilla = null;
+            if (full)
             {
-                Page vanilla = base.GetFirstConfigPage();
+                vanilla = base.GetFirstConfigPage();
                 PreselectNeutralDifficulty(vanilla);
-                return vanilla;
+                if (!customize)
+                {
+                    return vanilla;
+                }
             }
 
             List<Page> pages = new List<Page>();
-            if (path == Page_Site44Setup.Tinker)
+            if (customize)
             {
                 pages.Add(new Page_Site44Customize());
                 pages.Add(new Page_Site44Biomes());
-                if (Page_Site44Customize.ChooseStoryteller)
+                if (!full && Page_Site44Customize.ChooseStoryteller)
                 {
                     pages.Add(new Page_SelectStoryteller());
                 }
+            }
+
+            if (full)
+            {
+                // The customize pages come first, then RimWorld's own chain follows on.
+                Page head = PageUtility.StitchedPages(pages);
+                Page tail = head;
+                while (tail.next != null)
+                {
+                    tail = tail.next;
+                }
+
+                tail.next = vanilla;
+                vanilla.prev = tail;
+                return head;
             }
 
             pages.Add(new Page_Site44World());
@@ -88,7 +107,7 @@ namespace Site44
                     last = last.next;
                 }
 
-                bool askedForStoryteller = path == Page_Site44Setup.Tinker && Page_Site44Customize.ChooseStoryteller;
+                bool askedForStoryteller = customize && Page_Site44Customize.ChooseStoryteller;
                 last.nextAct = () =>
                 {
                     if (!askedForStoryteller)

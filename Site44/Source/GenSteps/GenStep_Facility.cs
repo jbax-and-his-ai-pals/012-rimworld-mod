@@ -2354,7 +2354,9 @@ namespace Site44
         {
             Building_FacilityTerminal terminal = (Building_FacilityTerminal)ThingMaker.MakeThing(def);
             terminal.kind = kind;
-            if ((kind == TerminalKind.Gate || kind == TerminalKind.Diagnostic) && def.defName == "Site44_DiagnosticNode" && Rand.Chance(Site44Tuning.NodeExtraChance))
+            // A diagnostic sector's node always has a use; a node standing in for a gate's terminal only sometimes carries a bonus.
+            if ((kind == TerminalKind.Gate || kind == TerminalKind.Diagnostic) && def.defName == "Site44_DiagnosticNode"
+                && (kind == TerminalKind.Diagnostic || Rand.Chance(Site44Tuning.NodeExtraChance)))
             {
                 terminal.extra = (NodeExtra)Rand.RangeInclusive(1, 3);
             }

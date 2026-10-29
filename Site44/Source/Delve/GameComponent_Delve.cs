@@ -16,6 +16,8 @@ namespace Site44
         public int depth = 1;
         public List<string> biomePool = new List<string>();   // fixed when the run starts; empty = every biome
         private int lastCheckTick;
+        private int runSeed;
+        private Dictionary<int, string> sizeByDepth = new Dictionary<int, string>();
 
         public GameComponent_Delve(Game game)
         {
@@ -50,12 +52,7 @@ namespace Site44
 
                 GameComponent_Delve delve = Instance;
                 DelveLevel level = DelveDifficulty.For(delve != null && delve.active ? delve.depth : 1);
-                string chosen = Site44Settings.Current.delveSize;
-                if (!string.IsNullOrEmpty(chosen) && chosen != "Grows with depth")
-                {
-                    level.SizeName = chosen;
-                }
-
+                level.SizeName = delve != null ? delve.ResolveSize(level.Depth) : DelveDifficulty.SizeFor(Site44Settings.Current.delveSize, level.Depth, null, 0);
                 if (QuickTest)
                 {
                     level.SizeName = "XS";
@@ -63,6 +60,26 @@ namespace Site44
 
                 return level;
             }
+        }
+
+        // The size of a level is settled once and kept, so the map and everything that asks about it agree.
+        private string ResolveSize(int levelDepth)
+        {
+            string size;
+            if (sizeByDepth.TryGetValue(levelDepth, out size))
+            {
+                return size;
+            }
+
+            string previous;
+            sizeByDepth.TryGetValue(levelDepth - 1, out previous);
+            size = DelveDifficulty.SizeFor(Site44Settings.Current.delveSize, levelDepth, previous, runSeed);
+            if (active)
+            {
+                sizeByDepth[levelDepth] = size;
+            }
+
+            return size;
         }
 
         public static void StartRun()
@@ -75,6 +92,8 @@ namespace Site44
 
             delve.active = true;
             delve.depth = 1;
+            delve.runSeed = Rand.Int;
+            delve.sizeByDepth.Clear();
             BiomeChoice.EnsureDefault(Site44Settings.Current);
             delve.biomePool = new List<string>(Site44Settings.Current.biomePool);
             DelveRules.Apply();
@@ -85,10 +104,13 @@ namespace Site44
         {
             Scribe_Values.Look(ref active, "active");
             Scribe_Values.Look(ref depth, "depth", 1);
+            Scribe_Values.Look(ref runSeed, "runSeed");
+            Scribe_Collections.Look(ref sizeByDepth, "sizeByDepth", LookMode.Value, LookMode.Value);
             Scribe_Collections.Look(ref biomePool, "biomePool", LookMode.Value);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 biomePool = biomePool ?? new List<string>();
+                sizeByDepth = sizeByDepth ?? new Dictionary<int, string>();
             }
         }
 
@@ -111,11 +133,11 @@ namespace Site44
 
         private void RecordBest()
         {
-            Site44Settings settings = Site44Settings.Current;
+            Site44Settings settings = Site44Settings.Global;
             if (depth > settings.bestDelveDepth)
             {
                 settings.bestDelveDepth = depth;
-                settings.Write();
+                Site44Settings.SaveGlobal();
             }
 
             Messages.Message("The run ends at depth " + depth + ". Best so far: " + settings.bestDelveDepth + ".", MessageTypeDefOf.NeutralEvent, false);
@@ -152,11 +174,11 @@ namespace Site44
             }
 
             depth++;
-            Site44Settings settings = Site44Settings.Current;
+            Site44Settings settings = Site44Settings.Global;
             if (depth > settings.bestDelveDepth)
             {
                 settings.bestDelveDepth = depth;
-                settings.Write();
+                Site44Settings.SaveGlobal();
             }
 
             Site site = SiteMaker.MakeSite(type.sitePart, tile, Find.FactionManager.OfAncients);

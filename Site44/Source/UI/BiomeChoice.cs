@@ -35,7 +35,10 @@ namespace Site44
             List<BiomeDef> all = Candidates();
             List<string> mild = all.Where(b => !IsExtreme(b)).Select(b => b.defName).ToList();
             s.biomePool = mild.Count >= all.Count ? new List<string>() : mild;
-            s.Write();
+            if (s == Site44Settings.Global)
+            {
+                Site44Settings.SaveGlobal();
+            }
         }
 
         public static bool PoolHasMild(Site44Settings s)
@@ -85,7 +88,10 @@ namespace Site44
             }
 
             s.biomePool = selected.Count >= all.Count ? new List<string>() : selected;
-            s.Write();
+            if (s == Site44Settings.Global)
+            {
+                Site44Settings.SaveGlobal();
+            }
             if (on && IsExtreme(biome))
             {
                 Messages.Message(biome.LabelCap + " is an extreme climate. An unprepared party can die of exposure there.", MessageTypeDefOf.NegativeEvent, false);

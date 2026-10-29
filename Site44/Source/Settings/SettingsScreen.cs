@@ -329,7 +329,7 @@ namespace Site44
             return true;
         }
 
-        private static string CurrentBalance()
+        internal static string CurrentBalance()
         {
             Site44Settings vanilla = new Site44Settings();
             vanilla.ApplyVanillaRules();
@@ -367,6 +367,15 @@ namespace Site44
         private static LevelRow Level(string label, string tip, Func<float> get, Action<float> set, string[] names, float[] values, bool advanced = false, Func<string> effect = null)
         {
             return new LevelRow { Label = label, Tip = tip, Advanced = advanced, Effect = effect, Get = get, Set = set, Default = 1f, Names = names, Values = values };
+        }
+
+        // Settings read only while a new game is being set up are locked once a game is running.
+        private static SettingRow NewGameOnly(SettingRow row)
+        {
+            Func<bool> original = row.Enabled;
+            row.Enabled = () => !Site44Settings.InRun && (original == null || original());
+            row.DisabledNote = row.DisabledNote ?? "Only used when a new game starts; change it from the main menu.";
+            return row;
         }
 
         private static ToggleRow Toggle(string label, string tip, Func<bool> get, Action<bool> set, bool def, string scope = null, bool advanced = false,
@@ -427,8 +436,16 @@ namespace Site44
                     () => S.missionFocusLevel, v => S.missionFocusLevel = v, 2, new[] { "off", "low (+3)", "normal (+6)", "high (+10)" }),
                 Toggle("Delvers ignore plain corpses", "Colonists inside a complex stop being upset by ordinary corpses. Rotting corpses still bother them.",
                     () => S.hardenedToBodies, v => S.hardenedToBodies = v, true, null, true),
-                Size("Size of Delve complexes", "Every level of a Delve run uses this size. 'Grows with depth' starts small and ramps up to XL.",
-                    () => S.delveSize, v => S.delveSize = v, "Small", "Delve", false, true)
+                new PickRow
+                {
+                    Label = "Delve pace", Scope = "Delve", Button = "Change",
+                    Tip = "Quick delves are always Small, Steady varies and tends to get larger, Expeditions are Medium to Large, or fix every level to one size.",
+                    Get = () => S.delveSize == "Grows with depth" ? "Steady" : S.delveSize,
+                    Default = () => D.delveSize,
+                    ResetValue = () => S.delveSize = D.delveSize,
+                    Pick = () => Find.WindowStack.Add(new FloatMenu(new[] { "Quick delves", "Steady", "Expeditions", "Extra small", "Small", "Medium", "Large", "XL" }
+                        .Select(name => new FloatMenuOption(name, () => S.delveSize = name)).ToList()))
+                }
             };
 
             var loot = new List<SettingRow>
@@ -521,6 +538,12 @@ namespace Site44
                     () => S.questFrequency, v => S.questFrequency = v, 3f, "Quest sites")
             };
 
+            NewGameOnly(delve.First(r => r.Label == "Starting colonists"));
+            NewGameOnly(setup.First(r => r.Label == "Starting kit"));
+            NewGameOnly(setup.First(r => r.Label == "Skip world and site selection"));
+            NewGameOnly(setup.First(r => r.Label == "Ruin quest frequency"));
+            NewGameOnly(setup.First(r => r.Label == "Complex used by the Breach scenario"));
+            NewGameOnly(setup.First(r => r.Label == "Size of the Breach scenario complex"));
             allRows = delve.Concat(loot).Concat(hazards).Concat(looks).Concat(setup).ToList();
             Func<string[], List<SettingRow>> pick = labels => labels.Select(l => allRows.First(r => r.Label == l)).ToList();
 
@@ -538,7 +561,7 @@ namespace Site44
                 new Section { Title = "Hacking, keys and clearance", Subtitle = "", Rows = pick(new[] {
                     "Cipher-lock hacking", "Puzzle difficulty", "Keycards for locked gates", "Clearance-gated wings", "Secure rooms" }) },
                 new Section { Title = "Complexes and sizes", Subtitle = "", Rows = pick(new[] {
-                    "Open layout (explore freely)", "Locked vaults", "Size of Delve complexes", "Complex used by the Breach scenario", "Size of the Breach scenario complex", "Size of quest-site complexes" }) },
+                    "Open layout (explore freely)", "Locked vaults", "Delve pace", "Complex used by the Breach scenario", "Size of the Breach scenario complex", "Size of quest-site complexes" }) },
                 new Section { Title = "Scenario setup", Subtitle = "", Rows = pick(new[] { "Starting kit", "Skip world and site selection", "Ruin quest frequency" }) },
                 new Section { Title = "Look and fine detail", Subtitle = "", Rows = pick(new[] {
                     "Dust and debris", "Outdoor props", "Furniture damage", "Rec rooms", "Specialty rooms" }) }
@@ -590,6 +613,11 @@ namespace Site44
             Listing_Standard list = new Listing_Standard { maxOneColumn = true };
             list.Begin(view);
             sectionTop.Clear();
+            GUI.color = Ui.Muted;
+            list.Label(Site44Settings.InRun
+                ? "Editing the settings for this game. The defaults for new games are changed from the main menu."
+                : "Editing the defaults that new games start from. Games already running keep their own copy.");
+            GUI.color = Color.white;
             try
             {
 

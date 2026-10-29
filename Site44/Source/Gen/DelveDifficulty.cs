@@ -15,6 +15,60 @@ namespace Site44.Gen
 
     public static class DelveDifficulty
     {
+        public const string QuickDelves = "Quick delves";
+        public const string Steady = "Steady";
+        public const string Expeditions = "Expeditions";
+
+        public static bool IsPaceStyle(string style)
+        {
+            return style == QuickDelves || style == Steady || style == Expeditions || style == "Grows with depth";
+        }
+
+        // The size of one level, from a pace style or a fixed size. Deterministic from the run seed and the depth; "previous" is
+        // the size of the level before it, so a long level is never followed by another long one on the steady pace.
+        public static string SizeFor(string style, int depth, string previous, int seed)
+        {
+            depth = Math.Max(1, depth);
+            switch (style)
+            {
+                case "Extra small": case "XS": return "XS";
+                case "Small": case "S": return "S";
+                case "Medium": case "M": return "M";
+                case "Large": case "L": return "L";
+                case "XL": return "XL";
+                case QuickDelves: return "S";
+            }
+
+            var rng = new FacilityRng(unchecked(seed * 31 + depth * 7919));
+            if (style == Expeditions)
+            {
+                return depth <= 1 ? "M" : Draw(rng, 0, 50, 50);
+            }
+
+            // Steady: two small levels to begin with, then larger sizes become more likely the deeper the run goes.
+            if (depth <= 2)
+            {
+                return "S";
+            }
+
+            int small, medium, large;
+            if (depth <= 5) { small = 40; medium = 50; large = 10; }
+            else if (depth <= 9) { small = 20; medium = 40; large = 40; }
+            else { small = 15; medium = 30; large = 55; }
+            if (previous == "L")
+            {
+                large = 0;
+            }
+
+            return Draw(rng, small, medium, large);
+        }
+
+        private static string Draw(FacilityRng rng, int small, int medium, int large)
+        {
+            int roll = rng.Next(small + medium + large);
+            return roll < small ? "S" : roll < small + medium ? "M" : "L";
+        }
+
         private static readonly string[] Sizes = { "S", "S", "M", "M", "L", "L", "XL" };
 
         // Depth 1 is the first complex. Complexes grow, hostile cryosleepers become likelier, secure rooms multiply and

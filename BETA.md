@@ -40,12 +40,13 @@ Goal: a first beta-quality build of Site-44 that a stranger can install, start, 
 1. End-to-end test of the real scenario path, plus a save and load test.
 2. A visible per-level goal readout.
 3. End-of-run summary: depth reached, best depth, what killed the party.
-4. A threat budget per level, spent on creature nests and security sectors (done; tuning from play remains).
-5. First-time messages that explain the gate, terminals, keycards and clearance.
-6. The accessibility pass over every window.
-7. A balance pass over the first ten levels with the presets.
-8. Release hygiene above.
-9. Archive the enclave code out of the shipped build, with a git tag preserving it.
+4. Two simple choices per new game, difficulty and pace (done), with everything else under Custom settings; each game keeps its own copy of the settings (done).
+5. A threat budget per level, spent on creature nests and security sectors (done; tuning from play remains).
+6. First-time messages that explain the gate, terminals, keycards and clearance.
+7. The accessibility pass over every window.
+8. A balance pass over the first ten levels with the presets.
+9. Release hygiene above.
+10. Archive the enclave code out of the shipped build, with a git tag preserving it.
 
 **Should (makes it feel complete)**
 - Story breadcrumbs as one small system: terminal logs and notes that tell a short arc across a run.

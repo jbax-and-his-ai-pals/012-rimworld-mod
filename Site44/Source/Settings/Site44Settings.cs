@@ -9,7 +9,38 @@ namespace Site44
     // Player-facing options (Options > Mod settings > Site-44). They apply to complexes generated afterwards.
     public class Site44Settings : ModSettings
     {
-        public static Site44Settings Current = new Site44Settings();
+        // The defaults new games start from; the mod settings window at the main menu edits these.
+        public static Site44Settings Global = new Site44Settings();
+
+        // The settings in force: this game's own copy while a Site-44 game is loaded, the global defaults otherwise.
+        public static Site44Settings Current
+        {
+            get
+            {
+                GameComponent_Site44Run run = Verse.Current.Game != null ? Verse.Current.Game.GetComponent<GameComponent_Site44Run>() : null;
+                return run != null && run.run != null ? run.run : Global;
+            }
+        }
+
+        public static bool InRun => Current != Global;
+
+        public static void SaveGlobal()
+        {
+            Global.Write();
+        }
+
+        public Site44Settings Clone()
+        {
+            Site44Settings copy = new Site44Settings();
+            foreach (System.Reflection.FieldInfo field in typeof(Site44Settings).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            {
+                object value = field.GetValue(this);
+                List<string> list = value as List<string>;
+                field.SetValue(copy, list != null ? new List<string>(list) : value);
+            }
+
+            return copy;
+        }
 
         // Treasure
         public float lootAmount = 1f;
@@ -66,7 +97,7 @@ namespace Site44
         public string scenarioSiteType = "Site44_Type_Office";
         public string siteSizeMode = "Random";
         public string scenarioComplexSize = "Small";
-        public string delveSize = "Small";                    // "Grows with depth" uses the delve difficulty ramp
+        public string delveSize = "Steady";                   // a pace style (Quick delves, Steady, Expeditions) or a fixed size
         public float propDensity = 1f;
 
         // Delivery
@@ -186,7 +217,7 @@ namespace Site44
             Scribe_Values.Look(ref scenarioSiteType, "scenarioSiteType", "Site44_Type_Office");
             Scribe_Values.Look(ref siteSizeMode, "siteSizeMode", "Random");
             Scribe_Values.Look(ref scenarioComplexSize, "scenarioSize2", "Small");
-            Scribe_Values.Look(ref delveSize, "delveSize", "Small");
+            Scribe_Values.Look(ref delveSize, "delveSize", "Steady");
             Scribe_Values.Look(ref propDensity, "propDensity", 1f);
             Scribe_Values.Look(ref questFrequency, "questFrequency", 1f);
         }
@@ -198,7 +229,7 @@ namespace Site44
 
         public Site44ModEntry(ModContentPack content) : base(content)
         {
-            Site44Settings.Current = GetSettings<Site44Settings>();
+            Site44Settings.Global = GetSettings<Site44Settings>();
         }
 
         public override string SettingsCategory()

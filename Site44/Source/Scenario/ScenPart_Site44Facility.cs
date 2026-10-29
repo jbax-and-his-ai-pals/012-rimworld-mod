@@ -52,6 +52,16 @@ namespace Site44
             }
         }
 
+        // Each game keeps its own copy of the settings it started with.
+        public override void PreMapGenerate()
+        {
+            GameComponent_Site44Run run = Verse.Current.Game != null ? Verse.Current.Game.GetComponent<GameComponent_Site44Run>() : null;
+            if (run != null)
+            {
+                run.Snapshot();
+            }
+        }
+
         // Safety net: if anything stripped the generated weapon before the game began, hand it out again.
         public override void PostGameStart()
         {

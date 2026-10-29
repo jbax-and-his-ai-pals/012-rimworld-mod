@@ -27,7 +27,10 @@ namespace Site44
         private readonly HashSet<IntVec3> reserved = new HashSet<IntVec3>();
         private readonly List<IntVec3> hotAnchors = new List<IntVec3>();
         private readonly List<IntVec3> coldAnchors = new List<IntVec3>();
+        private readonly List<float> hotTemps = new List<float>();
+        private readonly List<float> coldTemps = new List<float>();
         private bool? levelFrozen;
+        private int hazardSeed;
         private int preservedTotal;
         private readonly List<KeyValuePair<PlanRoom, Zone>> containerRooms = new List<KeyValuePair<PlanRoom, Zone>>();
         private string containerSummary = "";
@@ -65,6 +68,8 @@ namespace Site44
             reserved.Clear();
             hotAnchors.Clear();
             coldAnchors.Clear();
+            hotTemps.Clear();
+            coldTemps.Clear();
             levelFrozen = null;
             containerRooms.Clear();
             containerSummary = "";
@@ -89,6 +94,7 @@ namespace Site44
             rect = new CellRect(origin.x, origin.z, width, height);
 
             int planSeed = Rand.Int;
+            hazardSeed = planSeed;
             int graphSeed = Rand.Int;
             int targetZones = Mathf.Clamp(width * height / CellsPerZone, 8, 60);
             plan = siteType != null
@@ -153,7 +159,7 @@ namespace Site44
             MapGenerator.PlayerStartSpot = startSpot;
 
             MapComponent_Facility facility = map.GetComponent<MapComponent_Facility>();
-            facility.Initialize(width, height, planSeed, graphSeed, targetZones, hotAnchors, coldAnchors);
+            facility.Initialize(width, height, planSeed, graphSeed, targetZones, hotAnchors, coldAnchors, hotTemps, coldTemps);
             facility.startCell = startSpot;
             facility.siteTypeDefName = siteType != null ? siteType.defName : null;
 
@@ -1663,11 +1669,17 @@ namespace Site44
                     SpawnSecurity(rooms, zone, main);
                     break;
                 case SectorKind.HotZone:
-                    List<IntVec3> anchors = ZoneIsFrozen() ? coldAnchors : hotAnchors;
+                    bool frozen = ZoneIsFrozen();
+                    float severity = HazardScale.Draw(unchecked(hazardSeed * 31 + zone.Id * 7919 + threatDepth), DelveTiers.TierOf(threatDepth));
+                    float temperature = frozen ? HazardScale.ColdTemperature(severity) : HazardScale.HotTemperature(severity);
                     foreach (PlanRoom room in rooms)
                     {
-                        anchors.Add(World(room.Anchor));
+                        (frozen ? coldAnchors : hotAnchors).Add(World(room.Anchor));
+                        (frozen ? coldTemps : hotTemps).Add(temperature);
                     }
+
+                    Log.Message("[Site-44] " + (frozen ? "frozen" : "overheated") + " sector " + zone.Id + ": severity " + severity.ToString("0.00") + ", " + temperature.ToString("0") + " C, needs about "
+                                + Mathf.RoundToInt(HazardScale.RequiredInsulation(severity)) + " insulation.");
                     break;
             }
 

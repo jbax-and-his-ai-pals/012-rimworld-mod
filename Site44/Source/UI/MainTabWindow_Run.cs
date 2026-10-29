@@ -125,7 +125,8 @@ namespace Site44
             foreach (Pawn pawn in map.mapPawns.FreeColonists)
             {
                 string state = pawn.Dead ? "dead" : pawn.Downed ? "down" : pawn.health.summaryHealth.SummaryHealthPercent < 0.7f ? "hurt" : "well";
-                list.Add(new KeyValuePair<string, string>(pawn.LabelShortCap, state + " (" + Mathf.RoundToInt(pawn.health.summaryHealth.SummaryHealthPercent * 100f) + "% health)"));
+                list.Add(new KeyValuePair<string, string>(pawn.LabelShortCap, state + " (" + Mathf.RoundToInt(pawn.health.summaryHealth.SummaryHealthPercent * 100f) + "% health), heat insulation "
+                    + Mathf.RoundToInt(pawn.GetStatValue(StatDefOf.Insulation_Heat)) + ", cold insulation " + Mathf.RoundToInt(pawn.GetStatValue(StatDefOf.Insulation_Cold))));
             }
 
             return list;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
 using Site44.Gen;
+using UnityEngine;
 using Verse;
 using Verse.AI.Group;
 
@@ -35,6 +36,8 @@ namespace Site44
         private List<string> unlockedSectors = new List<string>();
         private List<int> hotAnchors = new List<int>();
         private List<int> coldAnchors = new List<int>();
+        private List<float> hotTemps = new List<float>();     // the temperature of each room in hotAnchors, same order
+        private List<float> coldTemps = new List<float>();
         public List<SecurityGroup> securityGroups = new List<SecurityGroup>();
 
         public MapComponent_Facility(Map map) : base(map)
@@ -50,7 +53,7 @@ namespace Site44
         public int TargetZones => targetZones;
 
         // gridNx/gridNy hold the plan width and height; gridSeed the plan seed.
-        public void Initialize(int width, int height, int planSeed, int graphSeedValue, int targetZoneCount, List<IntVec3> hotRoomAnchors, List<IntVec3> coldRoomAnchors)
+        public void Initialize(int width, int height, int planSeed, int graphSeedValue, int targetZoneCount, List<IntVec3> hotRoomAnchors, List<IntVec3> coldRoomAnchors, List<float> hotRoomTemps, List<float> coldRoomTemps)
         {
             gridNx = width;
             gridNy = height;
@@ -64,6 +67,8 @@ namespace Site44
                 hotAnchors.Add(anchor.z);
             }
 
+            hotTemps = new List<float>(hotRoomTemps);
+            coldTemps = new List<float>(coldRoomTemps);
             coldAnchors.Clear();
             foreach (IntVec3 anchor in coldRoomAnchors)
             {
@@ -134,10 +139,10 @@ namespace Site44
             }
 
             coolantLoopDiverted = true;
-            ApplyTemperature(hotAnchors, SafeTemperature);
+            ApplyTemperature(hotAnchors, null, SafeTemperature);
             if (hotAnchors.Count == 0)
             {
-                ApplyTemperature(coldAnchors, SafeTemperature);
+                ApplyTemperature(coldAnchors, null, SafeTemperature);
             }
 
             Find.LetterStack.ReceiveLetter(DirectorVoice.CoolantLabel, DirectorVoice.CoolantText, LetterDefOf.PositiveEvent);
@@ -151,7 +156,7 @@ namespace Site44
             }
 
             mainReactorOnline = true;
-            ApplyTemperature(coldAnchors, SafeTemperature);
+            ApplyTemperature(coldAnchors, null, SafeTemperature);
             List<Thing> lamps = map.listerThings.ThingsOfDef(Site44DefOf.Site44_LampEmergency).ToList();
             foreach (Thing lamp in lamps)
             {
@@ -238,12 +243,12 @@ namespace Site44
             {
                 if (!coolantLoopDiverted)
                 {
-                    ApplyTemperature(hotAnchors, HotZoneTemperature);
+                    ApplyTemperature(hotAnchors, hotTemps, HotZoneTemperature);
                 }
 
                 if (!ColdEnded)
                 {
-                    ApplyTemperature(coldAnchors, ColdZoneTemperature);
+                    ApplyTemperature(coldAnchors, coldTemps, ColdZoneTemperature);
                 }
             }
         }
@@ -464,23 +469,36 @@ namespace Site44
                 List<string> parts = new List<string>();
                 if (hotAnchors.Count > 0)
                 {
-                    parts.Add(coolantLoopDiverted ? "overheated sectors (cooled)" : "overheated sectors");
+                    parts.Add(coolantLoopDiverted ? "overheated sectors (cooled)" : "overheated sectors, up to " + Mathf.RoundToInt(MaxGap(hotTemps, HazardScale.ComfortMax, false)) + " heat insulation needed");
                 }
 
                 if (coldAnchors.Count > 0)
                 {
-                    parts.Add(ColdEnded ? "frozen sectors (warmed)" : "frozen sectors");
+                    parts.Add(ColdEnded ? "frozen sectors (warmed)" : "frozen sectors, up to " + Mathf.RoundToInt(MaxGap(coldTemps, HazardScale.ComfortMin, true)) + " cold insulation needed");
                 }
 
                 return parts.Count == 0 ? null : string.Join(" and ", parts.ToArray());
             }
         }
 
-        private void ApplyTemperature(List<int> anchors, float temperature)
+        // How far the worst room is outside normal comfort: the insulation a colonist needs to be comfortable there.
+        private static float MaxGap(List<float> temps, float comfort, bool cold)
+        {
+            float gap = 0f;
+            foreach (float t in temps)
+            {
+                gap = Mathf.Max(gap, cold ? comfort - t : t - comfort);
+            }
+
+            return gap;
+        }
+
+        private void ApplyTemperature(List<int> anchors, List<float> temps, float fallback)
         {
             HashSet<Room> done = new HashSet<Room>();
             for (int i = 0; i + 1 < anchors.Count; i += 2)
             {
+                float temperature = temps != null && i / 2 < temps.Count ? temps[i / 2] : fallback;
                 Room room = new IntVec3(anchors[i], 0, anchors[i + 1]).GetRoom(map);
                 if (room != null && !room.UsesOutdoorTemperature && done.Add(room))
                 {
@@ -516,12 +534,16 @@ namespace Site44
             Scribe_Collections.Look(ref unlockedSectors, "unlockedSectors", LookMode.Value);
             Scribe_Collections.Look(ref hotAnchors, "hotAnchors", LookMode.Value);
             Scribe_Collections.Look(ref coldAnchors, "coldAnchors", LookMode.Value);
+            Scribe_Collections.Look(ref hotTemps, "hotTemps", LookMode.Value);
+            Scribe_Collections.Look(ref coldTemps, "coldTemps", LookMode.Value);
             Scribe_Collections.Look(ref securityGroups, "securityGroups", LookMode.Deep);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 unlockedSectors = unlockedSectors ?? new List<string>();
                 hotAnchors = hotAnchors ?? new List<int>();
                 coldAnchors = coldAnchors ?? new List<int>();
+                hotTemps = hotTemps ?? new List<float>();
+                coldTemps = coldTemps ?? new List<float>();
                 securityGroups = securityGroups ?? new List<SecurityGroup>();
             }
         }

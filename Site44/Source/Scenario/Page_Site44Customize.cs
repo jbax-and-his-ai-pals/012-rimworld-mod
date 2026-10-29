@@ -45,6 +45,12 @@ namespace Site44
             GUI.color = Color.white;
             right.End();
 
+            Rect all = new Rect(x + (total - 260f) / 2f, main.yMax - 40f, 260f, 36f);
+            if (Widgets.ButtonText(all, "All settings"))
+            {
+                Find.WindowStack.Add(new Dialog_ModSettings(LoadedModManager.GetMod<Site44ModEntry>()));
+            }
+
             DoBottomButtons(inRect, "Next");
         }
 

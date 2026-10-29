@@ -85,7 +85,7 @@ namespace Site44
             float width = total - 16f;
             float column = (width - gap * 2f) / 3f;
 
-            Rect scrollRect = new Rect(x, main.y, total, main.height - 50f);
+            Rect scrollRect = new Rect(x, main.y, total, main.height);
             Widgets.BeginScrollView(scrollRect, ref scroll, new Rect(0f, 0f, width, contentHeight));
 
             float top = 0f;
@@ -108,12 +108,6 @@ namespace Site44
             float bottom = DrawRow(new Rect(0f, top + 24f, width, 4000f), "More setup", PathNames, PathText, path, index => path = index, path == FullVanilla ? FullSetupNote : null);
             contentHeight = top + 24f + bottom + 16f;
             Widgets.EndScrollView();
-
-            Rect all = new Rect(x + (total - 260f) / 2f, main.yMax - 40f, 260f, 36f);
-            if (Widgets.ButtonText(all, "All settings"))
-            {
-                Find.WindowStack.Add(new Dialog_ModSettings(LoadedModManager.GetMod<Site44ModEntry>()));
-            }
 
             DoBottomButtons(inRect, "Next");
         }

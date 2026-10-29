@@ -1,4 +1,5 @@
 using RimWorld;
+using Site44.Gen;
 using UnityEngine;
 using Verse;
 
@@ -43,6 +44,19 @@ namespace Site44
 
         // Each level spends one budget of danger on nests and security (see ThreatBudget).
         public static float DangerFactor => S.dangerX;
+
+        // Past depth 10 each tier multiplies the danger and the rewards of a level (see DelveTiers). Outside a Delve run it is 1.
+        public static float TierPressure => DelveDepth > 0 ? DelveTiers.Pressure(DelveDepth, S.tierStrengthX) : 1f;
+        public static float TierReward => DelveDepth > 0 ? DelveTiers.RewardFactor(DelveDepth, S.tierStrengthX) : 1f;
+
+        private static int DelveDepth
+        {
+            get
+            {
+                GameComponent_Delve run = GameComponent_Delve.Instance;
+                return GameComponent_Delve.IsDelve && run != null && run.active ? run.depth : 0;
+            }
+        }
         public static float SecurityWeight => new[] { 0f, 0.5f, 1f, 1.6f }[Mathf.Clamp(S.securityLevel, 0, 3)];
         public static float AlarmChance => new[] { 0f, 0.15f, 0.35f, 0.5f }[Mathf.Clamp(S.securityLevel, 0, 3)];
 
@@ -88,7 +102,7 @@ namespace Site44
             return IsConsumable(def) ? Mathf.Min(count, 1 + Mathf.RoundToInt(8f * SupplyShare)) : count;
         }
 
-        public static float LootAmount => S.lootAmount * (GameComponent_Delve.Level?.LootMultiplier ?? 1f);
+        public static float LootAmount => S.lootAmount * (GameComponent_Delve.Level?.LootMultiplier ?? 1f) * TierReward;
 
         // Share of floor cells carrying dust or debris in ruined rooms and in corridors.
         public static float DustChanceRoom => Mathf.Clamp01(0.30f * S.dustAmount * (T != null ? T.dustFactor : 1f));

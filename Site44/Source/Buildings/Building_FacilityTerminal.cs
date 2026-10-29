@@ -35,7 +35,7 @@ namespace Site44
         public int requiredTier;
         public int grantTier;           // a node that raises the level's clearance to this rung when solved (0: none)
         public NodeExtra extra;
-        private bool used;
+        public bool used;
         private int lockedUntil;
 
         public bool Hacked => used;

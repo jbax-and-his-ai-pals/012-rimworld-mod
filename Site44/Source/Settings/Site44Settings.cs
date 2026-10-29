@@ -74,6 +74,7 @@ namespace Site44
         public bool openLayout = true;
         public float lockedVaultX = 1f;
         public int securityLevel = 2;                         // facility security: 0 off, 1 light, 2 normal, 3 heavy
+        public float tierStrengthX = 1f;                      // how steeply each tier past depth 10 grows: x1 = 1.3 times the one before
         public float dangerX = 1f;                            // how much danger each level is given to spend
         public bool hackMinigame = true;
         public int bestDelveDepth;
@@ -116,7 +117,7 @@ namespace Site44
             supplyX = d.supplyX; lootAmount = d.lootAmount; crateDensity = d.crateDensity; hostileCasketX = d.hostileCasketX;
             delveInfection = d.delveInfection; delveDescentCare = d.delveDescentCare; delveDescentRest = d.delveDescentRest; puzzleDifficulty = d.puzzleDifficulty;
             keycardX = d.keycardX; nestDensity = d.nestDensity; startingColonists = d.startingColonists;
-            drugFindX = d.drugFindX; securityLevel = d.securityLevel; dangerX = d.dangerX; missionFocusLevel = d.missionFocusLevel;
+            drugFindX = d.drugFindX; securityLevel = d.securityLevel; dangerX = d.dangerX; tierStrengthX = d.tierStrengthX; missionFocusLevel = d.missionFocusLevel;
             delveAllowRaids = d.delveAllowRaids; delveAllowCaravanEvents = d.delveAllowCaravanEvents; delveAllowOtherThreats = d.delveAllowOtherThreats;
             delveAllowOutsideVisitors = d.delveAllowOutsideVisitors; delveAllowWeather = d.delveAllowWeather;
             switch (preset)
@@ -124,23 +125,23 @@ namespace Site44
                 case 0:
                     supplyX = 2.4f; lootAmount = 1.3f; crateDensity = 1.3f; hostileCasketX = 0.4f;
                     delveInfection = 2; delveDescentCare = 2; puzzleDifficulty = 0; keycardX = 1.4f;
-                    nestDensity = 0.5f; startingColonists = 4; securityLevel = 1; dangerX = 0.6f; drugFindX = 1.7f; missionFocusLevel = 3;
+                    nestDensity = 0.5f; startingColonists = 4; securityLevel = 1; dangerX = 0.6f; tierStrengthX = 0.33f; drugFindX = 1.7f; missionFocusLevel = 3;
                     break;
                 case 2:
                     supplyX = 0.4f; lootAmount = 0.8f; crateDensity = 0.8f; hostileCasketX = 1.6f;
-                    delveInfection = 0; puzzleDifficulty = 2; keycardX = 0.6f; nestDensity = 1.5f; drugFindX = 0.7f; dangerX = 1.4f;
+                    delveInfection = 0; puzzleDifficulty = 2; keycardX = 0.6f; nestDensity = 1.5f; drugFindX = 0.7f; dangerX = 1.4f; tierStrengthX = 1.5f;
                     break;
                 case 3:
                     supplyX = 0f; lootAmount = 0.6f; crateDensity = 0.6f; hostileCasketX = 2.2f;
                     delveInfection = 0; puzzleDifficulty = 2; keycardX = 0.3f; nestDensity = 2.2f; startingColonists = 2;
-                    drugFindX = 0.3f; securityLevel = 3; dangerX = 1.8f; missionFocusLevel = 1;
+                    drugFindX = 0.3f; securityLevel = 3; dangerX = 1.8f; tierStrengthX = 2f; missionFocusLevel = 1;
                     break;
                 case 4:
                     // Not balanced to be won: a lone colonist, no medicine, vanilla infection, nests and sleepers everywhere,
                     // no keycards, and the outside world switched back on (raids, threats, weather).
                     supplyX = 0f; lootAmount = 0.4f; crateDensity = 0.4f; hostileCasketX = 3f;
                     delveInfection = 0; puzzleDifficulty = 2; keycardX = 0f; nestDensity = 3f; startingColonists = 1;
-                    drugFindX = 0f; securityLevel = 3; dangerX = 2.5f; missionFocusLevel = 0;
+                    drugFindX = 0f; securityLevel = 3; dangerX = 2.5f; tierStrengthX = 3f; missionFocusLevel = 0;
                     delveAllowRaids = true; delveAllowOtherThreats = true; delveAllowWeather = true;
                     break;
             }
@@ -197,6 +198,7 @@ namespace Site44
             Scribe_Values.Look(ref lockedVaultX, "lockedVaultX", 1f);
             Scribe_Values.Look(ref securityLevel, "securityLevel", 2);
             Scribe_Values.Look(ref dangerX, "dangerX", 1f);
+            Scribe_Values.Look(ref tierStrengthX, "tierStrengthX", 1f);
             Scribe_Values.Look(ref hackMinigame, "hackMinigame", true);
             Scribe_Values.Look(ref bestDelveDepth, "bestDelveDepth");
             Scribe_Values.Look(ref skipWorldSetup, "skipWorldSetup", true);

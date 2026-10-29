@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- A bottom-bar tab, shown only during a Delve run. -->
+  <MainButtonDef>
+    <defName>Site44_Run</defName>
+    <label>Run</label>
+    <description>What this level still asks of the party, how the run is going, and how the party is.</description>
+    <workerClass>Site44.MainButtonWorker_Run</workerClass>
+    <tabWindowClass>Site44.MainTabWindow_Run</tabWindowClass>
+    <order>5</order>
+    <buttonVisible>true</buttonVisible>
+    <iconPath>UI/Icons/Options/OptionsGeneral</iconPath>
+  </MainButtonDef>
+
+</Defs>

@@ -2569,7 +2569,7 @@ namespace Site44
             ThreatSettings threat = new ThreatSettings
             {
                 Depth = threatDepth,
-                Budget = ThreatBudget.BudgetFor(threatDepth, roomCount, Site44Tuning.DangerFactor * Site44Tuning.FocusThreatFactor),
+                Budget = ThreatBudget.BudgetFor(threatDepth, roomCount, Site44Tuning.DangerFactor * Site44Tuning.FocusThreatFactor * Site44Tuning.TierPressure),
                 MaxNestsPerZone = Site44Tuning.MaxNestsPerZone,
                 MaxNestTier = Site44Tuning.FocusNestTierLimit,
                 MaxSecurityTier = Site44Tuning.FocusSecurityTierLimit,

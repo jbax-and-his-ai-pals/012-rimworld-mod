@@ -20,7 +20,7 @@ namespace Site44
         public List<string> biomePool = new List<string>();   // fixed when the run starts; empty = every biome
         private int lastCheckTick;
         private int runSeed;
-        private int startTick;
+        public int startTick;
         private Dictionary<int, string> sizeByDepth = new Dictionary<int, string>();
 
         public GameComponent_Delve(Game game)

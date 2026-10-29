@@ -304,7 +304,7 @@ namespace Site44
         private static readonly string[] PresetFields =
         {
             "supplyX", "lootAmount", "crateDensity", "hostileCasketX", "delveInfection", "delveDescentCare", "delveDescentRest", "puzzleDifficulty",
-            "keycardX", "nestDensity", "startingColonists", "drugFindX", "securityLevel", "dangerX", "missionFocusLevel",
+            "keycardX", "nestDensity", "startingColonists", "drugFindX", "securityLevel", "dangerX", "tierStrengthX", "missionFocusLevel",
             "delveAllowRaids", "delveAllowCaravanEvents", "delveAllowOtherThreats", "delveAllowOutsideVisitors", "delveAllowWeather"
         };
 
@@ -506,6 +506,8 @@ namespace Site44
                 Mult("Creature nests", "How much of each level's danger is spent on creature nests.", () => S.nestDensity, v => S.nestDensity = v, 3f),
                 Mult("Danger", "How much danger each level is given to spend on creature nests and security.",
                     () => S.dangerX, v => S.dangerX = v, 3f),
+                Mult("Tier strength", "From depth 11, a new tier begins every five levels and each one is this much more dangerous, and more rewarding, than the one before. At 100% each tier is 1.3 times the last. At 0% the danger stays flat after depth 10.",
+                    () => S.tierStrengthX, v => S.tierStrengthX = v, 3f),
                 Choice("Facility security", "Turrets and mechanoid guards in security sectors; a security terminal or staff clearance stands them down.",
                     () => S.securityLevel, v => S.securityLevel = v, 2, new[] { "off", "light", "normal", "heavy" }),
                 Toggle("Open layout (explore freely)", "On: every door is a plain door and the whole complex can be explored in any order.\nOff: sectors are sealed behind terminal gates and clearance levels.",

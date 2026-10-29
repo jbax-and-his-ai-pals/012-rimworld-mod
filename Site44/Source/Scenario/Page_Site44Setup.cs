@@ -75,8 +75,8 @@ namespace Site44
 
         public override void DoWindowContents(Rect inRect)
         {
-            DrawPageTitle(inRect);
-            Rect main = GetMainRect(inRect);
+            // The column headings say what the page is, so it has no title of its own.
+            Rect main = GetMainRect(inRect, 0f, true);
             Site44Settings settings = Site44Settings.Global;
 
             float total = Mathf.Min(main.width, 1200f);
@@ -95,12 +95,12 @@ namespace Site44
             }));
 
             string pace = settings.delveSize == "Grows with depth" ? DelveDifficulty.Steady : settings.delveSize;
-            top = Mathf.Max(top, DrawColumn(new Rect(column + gap, 0f, column, 4000f), "Pace", "How long the levels are.", PaceNames, PaceText, System.Array.IndexOf(PaceNames, pace), index =>
+            top = Mathf.Max(top, DrawColumn(new Rect(column + gap, 0f, column, 4000f), "Pace", null, PaceNames, PaceText, System.Array.IndexOf(PaceNames, pace), index =>
             {
                 settings.delveSize = PaceNames[index];
             }));
 
-            top = Mathf.Max(top, DrawColumn(new Rect((column + gap) * 2f, 0f, column, 4000f), "Focus", "What the game emphasises.", FocusNames, FocusText, Mathf.Clamp(settings.focus, 0, 2), index =>
+            top = Mathf.Max(top, DrawColumn(new Rect((column + gap) * 2f, 0f, column, 4000f), "Focus", null, FocusNames, FocusText, Mathf.Clamp(settings.focus, 0, 2), index =>
             {
                 settings.focus = index;
             }));

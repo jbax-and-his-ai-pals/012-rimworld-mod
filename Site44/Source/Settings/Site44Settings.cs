@@ -55,6 +55,7 @@ namespace Site44
         public int delveDescentCare;                          // what the extraction gate does for injuries: 0 nothing, 1 dress, 2 heal, 3 full restore
         public bool delveDescentRest;                         // the gate also refills food and rest
         //                         // the lift dresses wounds on the way down (off by default)
+        public int delveRecovery = 1;                         // natural recovery in Delve: 0 vanilla, 1 faster, 2 much faster
         public int delveInfection = 1;                        // wound infection in Delve: 0 vanilla, 1 reduced, 2 none
         public float supplyX = 1f;                            // food and medicine supply, x1 = about a quarter of picks kept (see Site44Tuning)
         public float crateDensity = 1f;
@@ -115,7 +116,7 @@ namespace Site44
         {
             Site44Settings d = new Site44Settings();
             supplyX = d.supplyX; lootAmount = d.lootAmount; crateDensity = d.crateDensity; hostileCasketX = d.hostileCasketX;
-            delveInfection = d.delveInfection; delveDescentCare = d.delveDescentCare; delveDescentRest = d.delveDescentRest; puzzleDifficulty = d.puzzleDifficulty;
+            delveRecovery = d.delveRecovery; delveInfection = d.delveInfection; delveDescentCare = d.delveDescentCare; delveDescentRest = d.delveDescentRest; puzzleDifficulty = d.puzzleDifficulty;
             keycardX = d.keycardX; nestDensity = d.nestDensity; startingColonists = d.startingColonists;
             drugFindX = d.drugFindX; securityLevel = d.securityLevel; dangerX = d.dangerX; tierStrengthX = d.tierStrengthX; missionFocusLevel = d.missionFocusLevel;
             delveAllowRaids = d.delveAllowRaids; delveAllowCaravanEvents = d.delveAllowCaravanEvents; delveAllowOtherThreats = d.delveAllowOtherThreats;
@@ -124,7 +125,7 @@ namespace Site44
             {
                 case 0:
                     supplyX = 2.4f; lootAmount = 1.3f; crateDensity = 1.3f; hostileCasketX = 0.4f;
-                    delveInfection = 2; delveDescentCare = 2; puzzleDifficulty = 0; keycardX = 1.4f;
+                    delveRecovery = 2; delveInfection = 2; delveDescentCare = 2; puzzleDifficulty = 0; keycardX = 1.4f;
                     nestDensity = 0.5f; startingColonists = 4; securityLevel = 1; dangerX = 0.6f; tierStrengthX = 0.33f; drugFindX = 1.7f; missionFocusLevel = 3;
                     break;
                 case 2:
@@ -133,14 +134,14 @@ namespace Site44
                     break;
                 case 3:
                     supplyX = 0f; lootAmount = 0.6f; crateDensity = 0.6f; hostileCasketX = 2.2f;
-                    delveInfection = 0; puzzleDifficulty = 2; keycardX = 0.3f; nestDensity = 2.2f; startingColonists = 2;
+                    delveRecovery = 0; delveInfection = 0; puzzleDifficulty = 2; keycardX = 0.3f; nestDensity = 2.2f; startingColonists = 2;
                     drugFindX = 0.3f; securityLevel = 3; dangerX = 1.8f; tierStrengthX = 2f; missionFocusLevel = 1;
                     break;
                 case 4:
                     // Not balanced to be won: a lone colonist, no medicine, vanilla infection, nests and sleepers everywhere,
                     // no keycards, and the outside world switched back on (raids, threats, weather).
                     supplyX = 0f; lootAmount = 0.4f; crateDensity = 0.4f; hostileCasketX = 3f;
-                    delveInfection = 0; puzzleDifficulty = 2; keycardX = 0f; nestDensity = 3f; startingColonists = 1;
+                    delveRecovery = 0; delveInfection = 0; puzzleDifficulty = 2; keycardX = 0f; nestDensity = 3f; startingColonists = 1;
                     drugFindX = 0f; securityLevel = 3; dangerX = 2.5f; tierStrengthX = 3f; missionFocusLevel = 0;
                     delveAllowRaids = true; delveAllowOtherThreats = true; delveAllowWeather = true;
                     break;
@@ -152,7 +153,7 @@ namespace Site44
         public void ApplyVanillaRules()
         {
             delveAllowRaids = true; delveAllowCaravanEvents = true; delveAllowOtherThreats = true; delveAllowOutsideVisitors = true; delveAllowWeather = true;
-            delveInfection = 0; delveDescentCare = 0; delveDescentRest = false;
+            delveRecovery = 0; delveInfection = 0; delveDescentCare = 0; delveDescentRest = false;
             missionFocusLevel = 0; hardenedToBodies = false; startingKit = false;
             supplyX = 4f; drugFindX = 0f; delverGearX = 0f;
             hackMinigame = false; securityLevel = 0; hotZonesEnabled = false;
@@ -175,6 +176,7 @@ namespace Site44
         {
             Scribe_Values.Look(ref lootAmount, "lootAmount", 1f);
             Scribe_Values.Look(ref supplyX, "supplyX", 1f);
+            Scribe_Values.Look(ref delveRecovery, "delveRecovery", 1);
             Scribe_Values.Look(ref delveInfection, "delveInfection", 1);
             Scribe_Values.Look(ref delveDescentCare, "delveDescentCare");
             Scribe_Values.Look(ref delveDescentRest, "delveDescentRest");

@@ -147,6 +147,39 @@ namespace Site44
         }
     }
 
+    // The blood pack: replaces lost blood at once.
+    public class IngestionOutcomeDoer_BloodPack : IngestionOutcomeDoer
+    {
+        protected override void DoIngestionOutcomeSpecial(Pawn pawn, Thing ingested, int ingestedCount)
+        {
+            Hediff blood = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.BloodLoss);
+            if (blood != null)
+            {
+                pawn.health.RemoveHediff(blood);
+            }
+
+            Messages.Message(pawn.LabelShort + (blood != null ? ": blood restored." : ": no blood loss to treat."), pawn, MessageTypeDefOf.PositiveEvent, false);
+        }
+    }
+
+    // The panacea pill: closes every wound that can still heal, clears infections and restores blood. Scars and missing parts stay.
+    public class IngestionOutcomeDoer_Panacea : IngestionOutcomeDoer
+    {
+        protected override void DoIngestionOutcomeSpecial(Pawn pawn, Thing ingested, int ingestedCount)
+        {
+            HediffDef infection = DefDatabase<HediffDef>.GetNamedSilentFail("WoundInfection");
+            int healed = 0;
+            foreach (Hediff hediff in pawn.health.hediffSet.hediffs.Where(h => (h is Hediff_Injury && !h.IsPermanent())
+                || h.def == HediffDefOf.BloodLoss || (infection != null && h.def == infection)).ToList())
+            {
+                pawn.health.RemoveHediff(hediff);
+                healed++;
+            }
+
+            Messages.Message(pawn.LabelShort + ": " + (healed > 0 ? "everything that can heal, heals." : "nothing needed treating."), pawn, MessageTypeDefOf.PositiveEvent, false);
+        }
+    }
+
     // The antiseptic injector: clears wound infections outright and dresses what is left.
     public class IngestionOutcomeDoer_Antiseptic : IngestionOutcomeDoer
     {

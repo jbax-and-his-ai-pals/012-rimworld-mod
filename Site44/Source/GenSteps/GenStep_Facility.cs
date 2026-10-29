@@ -1826,6 +1826,28 @@ namespace Site44
                 }
             }
 
+            // Advanced wings often hold a blood pack, and now and then a panacea pill.
+            ThingDef bloodPack = DefDatabase<ThingDef>.GetNamedSilentFail("Site44_BloodPack");
+            ThingDef panacea = DefDatabase<ThingDef>.GetNamedSilentFail("Site44_PanaceaPill");
+            foreach (Zone wing in graph.Zones.Where(z => z.Restricted && lockedGateZones.Contains(z.Id)))
+            {
+                foreach (ThingDef extra in new[] { Rand.Chance(0.6f) ? bloodPack : null, Rand.Chance(0.25f) ? panacea : null })
+                {
+                    if (extra == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (PlanRoom room in plan.Rooms.Where(r => graph.ZoneOfRoom(r.Id) == wing.Id && !r.IsCorridor).OrderBy(r => Rand.Value))
+                    {
+                        if (containers.TrySpawnItem(room, ThingMaker.MakeThing(extra)))
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
             // Caskets: survivors first, then hostile sleepers and remains by share, the rest just loot. Hostile sleepers
             // keep their old rules: deep inside, and well away from the start.
             int total = casketRooms.Count;

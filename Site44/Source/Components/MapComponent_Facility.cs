@@ -210,6 +210,7 @@ namespace Site44
                 ScanBadges();
                 AnnounceSecurity();
                 ApplyFocus();
+                ApplyRecovery();
                 TeachNearby();
             }
 
@@ -333,6 +334,47 @@ namespace Site44
                             pawn.health.AddHediff(edge);
                         }
                     }
+                }
+            }
+        }
+
+        // Natural recovery: a hidden boost to wound healing, and extra blood recovered each second, per the setting.
+        private void ApplyRecovery()
+        {
+            int level = Site44Settings.Current.delveRecovery;
+            HediffDef boost = DefDatabase<HediffDef>.GetNamedSilentFail("Site44_Recovery");
+            foreach (Pawn pawn in map.mapPawns.FreeColonistsSpawned)
+            {
+                if (pawn.health == null)
+                {
+                    continue;
+                }
+
+                if (boost != null)
+                {
+                    Hediff existing = pawn.health.hediffSet.GetFirstHediffOfDef(boost);
+                    if (level <= 0)
+                    {
+                        if (existing != null)
+                        {
+                            pawn.health.RemoveHediff(existing);
+                        }
+                    }
+                    else
+                    {
+                        if (existing == null)
+                        {
+                            existing = pawn.health.AddHediff(boost);
+                        }
+
+                        existing.Severity = level >= 2 ? 1f : 0.5f;
+                    }
+                }
+
+                Hediff blood = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.BloodLoss);
+                if (blood != null && level > 0 && pawn.health.hediffSet.BleedRateTotal < 0.0001f)
+                {
+                    blood.Severity -= level >= 2 ? 0.0015f : 0.0006f;
                 }
             }
         }

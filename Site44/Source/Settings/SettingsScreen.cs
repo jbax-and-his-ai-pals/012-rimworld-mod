@@ -303,7 +303,7 @@ namespace Site44
 
         private static readonly string[] PresetFields =
         {
-            "supplyX", "lootAmount", "crateDensity", "hostileCasketX", "delveInfection", "delveDescentCare", "delveDescentRest", "puzzleDifficulty",
+            "supplyX", "lootAmount", "crateDensity", "hostileCasketX", "delveRecovery", "delveInfection", "delveDescentCare", "delveDescentRest", "puzzleDifficulty",
             "keycardX", "nestDensity", "startingColonists", "drugFindX", "securityLevel", "dangerX", "tierStrengthX", "missionFocusLevel",
             "delveAllowRaids", "delveAllowCaravanEvents", "delveAllowOtherThreats", "delveAllowOutsideVisitors", "delveAllowWeather"
         };
@@ -311,7 +311,7 @@ namespace Site44
         private static readonly string[] VanillaFields =
         {
             "delveAllowRaids", "delveAllowCaravanEvents", "delveAllowOtherThreats", "delveAllowOutsideVisitors", "delveAllowWeather",
-            "delveInfection", "delveDescentCare", "delveDescentRest", "missionFocusLevel", "hardenedToBodies", "startingKit", "supplyX", "drugFindX",
+            "delveRecovery", "delveInfection", "delveDescentCare", "delveDescentRest", "missionFocusLevel", "hardenedToBodies", "startingKit", "supplyX", "drugFindX",
             "delverGearX", "hackMinigame", "securityLevel", "hotZonesEnabled"
         };
 
@@ -447,6 +447,8 @@ namespace Site44
                 },
                 Choice("Focus", "What the game emphasises: balanced, explorer (combat takes a backseat) or power trip (swarms of weak foes and a stronger party).",
                     () => S.focus, v => S.focus = v, 0, new[] { "balanced", "explorer", "power trip" }),
+                Choice("Natural recovery", "How quickly the party heals wounds and recovers lost blood between fights, compared with the base game.",
+                    () => S.delveRecovery, v => S.delveRecovery = v, 1, new[] { "same as vanilla", "faster", "much faster" }, "Delve"),
                 Choice("Wound infection risk", "Chance that a fresh wound becomes infected, compared with the base game.",
                     () => S.delveInfection, v => S.delveInfection = v, 1, new[] { "same as vanilla", "half of vanilla", "none" }, "Delve"),
                 Choice("Wounds on descent", "What the extraction gate does for the party's injuries on the way down.",

@@ -174,13 +174,21 @@ namespace Site44
             {
                 def = Def("ComponentIndustrial");
             }
-            else if (roll < 95)
+            else if (roll < 94)
             {
                 def = Def("MedicineIndustrial");
             }
-            else
+            else if (roll < 96)
+            {
+                def = Def("Site44_BloodPack") ?? Def("MedicineIndustrial");
+            }
+            else if (roll < 99)
             {
                 def = Def("Site44_AntisepticInjector") ?? Def("MedicineIndustrial");
+            }
+            else
+            {
+                def = Def("Site44_PanaceaPill") ?? Def("Site44_AntisepticInjector") ?? Def("MedicineIndustrial");
             }
 
             if (def == null)

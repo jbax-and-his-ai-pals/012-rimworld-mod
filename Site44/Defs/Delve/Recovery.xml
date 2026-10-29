@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- Hidden boost to natural wound healing in a Delve run (setting: natural recovery). Severity 0.5 is "faster", 1 is "much faster". -->
+  <HediffDef>
+    <defName>Site44_Recovery</defName>
+    <label>delver recovery</label>
+    <description>Conditioning and a rested body mend wounds faster than usual.</description>
+    <hediffClass>HediffWithComps</hediffClass>
+    <isBad>false</isBad>
+    <scenarioCanAdd>false</scenarioCanAdd>
+    <initialSeverity>0.5</initialSeverity>
+    <maxSeverity>1</maxSeverity>
+    <stages>
+      <li>
+        <label>faster</label>
+        <becomeVisible>false</becomeVisible>
+        <statFactors>
+          <InjuryHealingFactor>1.5</InjuryHealingFactor>
+        </statFactors>
+      </li>
+      <li>
+        <label>much faster</label>
+        <minSeverity>0.75</minSeverity>
+        <becomeVisible>false</becomeVisible>
+        <statFactors>
+          <InjuryHealingFactor>2.5</InjuryHealingFactor>
+        </statFactors>
+      </li>
+    </stages>
+  </HediffDef>
+
+  <!-- Blood pack: restores lost blood at once. -->
+  <ThingDef ParentName="DrugPillBase">
+    <defName>Site44_BloodPack</defName>
+    <label>blood pack</label>
+    <description>A sealed pack of matched plasma and clotting agent with a self-priming needle. It restores lost blood at once. It does not close wounds, so a bleeding colonist still needs tending first.</description>
+    <graphicData>
+      <texPath>Things/Item/Drug/Penoxycyline</texPath>
+      <graphicClass>Graphic_StackCount</graphicClass>
+      <color>(0.85,0.2,0.25)</color>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <statBases>
+      <MarketValue>60</MarketValue>
+      <Mass>0.1</Mass>
+    </statBases>
+    <techLevel>Industrial</techLevel>
+    <ingestible>
+      <drugCategory>None</drugCategory>
+      <outcomeDoers>
+        <li Class="Site44.IngestionOutcomeDoer_BloodPack" />
+      </outcomeDoers>
+    </ingestible>
+  </ThingDef>
+
+  <!-- Panacea pill: top-tier find. -->
+  <ThingDef ParentName="DrugPillBase">
+    <defName>Site44_PanaceaPill</defName>
+    <label>panacea pill</label>
+    <description>A pearl-white capsule of unmarked make. It closes every wound that can still heal, clears infections and restores lost blood. Scars and missing parts stay. Only a handful were ever made.</description>
+    <graphicData>
+      <texPath>Things/Item/Drug/Yayo</texPath>
+      <graphicClass>Graphic_StackCount</graphicClass>
+      <color>(1,1,0.9)</color>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <statBases>
+      <MarketValue>400</MarketValue>
+      <Mass>0.02</Mass>
+    </statBases>
+    <techLevel>Spacer</techLevel>
+    <ingestible>
+      <drugCategory>None</drugCategory>
+      <outcomeDoers>
+        <li Class="Site44.IngestionOutcomeDoer_Panacea" />
+      </outcomeDoers>
+    </ingestible>
+  </ThingDef>
+
+</Defs>

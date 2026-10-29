@@ -32,13 +32,16 @@ namespace Site44
             "Long levels worth exploring thoroughly."
         };
 
-        private static readonly string[] PathNames = { "Just play", "Let me tinker", "Full RimWorld setup" };
+        private static readonly string[] PathNames = { "Just play", "Customize Site-44 settings", "Full RimWorld setup" };
         private static readonly string[] PathText =
         {
-            "Start with these choices. The rest has sensible defaults.",
-            "One more page for the party, events, biomes and saving mode.",
-            "RimWorld's own pages for storyteller, difficulty, world and landing site. They open on its neutral difficulty."
+            "",
+            "Party size, events, healing, saving mode and biomes.",
+            "Choose storyteller, difficulty, world, and landing site."
         };
+
+        // Said only when the full setup is picked: RimWorld's own difficulty is a separate scale from this mod's.
+        private const string FullSetupNote = "RimWorld's difficulty mostly shapes vanilla events, which are off in Delve unless you turn them on. It also changes wound infection and mood, on top of Site-44's difficulty.";
 
         public override string PageTitle => "Difficulty and pace";
 
@@ -71,18 +74,18 @@ namespace Site44
             float column = (total - gap * 2f) / 3f;
             float height = main.height - 50f;
 
-            DrawColumn(new Rect(x, main.y, column, height), "Difficulty", DifficultyNames, DifficultyText, System.Array.IndexOf(DifficultyNames, SettingsScreen.CurrentBalance()), index =>
+            DrawColumn(new Rect(x, main.y, column, height), "Difficulty", "Site-44's own features: danger, supplies and healing.", DifficultyNames, DifficultyText, System.Array.IndexOf(DifficultyNames, SettingsScreen.CurrentBalance()), index =>
             {
                 settings.ApplyPreset(index);
             });
 
             string pace = settings.delveSize == "Grows with depth" ? DelveDifficulty.Steady : settings.delveSize;
-            DrawColumn(new Rect(x + column + gap, main.y, column, height), "Pace", PaceNames, PaceText, System.Array.IndexOf(PaceNames, pace), index =>
+            DrawColumn(new Rect(x + column + gap, main.y, column, height), "Pace", null, PaceNames, PaceText, System.Array.IndexOf(PaceNames, pace), index =>
             {
                 settings.delveSize = PaceNames[index];
             });
 
-            DrawColumn(new Rect(x + (column + gap) * 2f, main.y, column, height), "Setup", PathNames, PathText, path, index => path = index);
+            DrawColumn(new Rect(x + (column + gap) * 2f, main.y, column, height), "More setup", null, PathNames, PathText, path, index => path = index, path == FullVanilla ? FullSetupNote : null);
 
             Rect all = new Rect(x + (total - 260f) / 2f, main.yMax - 40f, 260f, 36f);
             if (Widgets.ButtonText(all, "All settings"))
@@ -108,7 +111,7 @@ namespace Site44
             Find.GameInitData.permadeath = settings.commitment;
         }
 
-        public static void DrawColumn(Rect rect, string title, string[] names, string[] text, int selected, System.Action<int> choose)
+        public static void DrawColumn(Rect rect, string title, string subtitle, string[] names, string[] text, int selected, System.Action<int> choose, string selectedNote = null)
         {
             Listing_Standard list = new Listing_Standard { maxOneColumn = true };
             list.Begin(rect);
@@ -116,6 +119,13 @@ namespace Site44
             list.Label(title);
             Text.Font = GameFont.Small;
             list.GapLine(4f);
+            if (!subtitle.NullOrEmpty())
+            {
+                GUI.color = Ui.Muted;
+                list.Label(subtitle);
+                GUI.color = Color.white;
+            }
+
             list.Gap(6f);
             for (int i = 0; i < names.Length; i++)
             {
@@ -125,7 +135,16 @@ namespace Site44
                 }
 
                 GUI.color = Ui.Muted;
-                list.Label(text[i]);
+                if (!text[i].NullOrEmpty())
+                {
+                    list.Label(text[i]);
+                }
+
+                if (i == selected && !selectedNote.NullOrEmpty())
+                {
+                    list.Label(selectedNote);
+                }
+
                 GUI.color = Color.white;
                 list.Gap(10f);
             }

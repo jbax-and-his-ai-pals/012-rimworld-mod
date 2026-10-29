@@ -10,7 +10,7 @@ namespace Site44
     {
         public static bool ChooseStoryteller;
 
-        public override string PageTitle => "Customize this game";
+        public override string PageTitle => "Customize Site-44 settings";
 
         public override void DoWindowContents(Rect inRect)
         {

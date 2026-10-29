@@ -16,12 +16,37 @@ namespace Site44
         public override Page GetFirstConfigPage()
         {
             bool delve = AllParts.Any(p => p is ScenPart_Site44Delve);
-            if (!delve || !Site44Settings.Current.skipWorldSetup || ModsConfig.OdysseyActive)
+            if (!delve || ModsConfig.OdysseyActive)
             {
                 return base.GetFirstConfigPage();
             }
 
-            List<Page> pages = new List<Page> { new Page_Site44Setup(), new Page_Site44Biomes(), new Page_Site44World(), new Page_Site44StartTile() };
+            // The first page asks about difficulty, pace and how much more to set up; it puts together the rest (BuildPages).
+            return new Page_Site44Setup();
+        }
+
+        // The pages after the first one. Just play: nothing extra. Tinker: a page of per-game choices and the biomes, plus
+        // RimWorld's storyteller page if the player asked for it. Full vanilla: RimWorld's own pages.
+        public Page BuildPages(int path)
+        {
+            if (path == Page_Site44Setup.FullVanilla)
+            {
+                return base.GetFirstConfigPage();
+            }
+
+            List<Page> pages = new List<Page>();
+            if (path == Page_Site44Setup.Tinker)
+            {
+                pages.Add(new Page_Site44Customize());
+                pages.Add(new Page_Site44Biomes());
+                if (Page_Site44Customize.ChooseStoryteller)
+                {
+                    pages.Add(new Page_SelectStoryteller());
+                }
+            }
+
+            pages.Add(new Page_Site44World());
+            pages.Add(new Page_Site44StartTile());
             if (ModsConfig.IdeologyActive)
             {
                 pages.Add(new Page_ChooseIdeoPreset());
@@ -41,7 +66,16 @@ namespace Site44
                     last = last.next;
                 }
 
-                last.nextAct = PageUtility.InitGameStart;
+                bool askedForStoryteller = path == Page_Site44Setup.Tinker && Page_Site44Customize.ChooseStoryteller;
+                last.nextAct = () =>
+                {
+                    if (!askedForStoryteller)
+                    {
+                        Page_Site44Setup.ApplyDefaultStoryteller();
+                    }
+
+                    PageUtility.InitGameStart();
+                };
             }
 
             return first;

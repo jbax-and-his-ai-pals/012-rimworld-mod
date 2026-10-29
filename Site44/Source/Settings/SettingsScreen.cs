@@ -550,8 +550,6 @@ namespace Site44
                 Size("Size of quest-site complexes", "Extra small (about 60 cells across), Small (85), Medium (120), Large (160) or XL (the whole site map). Random picks one each time.",
                     () => S.siteSizeMode, v => S.siteSizeMode = v, "Random", "Quest sites", true, false),
                 Toggle("Starting kit", "Starting colonists begin fed and rested, in good spirits, with survival meals and focus tabs.", () => S.startingKit, v => S.startingKit = v, true, "Breach"),
-                Toggle("Skip world and site selection", "The Site-44 scenarios use nothing from the world except the climate and biome, so a default world and a start tile are chosen for you. Turn off to use the ordinary world and landing-site pages. Not used when the Odyssey expansion is active.",
-                    () => S.skipWorldSetup, v => S.skipWorldSetup = v, true),
                 Mult("Ruin quest frequency", "How often the storyteller offers a ruined-complex expedition. 0% = never. Takes effect after restarting the game.",
                     () => S.questFrequency, v => S.questFrequency = v, 3f, "Quest sites")
             };
@@ -560,7 +558,6 @@ namespace Site44
             NewGameOnly(delve.First(r => r.Label == "Commitment mode"));
             NewGameOnly(delve.First(r => r.Label == "Storyteller"));
             NewGameOnly(setup.First(r => r.Label == "Starting kit"));
-            NewGameOnly(setup.First(r => r.Label == "Skip world and site selection"));
             NewGameOnly(setup.First(r => r.Label == "Ruin quest frequency"));
             NewGameOnly(setup.First(r => r.Label == "Complex used by the Breach scenario"));
             NewGameOnly(setup.First(r => r.Label == "Size of the Breach scenario complex"));
@@ -582,7 +579,7 @@ namespace Site44
                     "Cipher-lock hacking", "Puzzle difficulty", "Keycards for locked gates", "Clearance-gated wings", "Secure rooms" }) },
                 new Section { Title = "Complexes and sizes", Subtitle = "", Rows = pick(new[] {
                     "Open layout (explore freely)", "Locked vaults", "Delve pace", "Complex used by the Breach scenario", "Size of the Breach scenario complex", "Size of quest-site complexes" }) },
-                new Section { Title = "Scenario setup", Subtitle = "", Rows = pick(new[] { "Starting kit", "Skip world and site selection", "Ruin quest frequency" }) },
+                new Section { Title = "Scenario setup", Subtitle = "", Rows = pick(new[] { "Starting kit", "Ruin quest frequency" }) },
                 new Section { Title = "Look and fine detail", Subtitle = "", Rows = pick(new[] {
                     "Dust and debris", "Outdoor props", "Furniture damage", "Rec rooms", "Specialty rooms" }) }
             };
@@ -713,6 +710,23 @@ namespace Site44
                 GUI.color = new Color(1f, 0.5f, 0.4f);
                 list.Label(row.Label + ": this setting could not be drawn (see the log).");
                 GUI.color = Color.white;
+            }
+        }
+
+        internal static void DrawRows(Listing_Standard list, params string[] labels)
+        {
+            if (sections == null)
+            {
+                Build();
+            }
+
+            foreach (string label in labels)
+            {
+                SettingRow row = allRows.FirstOrDefault(r => r.Label == label);
+                if (row != null)
+                {
+                    DrawRowSafely(list, row);
+                }
             }
         }
 

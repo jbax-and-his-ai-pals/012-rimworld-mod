@@ -6,10 +6,14 @@ using Verse;
 
 namespace Site44
 {
-    // The two choices that shape a new game: how hard it is and, for a Delve run, how long its levels are.
-    // Everything else lives behind "Custom settings".
+    // The first page of a Delve game: how hard it is, how long its levels are, and how much more the player wants to set up.
+    // Everything not asked here has a sensible default and lives in the settings.
     public class Page_Site44Setup : Page
     {
+        public const int JustPlay = 0, Tinker = 1, FullVanilla = 2;
+
+        private static int path;
+
         private static readonly string[] DifficultyNames = { "Easier", "Default", "Harder", "Brutal", "Unfair" };
         private static readonly string[] DifficultyText =
         {
@@ -28,13 +32,71 @@ namespace Site44
             "Long levels worth exploring thoroughly."
         };
 
-        private bool IsDelve => Find.Scenario != null && Find.Scenario.AllParts.Any(p => p is ScenPart_Site44Delve);
+        private static readonly string[] PathNames = { "Just play", "Let me tinker", "Full RimWorld setup" };
+        private static readonly string[] PathText =
+        {
+            "Start with these choices. The rest has sensible defaults.",
+            "One more page for the party, events, biomes and saving mode.",
+            "RimWorld's own pages for storyteller, difficulty, world and landing site. Its difficulty adds to this mod's."
+        };
 
-        // The storyteller page is skipped in this flow. The game still needs a storyteller and a saving mode, so they come from the
-        // settings: Cassandra by default, and vanilla's neutral difficulty so that this mod's own difficulty is the only scaling
-        // (vanilla's difficulty would otherwise multiply wound infection and mood a second time). Vanilla's difficulty and storyteller
-        // can still be changed during play from the game's own options.
+        public override string PageTitle => "Difficulty and pace";
+
+        // The rest of the pages depend on the choice made here, so they are put together when the player moves on.
         protected override void DoNext()
+        {
+            Site44Scenario scenario = Find.Scenario as Site44Scenario;
+            if (scenario != null)
+            {
+                next = scenario.BuildPages(path);
+                if (next != null)
+                {
+                    next.prev = this;
+                }
+            }
+
+            Site44Settings.SaveGlobal();
+            base.DoNext();
+        }
+
+        public override void DoWindowContents(Rect inRect)
+        {
+            DrawPageTitle(inRect);
+            Rect main = GetMainRect(inRect);
+            Site44Settings settings = Site44Settings.Global;
+
+            float total = Mathf.Min(main.width, 1100f);
+            float x = main.x + (main.width - total) / 2f;
+            float gap = 28f;
+            float column = (total - gap * 2f) / 3f;
+            float height = main.height - 50f;
+
+            DrawColumn(new Rect(x, main.y, column, height), "Difficulty", DifficultyNames, DifficultyText, System.Array.IndexOf(DifficultyNames, SettingsScreen.CurrentBalance()), index =>
+            {
+                settings.ApplyPreset(index);
+            });
+
+            string pace = settings.delveSize == "Grows with depth" ? DelveDifficulty.Steady : settings.delveSize;
+            DrawColumn(new Rect(x + column + gap, main.y, column, height), "Pace", PaceNames, PaceText, System.Array.IndexOf(PaceNames, pace), index =>
+            {
+                settings.delveSize = PaceNames[index];
+            });
+
+            DrawColumn(new Rect(x + (column + gap) * 2f, main.y, column, height), "Setup", PathNames, PathText, path, index => path = index);
+
+            Rect all = new Rect(x + (total - 260f) / 2f, main.yMax - 40f, 260f, 36f);
+            if (Widgets.ButtonText(all, "All settings"))
+            {
+                Find.WindowStack.Add(new Dialog_ModSettings(LoadedModManager.GetMod<Site44ModEntry>()));
+            }
+
+            DoBottomButtons(inRect, "Next");
+        }
+
+        // The game still needs a storyteller and a saving mode when the pages do not ask for them: Cassandra by default, and
+        // vanilla's neutral difficulty so this mod's own difficulty is the only scaling (vanilla's would multiply wound infection
+        // and mood a second time). Vanilla's difficulty and storyteller can still be changed during play from the game's options.
+        public static void ApplyDefaultStoryteller()
         {
             Site44Settings settings = Site44Settings.Global;
             StorytellerDef teller = DefDatabase<StorytellerDef>.GetNamedSilentFail(settings.storyteller)
@@ -44,53 +106,9 @@ namespace Site44
             Current.Game.storyteller = new Storyteller(teller, difficulty, new Difficulty(difficulty));
             Find.GameInitData.permadeathChosen = true;
             Find.GameInitData.permadeath = settings.commitment;
-            base.DoNext();
         }
 
-        public override string PageTitle => IsDelve ? "Difficulty and pace" : "Difficulty";
-
-        public override void DoWindowContents(Rect inRect)
-        {
-            DrawPageTitle(inRect);
-            Rect main = GetMainRect(inRect);
-            Site44Settings settings = Site44Settings.Global;
-            bool delve = IsDelve;
-
-            float total = Mathf.Min(main.width, delve ? 900f : 460f);
-            float x = main.x + (main.width - total) / 2f;
-            float column = delve ? (total - 30f) / 2f : total;
-
-            DrawColumn(new Rect(x, main.y, column, main.height - 50f), "Difficulty", DifficultyNames, DifficultyText, SelectedDifficulty(), index =>
-            {
-                settings.ApplyPreset(index);
-                Site44Settings.SaveGlobal();
-            });
-
-            if (delve)
-            {
-                int pace = System.Array.IndexOf(PaceNames, settings.delveSize == "Grows with depth" ? DelveDifficulty.Steady : settings.delveSize);
-                DrawColumn(new Rect(x + column + 30f, main.y, column, main.height - 50f), "Pace", PaceNames, PaceText, pace, index =>
-                {
-                    settings.delveSize = PaceNames[index];
-                    Site44Settings.SaveGlobal();
-                });
-            }
-
-            Rect custom = new Rect(x + (total - 260f) / 2f, main.yMax - 40f, 260f, 36f);
-            if (Widgets.ButtonText(custom, "Custom settings"))
-            {
-                Find.WindowStack.Add(new Dialog_ModSettings(LoadedModManager.GetMod<Site44ModEntry>()));
-            }
-
-            DoBottomButtons(inRect, "Next");
-        }
-
-        private static int SelectedDifficulty()
-        {
-            return System.Array.IndexOf(DifficultyNames, SettingsScreen.CurrentBalance());
-        }
-
-        private static void DrawColumn(Rect rect, string title, string[] names, string[] text, int selected, System.Action<int> choose)
+        public static void DrawColumn(Rect rect, string title, string[] names, string[] text, int selected, System.Action<int> choose)
         {
             Listing_Standard list = new Listing_Standard { maxOneColumn = true };
             list.Begin(rect);

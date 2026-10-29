@@ -80,7 +80,16 @@ namespace Site44
             CompQuality quality = thing.TryGetComp<CompQuality>();
             if (quality != null)
             {
-                quality.SetQuality(Rand.Chance(0.6f) ? QualityCategory.Poor : QualityCategory.Normal, ArtGenerationContext.Outsider);
+                if (Site44Tuning.PowerTrip)
+                {
+                    // Gear gets better the deeper the run goes.
+                    int depth = GameComponent_Delve.Level != null ? GameComponent_Delve.Level.Depth : 1;
+                    quality.SetQuality((QualityCategory)Mathf.Clamp(2 + Rand.RangeInclusive(0, 1) + depth / 3, 2, 5), ArtGenerationContext.Outsider);
+                }
+                else
+                {
+                    quality.SetQuality(Rand.Chance(0.6f) ? QualityCategory.Poor : QualityCategory.Normal, ArtGenerationContext.Outsider);
+                }
             }
 
             if (def.useHitPoints && def.stackLimit == 1 && thing.MaxHitPoints > 1)

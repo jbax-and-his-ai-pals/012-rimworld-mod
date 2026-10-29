@@ -1895,7 +1895,7 @@ namespace Site44
             }
 
             List<string> kinds = new List<string>();
-            int count = tier <= 1 ? 2 : Rand.RangeInclusive(2, 3);
+            int count = Site44Tuning.PowerTrip ? 3 : tier <= 1 ? 2 : Rand.RangeInclusive(2, 3);
             for (int i = 0; i < count; i++)
             {
                 kinds.Add(tier >= 2 && Rand.Chance(0.4f) ? "Spelopede" : "Megascarab");
@@ -2567,7 +2567,10 @@ namespace Site44
             ThreatSettings threat = new ThreatSettings
             {
                 Depth = threatDepth,
-                Budget = ThreatBudget.BudgetFor(threatDepth, roomCount, Site44Tuning.DangerFactor),
+                Budget = ThreatBudget.BudgetFor(threatDepth, roomCount, Site44Tuning.DangerFactor * Site44Tuning.FocusThreatFactor),
+                MaxNestsPerZone = Site44Tuning.MaxNestsPerZone,
+                MaxNestTier = Site44Tuning.FocusNestTierLimit,
+                MaxSecurityTier = Site44Tuning.FocusSecurityTierLimit,
                 NestWeight = settings.nestDensity,
                 SecurityWeight = Site44Tuning.SecurityWeight
             };

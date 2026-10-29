@@ -30,6 +30,8 @@ namespace Site44.Gen
         public float NestWeight = 1f;                    // relative share of the budget spent on nests
         public float SecurityWeight = 1f;                // relative share spent on security
         public int MaxNestsPerZone = 2;
+        public int MaxNestTier;                          // 0: no extra limit beyond the depth
+        public int MaxSecurityTier;                      // 0: no extra limit
     }
 
     /// <summary>
@@ -88,6 +90,11 @@ namespace Site44.Gen
             if (shareS > 0f && security.Count > 0)
             {
                 int cap = SecurityTierCap(settings.Depth);
+                if (settings.MaxSecurityTier > 0)
+                {
+                    cap = Math.Min(cap, settings.MaxSecurityTier);
+                }
+
                 float fairShare = budgetS / security.Count;
                 float remaining = budgetS;
                 foreach (ThreatSite site in security)
@@ -121,6 +128,11 @@ namespace Site44.Gen
             if (shareN > 0f || budgetN > 0f)
             {
                 int nestCap = Math.Min(NestTierCap(settings.Depth), NestCosts.Length);
+                if (settings.MaxNestTier > 0)
+                {
+                    nestCap = Math.Min(nestCap, settings.MaxNestTier);
+                }
+
                 var chosen = new HashSet<int>();
                 var perZone = new Dictionary<int, int>();
                 foreach (ThreatSite site in Shuffled(sites.Where(s => s.Kind == ThreatKind.Nest).ToList(), rng))

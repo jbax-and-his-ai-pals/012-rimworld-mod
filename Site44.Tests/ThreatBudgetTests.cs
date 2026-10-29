@@ -137,6 +137,32 @@ namespace Site44.Tests
         }
 
         [Fact]
+        public void FocusLimitsCapTheTiers()
+        {
+            for (int seed = 0; seed < 100; seed++)
+            {
+                var plan = ThreatBudget.Plan(seed, Sites(60, 4), new ThreatSettings { Depth = 9, Budget = 200f, MaxNestTier = 1, MaxSecurityTier = 1 });
+                Assert.All(plan, p => Assert.Equal(1, p.Tier));
+                Assert.Contains(plan, p => p.Kind == ThreatKind.Nest);
+            }
+        }
+
+        [Fact]
+        public void MoreNestsPerZoneWhenAllowed()
+        {
+            int two = 0, three = 0;
+            for (int seed = 0; seed < 100; seed++)
+            {
+                var wide = Sites(60, 0);
+                foreach (var site in wide) site.ZoneId = site.Id / 10;   // ten rooms to a zone, so a third nest can fit
+                two += ThreatBudget.Plan(seed, wide, new ThreatSettings { Depth = 4, Budget = 300f, MaxNestTier = 1, MaxNestsPerZone = 2 }).Count;
+                three += ThreatBudget.Plan(seed, wide, new ThreatSettings { Depth = 4, Budget = 300f, MaxNestTier = 1, MaxNestsPerZone = 3 }).Count;
+            }
+
+            Assert.True(three > two);
+        }
+
+        [Fact]
         public void BudgetGrowsWithDepthDangerAndSize()
         {
             Assert.True(ThreatBudget.BudgetFor(4, 40, 1f) > ThreatBudget.BudgetFor(1, 40, 1f));

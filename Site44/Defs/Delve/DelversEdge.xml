@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- The power trip focus: a party that hits the ruins harder than the ruins hit back. -->
+  <HediffDef>
+    <defName>Site44_DelversEdge</defName>
+    <label>delver's edge</label>
+    <description>A well-drilled delver's confidence and conditioning: wounds close faster, hits land softer, and lessons stick.</description>
+    <hediffClass>HediffWithComps</hediffClass>
+    <defaultLabelColor>(0.7,0.9,1)</defaultLabelColor>
+    <isBad>false</isBad>
+    <scenarioCanAdd>true</scenarioCanAdd>
+    <initialSeverity>1</initialSeverity>
+    <maxSeverity>1</maxSeverity>
+    <stages>
+      <li>
+        <statFactors>
+          <IncomingDamageFactor>0.75</IncomingDamageFactor>
+          <InjuryHealingFactor>1.5</InjuryHealingFactor>
+          <GlobalLearningFactor>1.5</GlobalLearningFactor>
+        </statFactors>
+      </li>
+    </stages>
+  </HediffDef>
+
+</Defs>

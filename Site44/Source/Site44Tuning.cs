@@ -21,6 +21,26 @@ namespace Site44
         // Turrets, patrol mechs and terminal alarms.
         public static bool SecurityEnabled => S.securityLevel > 0;
 
+        // Focus: balanced, explorer (combat takes a backseat) or power trip (swarms of weak foes, a tougher party, better gear).
+        public static int Focus
+        {
+            get
+            {
+                // -site44focus=explorer|power forces a focus for test runs.
+                string forced = SiteTypes.CommandLineValue("site44focus");
+                if (forced == "explorer") return 1;
+                if (forced == "power") return 2;
+                return Mathf.Clamp(S.focus, 0, 2);
+            }
+        }
+        public static bool Explorer => Focus == 1;
+        public static bool PowerTrip => Focus == 2;
+        public static float FocusThreatFactor => new[] { 1f, 0.35f, 1f }[Focus];
+        public static int FocusNestTierLimit => Focus == 0 ? 0 : 1;
+        public static int FocusSecurityTierLimit => Explorer ? 1 : 0;
+        public static int MaxNestsPerZone => PowerTrip ? 3 : 2;
+        public static int PuzzleDifficulty => Explorer ? 0 : S.puzzleDifficulty;
+
         // Each level spends one budget of danger on nests and security (see ThreatBudget).
         public static float DangerFactor => S.dangerX;
         public static float SecurityWeight => new[] { 0f, 0.5f, 1f, 1.6f }[Mathf.Clamp(S.securityLevel, 0, 3)];
@@ -37,7 +57,7 @@ namespace Site44
         public const int MildLevels = 3;
 
         // Chance that a terminal-locked gate also has a keycard on the near side, and that the card is guarded by a nest.
-        public static float KeycardChance => Mathf.Clamp01(0.5f * S.keycardX);
+        public static float KeycardChance => Mathf.Clamp01(0.5f * S.keycardX * (Explorer ? 1.5f : 1f));
 
         // Share of medicine and meal picks kept at x1 supply, and the bait item chances at x1.
         public static float SupplyShare => Mathf.Clamp01(0.25f * S.supplyX);

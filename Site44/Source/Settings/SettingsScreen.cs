@@ -443,6 +443,8 @@ namespace Site44
                     Pick = () => Find.WindowStack.Add(new FloatMenu(DefDatabase<StorytellerDef>.AllDefs.Where(d => d.listVisible && !d.tutorialMode)
                         .Select(d => new FloatMenuOption(d.label.CapitalizeFirst(), () => S.storyteller = d.defName)).ToList()))
                 },
+                Choice("Focus", "What the game emphasises: balanced, explorer (combat takes a backseat) or power trip (swarms of weak foes and a stronger party).",
+                    () => S.focus, v => S.focus = v, 0, new[] { "balanced", "explorer", "power trip" }),
                 Choice("Wound infection risk", "Chance that a fresh wound becomes infected, compared with the base game.",
                     () => S.delveInfection, v => S.delveInfection = v, 1, new[] { "same as vanilla", "half of vanilla", "none" }, "Delve"),
                 Choice("Wounds on descent", "What the extraction gate does for the party's injuries on the way down.",
@@ -567,7 +569,7 @@ namespace Site44
             sections = new List<Section>
             {
                 new Section { Title = "General settings", Subtitle = "", Rows = pick(new[] {
-                    "Starting colonists", "Commitment mode", "Storyteller", "Vanilla enemy raids", "Vanilla caravan events", "Vanilla other threats", "Vanilla visitors and outside arrivals", "Vanilla weather disasters",
+                    "Starting colonists", "Focus", "Commitment mode", "Storyteller", "Vanilla enemy raids", "Vanilla caravan events", "Vanilla other threats", "Vanilla visitors and outside arrivals", "Vanilla weather disasters",
                     "Wound infection risk", "Wounds on descent", "Restore hunger and rest on descent", "Mission focus (mood bonus in a complex)", "Delvers ignore plain corpses" }) },
                 new Section { Title = "Loot and supplies", Subtitle = "", Rows = pick(new[] {
                     "Food and medicine supply", "Number of loot crates", "Loot stack size", "Focus tabs in loot", "Delver gear in rich loot", "Intact rooms" }) },

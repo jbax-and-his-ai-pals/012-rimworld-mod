@@ -56,7 +56,7 @@ namespace Site44
             {
                 int skill = pawn.skills != null ? pawn.skills.GetSkill(Terminal.PrimarySkill).Level : 0;
                 int seed = Terminal.thingIDNumber * 7919 + Find.TickManager.TicksGame / 600 + pawn.thingIDNumber;
-                CipherPuzzle puzzle = CipherPuzzle.Create(seed, skill, Terminal.PuzzleTier, Site44Settings.Current.puzzleDifficulty);
+                CipherPuzzle puzzle = CipherPuzzle.Create(seed, skill, Terminal.PuzzleTier, Site44Tuning.PuzzleDifficulty);
                 puzzleOpened = true;
                 Find.WindowStack.Add(new Dialog_CipherLock(puzzle, Terminal.LabelCap, outcome => puzzleOutcome = outcome));
             };

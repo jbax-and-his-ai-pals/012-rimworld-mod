@@ -206,6 +206,7 @@ namespace Site44
             {
                 ScanBadges();
                 AnnounceSecurity();
+                ApplyFocus();
             }
 
             if (!IsFacilityMap || coolantLoopDiverted || !Site44Tuning.HotZonesEnabled)
@@ -215,6 +216,32 @@ namespace Site44
             if (Find.TickManager.TicksGame % HeatCadenceTicks == 0)
             {
                 ApplyHeat(HotZoneTemperature);
+            }
+        }
+
+        // The explorer focus starts every level as recognised staff; the power focus gives the party its edge.
+        private void ApplyFocus()
+        {
+            if (Site44Tuning.Explorer && clearance < FacilityFaction.AllyTier)
+            {
+                clearance = FacilityFaction.AllyTier;
+                announcedTier = FacilityFaction.AllyTier;
+                FacilityFaction.ApplyTier(clearance);
+            }
+
+            if (Site44Tuning.PowerTrip)
+            {
+                HediffDef edge = DefDatabase<HediffDef>.GetNamedSilentFail("Site44_DelversEdge");
+                if (edge != null)
+                {
+                    foreach (Pawn pawn in map.mapPawns.FreeColonistsSpawned)
+                    {
+                        if (pawn.health != null && !pawn.health.hediffSet.HasHediff(edge))
+                        {
+                            pawn.health.AddHediff(edge);
+                        }
+                    }
+                }
             }
         }
 

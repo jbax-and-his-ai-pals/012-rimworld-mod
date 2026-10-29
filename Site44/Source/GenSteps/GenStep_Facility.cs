@@ -33,6 +33,7 @@ namespace Site44
         private readonly HashSet<Pawn> ownedHostiles = new HashSet<Pawn>();
         private readonly Dictionary<int, int> securityTiers = new Dictionary<int, int>();   // security zone id -> tier of its guard group
         private readonly List<ThreatPick> nestPicks = new List<ThreatPick>();
+        private int extractionRoomId = -1;
         private readonly HashSet<int> nestRooms = new HashSet<int>();
         private int threatDepth = 1;
         private int waterFlattened;
@@ -128,6 +129,7 @@ namespace Site44
 
             PlaceContainers();
             PlaceExtraction();
+            PlaceGuardian();
             PlaceInsiderSource();
             PopulateSecureRooms();
             MarkEntrances();
@@ -2729,6 +2731,7 @@ namespace Site44
                 return;
             }
 
+            extractionRoomId = target.Id;
             Building_ExtractionGate gate = (Building_ExtractionGate)ThingMaker.MakeThing(Site44DefOf.Site44_ExtractionGate);
             gate.unlocked = quick;
             GenSpawn.Spawn(gate, gateSpot, map, Rot4.North);
@@ -2739,6 +2742,64 @@ namespace Site44
             }
 
             Log.Message("[Site-44] delve: extraction gate at " + gateSpot + ".");
+        }
+
+        // The last level of a tier holds a guardian: a mechanoid squad, bigger in the deeper tiers, in a far room. It previews what the
+        // next tier brings. Nothing makes the party go there, but the room holds three rich crates and one rare find.
+        private void PlaceGuardian()
+        {
+            if (!GameComponent_Delve.IsDelve || faction == null || !DelveTiers.IsGuardianDepth(threatDepth) || Site44Tuning.DangerFactor <= 0f)
+            {
+                return;
+            }
+
+            int start = StartRoomId();
+            PlanRoom room = plan.Rooms
+                .Where(r => !r.IsCorridor && r.Cells.Count >= 16 && r.Id != start && r.Id != extractionRoomId && !IsEntryRoom(r) && !nestRooms.Contains(r.Id)
+                            && !graph.Zones[graph.ZoneOfRoom(r.Id)].Restricted && graph.Zones[graph.ZoneOfRoom(r.Id)].Kind != SectorKind.Security)
+                .OrderByDescending(r => Mathf.Abs(r.Anchor.X - plan.Start.X) + Mathf.Abs(r.Anchor.Y - plan.Start.Y))
+                .FirstOrDefault();
+            if (room == null)
+            {
+                Log.Message("[Site-44] guardian: no room large enough.");
+                return;
+            }
+
+            int groups = Mathf.Min(3, 1 + (DelveTiers.TierOf(threatDepth) + 1) / 2);
+            List<Pawn> guards = new List<Pawn>();
+            for (int g = 0; g < groups; g++)
+            {
+                foreach (string kindName in FacilityMechs.SquadFor(10))
+                {
+                    Pawn mech = FacilityMechs.Make(kindName, faction);
+                    IntVec3 cell;
+                    if (mech != null && TryFindFreeCell(room, out cell))
+                    {
+                        GenSpawn.Spawn(mech, cell, map);
+                        guards.Add(mech);
+                        ownedHostiles.Add(mech);
+                    }
+                }
+            }
+
+            if (guards.Count > 0)
+            {
+                LordMaker.MakeNewLord(faction, new LordJob_DefendPoint(World(room.Anchor), null, 16f), map, guards);
+            }
+
+            FacilityContainers containers = new FacilityContainers(map, plan, origin, IsFree);
+            int crates = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                if (containers.TrySpawnCrate(room, true, true))
+                {
+                    crates++;
+                }
+            }
+
+            ThingDef rare = DefDatabase<ThingDef>.GetNamedSilentFail(WingRareFind());
+            bool rareLeft = rare != null && containers.TrySpawnItem(room, ThingMaker.MakeThing(rare));
+            Log.Message("[Site-44] guardian: " + guards.Count + " mechanoid(s) in room " + room.Id + ", " + crates + " crate(s)" + (rareLeft ? " and a rare find." : "."));
         }
 
         // ----- validation -----

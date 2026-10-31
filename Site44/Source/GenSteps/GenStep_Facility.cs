@@ -2881,6 +2881,16 @@ namespace Site44
             ThingDef rare = DefDatabase<ThingDef>.GetNamedSilentFail(WingRareFind());
             bool rareLeft = rare != null && containers.TrySpawnItem(room, ThingMaker.MakeThing(rare));
 
+            // From depth 15 a guardian sometimes also guards a renewal capsule, the one cure that restores everything.
+            if (threatDepth >= 15 && Rand.Chance(0.35f))
+            {
+                ThingDef renewal = DefDatabase<ThingDef>.GetNamedSilentFail("Site44_RenewalCapsule");
+                if (renewal != null)
+                {
+                    containers.TrySpawnItem(room, ThingMaker.MakeThing(renewal));
+                }
+            }
+
             // And a piece of temperature gear from the best this depth can offer, or now and then a mixed one.
             bool gearHot = Rand.Bool;
             List<GearPiece> top = GearCatalog.For(gearHot).Where(p => p.MinDepth <= threatDepth).OrderByDescending(p => p.Value).Take(3).ToList();

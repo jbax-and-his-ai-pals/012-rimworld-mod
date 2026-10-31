@@ -58,7 +58,7 @@
   <ThingDef ParentName="DrugPillBase">
     <defName>Site44_PanaceaPill</defName>
     <label>panacea pill</label>
-    <description>A pearl-white capsule of unmarked make. It closes every wound that can still heal, clears infections and restores lost blood. Scars and missing parts stay. Only a handful were ever made.</description>
+    <description>A pearl-white capsule of unmarked make. It closes every wound that can still heal, clears infections, restores lost blood and cures illnesses and poisoning. Scars, missing parts, bionic parts and chronic conditions stay. Only a handful were ever made.</description>
     <graphicData>
       <texPath>Things/Item/Drug/Yayo</texPath>
       <graphicClass>Graphic_StackCount</graphicClass>
@@ -74,6 +74,30 @@
       <drugCategory>None</drugCategory>
       <outcomeDoers>
         <li Class="Site44.IngestionOutcomeDoer_Panacea" />
+      </outcomeDoers>
+    </ingestible>
+  </ThingDef>
+
+  <!-- Renewal capsule: the rarest cure. Restores everything but bionics. Only the deepest guardians keep one. -->
+  <ThingDef ParentName="DrugPillBase">
+    <defName>Site44_RenewalCapsule</defName>
+    <label>renewal capsule</label>
+    <description>A gold-banded capsule, warm to the touch. It does everything a panacea pill does and then rebuilds what no pill can: missing parts, old scars and lasting conditions. Bionic parts are kept. It cannot bring back the dead. There are very few of these left.</description>
+    <graphicData>
+      <texPath>Things/Item/Drug/Yayo</texPath>
+      <graphicClass>Graphic_StackCount</graphicClass>
+      <color>(1,0.85,0.35)</color>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <statBases>
+      <MarketValue>1500</MarketValue>
+      <Mass>0.02</Mass>
+    </statBases>
+    <techLevel>Spacer</techLevel>
+    <ingestible>
+      <drugCategory>None</drugCategory>
+      <outcomeDoers>
+        <li Class="Site44.IngestionOutcomeDoer_Renewal" />
       </outcomeDoers>
     </ingestible>
   </ThingDef>

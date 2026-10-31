@@ -36,16 +36,24 @@ namespace Site44
             Text.Font = GameFont.Small;
             y += 38f;
 
-            Rect tend = new Rect(0f, y, 200f, 30f);
+            Rect tend = new Rect(0f, y, 160f, 30f);
             if (Widgets.ButtonText(tend, "Tend everyone"))
             {
                 PartyCare.TendEveryone(map);
             }
 
             TooltipHandler.TipRegion(tend, "Sends a doctor to every colonist who needs tending, worst bleeding first, with medicine from the shared supplies.");
+            Rect recover = new Rect(170f, y, 160f, 30f);
+            if (Widgets.ButtonText(recover, "Recover"))
+            {
+                PartyCare.RecoverEveryone(map);
+            }
+
+            TooltipHandler.TipRegion(recover, "Tends every wounded colonist, then gets them into a bed: the downed are carried, the rest lie down (and are taken off draft). Bed rest mends tended wounds quickly.");
+            y += 34f;
             string report = PartyCare.LastReport;
-            Widgets.Label(new Rect(210f, y + 2f, inRect.width - 210f, 30f), report.NullOrEmpty() ? "Works while the party is drafted." : report);
-            y += 38f;
+            Widgets.Label(new Rect(0f, y, inRect.width, 26f), report.NullOrEmpty() ? "Both work while the party is drafted. Recover needs a bed on the level." : report);
+            y += 32f;
 
             Rect outRect = new Rect(0f, y, inRect.width, inRect.height - y);
             float height = 40f + 4 * 34f + (goals.Count + stats.Count + party.Count + supplies.Count) * 26f;

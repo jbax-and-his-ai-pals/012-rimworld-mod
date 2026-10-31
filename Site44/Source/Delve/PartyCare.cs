@@ -121,9 +121,10 @@ namespace Site44
         }
     }
 
-    // One-press care for a party that is drafted most of the time: each wounded colonist is sent a doctor, worst bleeding first,
-    // using the same ordered "tend" job the base game gives a drafted doctor, but with medicine drawn from the shared pool (or
-    // fetched from the ground) instead of only what the doctor happens to carry.
+    // One-press care for a party that is drafted most of the time. "Tend everyone" sends a doctor to each wounded colonist, worst
+    // bleeding first, using the same ordered "tend" job the base game gives a drafted doctor, but with medicine drawn from the shared
+    // pool (or fetched from the ground) instead of only what the doctor happens to carry. "Recover" does that and then gets the
+    // colonist into a bed: the downed are carried, the rest lie down.
     public static class PartyCare
     {
         public static string LastReport;
@@ -135,12 +136,7 @@ namespace Site44
                 return null;
             }
 
-            GameComponent_PartyStash stash = GameComponent_PartyStash.Instance;
-            if (stash != null && GameComponent_PartyStash.Enabled)
-            {
-                stash.PoolFromParty();
-            }
-
+            PoolMedicine();
             List<Pawn> patients = map.mapPawns.FreeColonistsSpawned
                 .Where(p => HealthAIUtility.ShouldBeTendedNowByPlayer(p))
                 .OrderByDescending(p => p.health.hediffSet.BleedRateTotal)
@@ -163,37 +159,13 @@ namespace Site44
                     continue;
                 }
 
-                Thing medicine = null;
-                if (stash != null)
-                {
-                    Thing taken = stash.TakeMedicine(patient, Medicine.GetMedicineCountToFullyHeal(patient));
-                    if (taken != null)
-                    {
-                        int added = doctor.inventory.innerContainer.TryAdd(taken, taken.stackCount);
-                        if (added < taken.stackCount && !taken.Destroyed)
-                        {
-                            stash.Add(taken);
-                        }
-
-                        medicine = doctor.inventory.innerContainer.FirstOrDefault(t => t.def == taken.def);
-                    }
-                }
-
-                if (medicine == null)
-                {
-                    medicine = HealthAIUtility.FindBestMedicine(doctor, patient);
-                }
-
-                Job job = medicine != null ? JobMaker.MakeJob(JobDefOf.TendPatient, patient, medicine) : JobMaker.MakeJob(JobDefOf.TendPatient, patient);
-                job.count = 1;
-                job.draftedTend = true;
-                doctor.jobs.TryTakeOrderedJob(job, JobTag.Misc);
-                busy.Add(doctor);
-                sent++;
-                if (medicine == null)
+                if (!SendDoctor(doctor, patient))
                 {
                     withoutMedicine++;
                 }
+
+                busy.Add(doctor);
+                sent++;
             }
 
             string text = sent + " of " + patients.Count + " patient(s) sent a doctor";
@@ -208,6 +180,139 @@ namespace Site44
             }
 
             return Report(text + ".");
+        }
+
+        public static string RecoverEveryone(Map map)
+        {
+            if (map == null)
+            {
+                return null;
+            }
+
+            PoolMedicine();
+            List<Pawn> patients = map.mapPawns.FreeColonistsSpawned
+                .Where(p => p.Downed || HealthAIUtility.ShouldBeTendedNowByPlayer(p) || HealthAIUtility.ShouldSeekMedicalRest(p))
+                .OrderByDescending(p => p.Downed ? 1 : 0)
+                .ThenByDescending(p => p.health.hediffSet.BleedRateTotal)
+                .ToList();
+            if (patients.Count == 0)
+            {
+                return Report("Nobody needs to recover.");
+            }
+
+            HashSet<Pawn> busy = new HashSet<Pawn>();
+            int tending = 0;
+            int carried = 0;
+            int lying = 0;
+            int noBed = 0;
+            int noDoctor = 0;
+            foreach (Pawn patient in patients)
+            {
+                Pawn doctor = null;
+                if (HealthAIUtility.ShouldBeTendedNowByPlayer(patient))
+                {
+                    doctor = ChooseDoctor(map, patient, busy);
+                    if (doctor == null)
+                    {
+                        noDoctor++;
+                    }
+                    else
+                    {
+                        SendDoctor(doctor, patient);
+                        busy.Add(doctor);
+                        tending++;
+                    }
+                }
+
+                if (patient.Downed)
+                {
+                    Pawn carrier = doctor != null && doctor != patient ? doctor : ChooseCarrier(map, patient, busy);
+                    Building_Bed bed = carrier != null ? FindBed(patient, carrier) : null;
+                    if (carrier == null || bed == null)
+                    {
+                        noBed++;
+                        continue;
+                    }
+
+                    Job rescue = JobMaker.MakeJob(JobDefOf.Rescue, patient, bed);
+                    rescue.count = 1;
+                    carrier.jobs.TryTakeOrderedJob(rescue, JobTag.Misc, carrier == doctor);
+                    busy.Add(carrier);
+                    carried++;
+                    continue;
+                }
+
+                Building_Bed own = FindBed(patient, patient);
+                if (own == null)
+                {
+                    noBed++;
+                    continue;
+                }
+
+                if (patient.drafter != null && patient.drafter.Drafted && doctor != patient)
+                {
+                    patient.drafter.Drafted = false;
+                }
+
+                Job lay = JobMaker.MakeJob(JobDefOf.LayDown, own);
+                lay.restUntilHealed = true;
+                patient.jobs.TryTakeOrderedJob(lay, JobTag.Misc, doctor == patient);
+                lying++;
+            }
+
+            List<string> parts = new List<string>();
+            if (tending > 0) parts.Add(tending + " being tended");
+            if (carried > 0) parts.Add(carried + " being carried to a bed");
+            if (lying > 0) parts.Add(lying + " lying down");
+            if (noDoctor > 0) parts.Add(noDoctor + " with nobody free to tend them");
+            if (noBed > 0) parts.Add(noBed + " with no bed to reach");
+            return Report(parts.Count == 0 ? "Nothing could be done." : string.Join("; ", parts.ToArray()) + ".");
+        }
+
+        private static void PoolMedicine()
+        {
+            GameComponent_PartyStash stash = GameComponent_PartyStash.Instance;
+            if (stash != null && GameComponent_PartyStash.Enabled)
+            {
+                stash.PoolFromParty();
+            }
+        }
+
+        // Orders the doctor to tend the patient, with medicine from the pool if there is any. Returns false when no medicine was found.
+        private static bool SendDoctor(Pawn doctor, Pawn patient)
+        {
+            GameComponent_PartyStash stash = GameComponent_PartyStash.Instance;
+            Thing medicine = null;
+            if (stash != null && GameComponent_PartyStash.Enabled)
+            {
+                Thing taken = stash.TakeMedicine(patient, Medicine.GetMedicineCountToFullyHeal(patient));
+                if (taken != null)
+                {
+                    int added = doctor.inventory.innerContainer.TryAdd(taken, taken.stackCount);
+                    if (added < taken.stackCount && !taken.Destroyed)
+                    {
+                        stash.Add(taken);
+                    }
+
+                    medicine = doctor.inventory.innerContainer.FirstOrDefault(t => t.def == taken.def);
+                }
+            }
+
+            if (medicine == null)
+            {
+                medicine = HealthAIUtility.FindBestMedicine(doctor, patient);
+            }
+
+            Job job = medicine != null ? JobMaker.MakeJob(JobDefOf.TendPatient, patient, medicine) : JobMaker.MakeJob(JobDefOf.TendPatient, patient);
+            job.count = 1;
+            job.draftedTend = true;
+            doctor.jobs.TryTakeOrderedJob(job, JobTag.Misc);
+            return medicine != null;
+        }
+
+        private static Building_Bed FindBed(Pawn patient, Pawn traveller)
+        {
+            return RestUtility.FindBedFor(patient, traveller, false) ?? RestUtility.FindBedFor(patient, traveller, false, true);
         }
 
         private static string Report(string text)
@@ -229,6 +334,19 @@ namespace Site44
                             && d.CanReach(patient, PathEndMode.ClosestTouch, Danger.Deadly))
                 .OrderBy(d => d == patient ? 1 : 0)
                 .ThenByDescending(d => d.skills != null ? d.skills.GetSkill(SkillDefOf.Medicine).Level : 0)
+                .FirstOrDefault();
+        }
+
+        // Someone free who can carry the patient: the colonist with the strongest body, not the patient.
+        private static Pawn ChooseCarrier(Map map, Pawn patient, HashSet<Pawn> busy)
+        {
+            return map.mapPawns.FreeColonistsSpawned
+                .Where(c => c != patient
+                            && !busy.Contains(c)
+                            && !c.Downed
+                            && c.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation)
+                            && c.CanReach(patient, PathEndMode.ClosestTouch, Danger.Deadly))
+                .OrderByDescending(c => c.health.summaryHealth.SummaryHealthPercent)
                 .FirstOrDefault();
         }
 

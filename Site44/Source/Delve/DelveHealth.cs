@@ -162,21 +162,51 @@ namespace Site44
         }
     }
 
-    // The panacea pill: closes every wound that can still heal, clears infections and restores blood. Scars and missing parts stay.
+    // The panacea pill: closes every wound that can still heal, clears infections, restores blood and cures illnesses and poisoning.
+    // Scars, missing parts, bionic parts and chronic conditions stay.
     public class IngestionOutcomeDoer_Panacea : IngestionOutcomeDoer
     {
+        // Anything harmful that is not permanent: wounds, infections, blood loss, illnesses, poisoning. Not parts, bionics or addictions.
+        private static bool IsCurable(Hediff h)
+        {
+            return h.def.isBad && !h.def.chronic && !h.IsPermanent()
+                && !(h is Hediff_MissingPart) && !(h is Hediff_AddedPart) && !(h is Hediff_Addiction) && h.def != HediffDefOf.Anesthetic;
+        }
+
         protected override void DoIngestionOutcomeSpecial(Pawn pawn, Thing ingested, int ingestedCount)
         {
-            HediffDef infection = DefDatabase<HediffDef>.GetNamedSilentFail("WoundInfection");
             int healed = 0;
-            foreach (Hediff hediff in pawn.health.hediffSet.hediffs.Where(h => (h is Hediff_Injury && !h.IsPermanent())
-                || h.def == HediffDefOf.BloodLoss || (infection != null && h.def == infection)).ToList())
+            foreach (Hediff hediff in pawn.health.hediffSet.hediffs.Where(h => IsCurable(h)).ToList())
             {
                 pawn.health.RemoveHediff(hediff);
                 healed++;
             }
 
             Messages.Message(pawn.LabelShort + ": " + (healed > 0 ? "everything that can heal, heals." : "nothing needed treating."), pawn, MessageTypeDefOf.PositiveEvent, false);
+        }
+    }
+
+    // Renewal capsule: the rarest cure. Everything the panacea does, and missing parts, scars and chronic conditions as well. Bionic parts
+    // stay, and nobody comes back from the dead.
+    public class IngestionOutcomeDoer_Renewal : IngestionOutcomeDoer
+    {
+        protected override void DoIngestionOutcomeSpecial(Pawn pawn, Thing ingested, int ingestedCount)
+        {
+            int fixedCount = 0;
+            foreach (Hediff_MissingPart missing in pawn.health.hediffSet.GetMissingPartsCommonAncestors().ToList())
+            {
+                pawn.health.RestorePart(missing.Part);
+                fixedCount++;
+            }
+
+            foreach (Hediff hediff in pawn.health.hediffSet.hediffs.Where(h => !(h is Hediff_AddedPart) && !(h is Hediff_MissingPart) && h.def.isBad
+                && !(h is Hediff_Addiction) && h.def != HediffDefOf.Anesthetic).ToList())
+            {
+                pawn.health.RemoveHediff(hediff);
+                fixedCount++;
+            }
+
+            Messages.Message(pawn.LabelShort + ": " + (fixedCount > 0 ? "the body is made whole again." : "nothing needed renewing."), pawn, MessageTypeDefOf.PositiveEvent, false);
         }
     }
 

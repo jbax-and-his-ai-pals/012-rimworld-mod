@@ -311,7 +311,7 @@ namespace Site44
         private static readonly string[] VanillaFields =
         {
             "delveAllowRaids", "delveAllowCaravanEvents", "delveAllowOtherThreats", "delveAllowOutsideVisitors", "delveAllowWeather",
-            "delveRecovery", "delveBedRecovery", "delveInfection", "delveDescentCare", "delveDescentRest", "missionFocusLevel", "hardenedToBodies", "startingKit", "sharedStash", "supplyX", "drugFindX",
+            "delveRecovery", "delveBedRecovery", "delveSleepLength", "delveInfection", "delveDescentCare", "delveDescentRest", "missionFocusLevel", "hardenedToBodies", "startingKit", "sharedStash", "supplyX", "drugFindX",
             "delverGearX", "hackMinigame", "securityLevel", "hotZonesEnabled"
         };
 
@@ -451,6 +451,8 @@ namespace Site44
                     () => S.delveRecovery, v => S.delveRecovery = v, 1, new[] { "same as vanilla", "faster", "much faster" }, "Delve"),
                 Choice("Recovery in a bed", "How fast a colonist who has been tended mends while lying in a bed: wounds close over a fixed time however deep they are. A better bed is quicker. Wounds that have not been tended heal at the normal pace.",
                     () => S.delveBedRecovery, v => S.delveBedRecovery = v, 2, new[] { "same as vanilla", "about 6 hours", "about 3 hours", "about 90 minutes" }, "Delve"),
+                Choice("Length of a full sleep", "How long a colonist needs in a bed to go from exhausted to fully rested. The base game takes about 10 hours. A better bed is quicker. How quickly tiredness builds is unchanged.",
+                    () => S.delveSleepLength, v => S.delveSleepLength = v, 2, new[] { "same as vanilla", "about 4 hours", "about 2 hours", "about 1 hour" }, "Delve"),
                 Choice("Wound infection risk", "Chance that a fresh wound becomes infected, compared with the base game.",
                     () => S.delveInfection, v => S.delveInfection = v, 1, new[] { "same as vanilla", "half of vanilla", "none" }, "Delve"),
                 Choice("Wounds on descent", "What the extraction gate does for the party's injuries on the way down.",

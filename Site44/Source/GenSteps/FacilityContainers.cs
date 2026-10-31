@@ -210,9 +210,17 @@ namespace Site44
             {
                 def = Def("Site44_BloodPack") ?? Def("MedicineIndustrial");
             }
-            else if (roll < 99)
+            else if (roll < 97)
             {
                 def = Def("Site44_AntisepticInjector") ?? Def("MedicineIndustrial");
+            }
+            else if (roll < 98)
+            {
+                def = Def("Site44_FieldSurgeryKit") ?? Def("MedicineIndustrial");
+            }
+            else if (roll < 99)
+            {
+                def = Def("Site44_RegenGel") ?? Def("MedicineIndustrial");
             }
             else
             {

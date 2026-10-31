@@ -191,7 +191,7 @@ namespace Site44
 
             PoolMedicine();
             List<Pawn> patients = map.mapPawns.FreeColonistsSpawned
-                .Where(p => p.Downed || HealthAIUtility.ShouldBeTendedNowByPlayer(p) || HealthAIUtility.ShouldSeekMedicalRest(p))
+                .Where(p => p.Downed || HealthAIUtility.ShouldBeTendedNowByPlayer(p) || HealthAIUtility.ShouldSeekMedicalRest(p) || IsTired(p))
                 .OrderByDescending(p => p.Downed ? 1 : 0)
                 .ThenByDescending(p => p.health.hediffSet.BleedRateTotal)
                 .ToList();
@@ -255,7 +255,7 @@ namespace Site44
                 }
 
                 Job lay = JobMaker.MakeJob(JobDefOf.LayDown, own);
-                lay.restUntilHealed = true;
+                lay.restUntilHealed = HealthAIUtility.ShouldSeekMedicalRest(patient);
                 patient.jobs.TryTakeOrderedJob(lay, JobTag.Misc, doctor == patient);
                 lying++;
             }
@@ -267,6 +267,11 @@ namespace Site44
             if (noDoctor > 0) parts.Add(noDoctor + " with nobody free to tend them");
             if (noBed > 0) parts.Add(noBed + " with no bed to reach");
             return Report(parts.Count == 0 ? "Nothing could be done." : string.Join("; ", parts.ToArray()) + ".");
+        }
+
+        private static bool IsTired(Pawn p)
+        {
+            return p.needs != null && p.needs.rest != null && p.needs.rest.CurLevel < Need_Rest.ThreshTired;
         }
 
         private static void PoolMedicine()

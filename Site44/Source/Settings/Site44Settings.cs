@@ -57,6 +57,7 @@ namespace Site44
         //                         // the lift dresses wounds on the way down (off by default)
         public int delveRecovery = 1;                         // natural recovery in Delve: 0 vanilla, 1 faster, 2 much faster
         public int delveBedRecovery = 2;                      // wounds closing while in bed: 0 vanilla, 1 about 6 hours, 2 about 3 hours, 3 about 90 minutes
+        public int delveSleepLength = 2;                      // a full sleep in Delve: 0 vanilla, 1 about 4 hours, 2 about 2 hours, 3 about 1 hour
         public int delveInfection = 1;                        // wound infection in Delve: 0 vanilla, 1 reduced, 2 none
         public float supplyX = 1f;                            // food and medicine supply, x1 = about a quarter of picks kept (see Site44Tuning)
         public float crateDensity = 1f;
@@ -155,7 +156,7 @@ namespace Site44
         public void ApplyVanillaRules()
         {
             delveAllowRaids = true; delveAllowCaravanEvents = true; delveAllowOtherThreats = true; delveAllowOutsideVisitors = true; delveAllowWeather = true;
-            delveRecovery = 0; delveBedRecovery = 0; delveInfection = 0; delveDescentCare = 0; delveDescentRest = false;
+            delveRecovery = 0; delveBedRecovery = 0; delveSleepLength = 0; delveInfection = 0; delveDescentCare = 0; delveDescentRest = false;
             missionFocusLevel = 0; hardenedToBodies = false; startingKit = false; sharedStash = false;
             supplyX = 4f; drugFindX = 0f; delverGearX = 0f;
             hackMinigame = false; securityLevel = 0; hotZonesEnabled = false;
@@ -180,6 +181,7 @@ namespace Site44
             Scribe_Values.Look(ref supplyX, "supplyX", 1f);
             Scribe_Values.Look(ref delveRecovery, "delveRecovery", 1);
             Scribe_Values.Look(ref delveBedRecovery, "delveBedRecovery", 2);
+            Scribe_Values.Look(ref delveSleepLength, "delveSleepLength", 2);
             Scribe_Values.Look(ref delveInfection, "delveInfection", 1);
             Scribe_Values.Look(ref delveDescentCare, "delveDescentCare");
             Scribe_Values.Look(ref delveDescentRest, "delveDescentRest");

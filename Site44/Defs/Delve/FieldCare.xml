@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- The hediff behind the regeneration gel: about twelve hours of slow healing. -->
+  <HediffDef>
+    <defName>Site44_RegenGel</defName>
+    <label>regeneration gel</label>
+    <description>A medical gel is working under the skin. For a few hours the worst wound keeps closing, whatever the colonist is doing.</description>
+    <hediffClass>HediffWithComps</hediffClass>
+    <isBad>false</isBad>
+    <scenarioCanAdd>false</scenarioCanAdd>
+    <initialSeverity>1</initialSeverity>
+    <maxSeverity>1</maxSeverity>
+    <comps>
+      <li Class="HediffCompProperties_Disappears">
+        <disappearsAfterTicks>30000~30000</disappearsAfterTicks>
+        <showRemainingTime>true</showRemainingTime>
+      </li>
+      <li Class="Site44.HediffCompProperties_RegenGel">
+        <healPerHour>2.5</healPerHour>
+      </li>
+    </comps>
+  </HediffDef>
+
+  <!-- Regeneration gel: slow healing that works while the colonist keeps moving. -->
+  <ThingDef ParentName="DrugPillBase">
+    <defName>Site44_RegenGel</defName>
+    <label>regeneration gel</label>
+    <description>A squeeze tube of clear, faintly warm gel. Rubbed into the skin or swallowed, it closes the worst wound over about twelve hours, whatever the colonist is doing. It does not stop bleeding, so a bleeding colonist still needs tending first.</description>
+    <graphicData>
+      <texPath>Things/Item/Drug/Penoxycyline</texPath>
+      <graphicClass>Graphic_StackCount</graphicClass>
+      <color>(0.55,0.95,0.7)</color>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <statBases>
+      <MarketValue>120</MarketValue>
+      <Mass>0.05</Mass>
+    </statBases>
+    <techLevel>Spacer</techLevel>
+    <ingestible>
+      <drugCategory>None</drugCategory>
+      <outcomeDoers>
+        <li Class="Site44.IngestionOutcomeDoer_RegenGel" />
+      </outcomeDoers>
+    </ingestible>
+  </ThingDef>
+
+  <!-- Field surgery kit: closes the worst wound for good, at once. -->
+  <ThingDef ParentName="DrugPillBase">
+    <defName>Site44_FieldSurgeryKit</defName>
+    <label>field surgery kit</label>
+    <description>A roll of sterile tools, staples and sealant. One use: it closes the worst wound for good and dresses the rest. It cannot rebuild a lost part or remove a scar.</description>
+    <graphicData>
+      <texPath>Things/Item/Drug/Yayo</texPath>
+      <graphicClass>Graphic_StackCount</graphicClass>
+      <color>(0.8,0.9,1)</color>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <statBases>
+      <MarketValue>150</MarketValue>
+      <Mass>0.3</Mass>
+    </statBases>
+    <techLevel>Industrial</techLevel>
+    <ingestible>
+      <drugCategory>None</drugCategory>
+      <outcomeDoers>
+        <li Class="Site44.IngestionOutcomeDoer_FieldSurgery" />
+      </outcomeDoers>
+    </ingestible>
+  </ThingDef>
+
+</Defs>

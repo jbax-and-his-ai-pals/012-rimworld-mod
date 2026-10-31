@@ -31,6 +31,18 @@ namespace Site44
             }
         }
 
+        // Game hours for a full sleep, by setting (0 is the base game).
+        public static float SleepHours(int level)
+        {
+            switch (level)
+            {
+                case 1: return 4f;
+                case 2: return 2f;
+                case 3: return 1f;
+                default: return 0f;
+            }
+        }
+
         public override void GameComponentTick()
         {
             if (Find.TickManager.TicksGame % Interval != 0 || !GameComponent_Delve.IsDelve)
@@ -39,15 +51,38 @@ namespace Site44
             }
 
             float hours = Hours(Site44Settings.Current.delveBedRecovery);
-            if (hours <= 0f)
+            float sleep = SleepHours(Site44Settings.Current.delveSleepLength);
+            if (hours <= 0f && sleep <= 0f)
             {
                 return;
             }
 
             foreach (Pawn pawn in PawnsFinder.AllMaps_FreeColonistsSpawned)
             {
-                Pulse(pawn, hours);
+                if (sleep > 0f)
+                {
+                    TopUpRest(pawn, sleep);
+                }
+
+                if (hours > 0f)
+                {
+                    Pulse(pawn, hours);
+                }
             }
+        }
+
+        // A colonist who is asleep gains rest faster than the base game gives, so a full sleep takes the chosen time.
+        private static void TopUpRest(Pawn pawn, float sleepHours)
+        {
+            Need_Rest rest = pawn.needs != null ? pawn.needs.rest : null;
+            if (rest == null || !rest.Resting)
+            {
+                return;
+            }
+
+            Building_Bed bed = pawn.CurrentBed();
+            float quality = Mathf.Clamp(bed != null ? bed.GetStatValue(StatDefOf.BedRestEffectiveness) : 0.8f, 0.5f, 1.5f);
+            rest.CurLevel = Mathf.Min(1f, rest.CurLevel + BedHealing.SleepTopUp(sleepHours, quality, Interval));
         }
 
         private static void Pulse(Pawn pawn, float hours)

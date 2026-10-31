@@ -28,20 +28,34 @@ namespace Site44
             List<KeyValuePair<string, string>> stats = Stats(run, map);
             List<KeyValuePair<string, string>> party = Party(map);
 
+            List<KeyValuePair<string, string>> supplies = PartyCare.SupplyLines();
+
             float y = 0f;
             Text.Font = GameFont.Medium;
             Widgets.Label(new Rect(0f, y, inRect.width, 34f), "The run");
             Text.Font = GameFont.Small;
             y += 38f;
 
+            Rect tend = new Rect(0f, y, 200f, 30f);
+            if (Widgets.ButtonText(tend, "Tend everyone"))
+            {
+                PartyCare.TendEveryone(map);
+            }
+
+            TooltipHandler.TipRegion(tend, "Sends a doctor to every colonist who needs tending, worst bleeding first, with medicine from the shared supplies.");
+            string report = PartyCare.LastReport;
+            Widgets.Label(new Rect(210f, y + 2f, inRect.width - 210f, 30f), report.NullOrEmpty() ? "Works while the party is drafted." : report);
+            y += 38f;
+
             Rect outRect = new Rect(0f, y, inRect.width, inRect.height - y);
-            float height = 40f + 3 * 34f + (goals.Count + stats.Count + party.Count) * 26f;
+            float height = 40f + 4 * 34f + (goals.Count + stats.Count + party.Count + supplies.Count) * 26f;
             Rect viewRect = new Rect(0f, 0f, outRect.width - 18f, height);
             Widgets.BeginScrollView(outRect, ref scroll, viewRect);
             float vy = 0f;
             vy = Section(viewRect, vy, "This level", goals);
             vy = Section(viewRect, vy, "The run so far", stats);
             vy = Section(viewRect, vy, "The party", party);
+            vy = Section(viewRect, vy, "Supplies", supplies);
             Widgets.EndScrollView();
         }
 

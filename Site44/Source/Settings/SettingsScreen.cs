@@ -311,7 +311,7 @@ namespace Site44
         private static readonly string[] VanillaFields =
         {
             "delveAllowRaids", "delveAllowCaravanEvents", "delveAllowOtherThreats", "delveAllowOutsideVisitors", "delveAllowWeather",
-            "delveRecovery", "delveInfection", "delveDescentCare", "delveDescentRest", "missionFocusLevel", "hardenedToBodies", "startingKit", "supplyX", "drugFindX",
+            "delveRecovery", "delveInfection", "delveDescentCare", "delveDescentRest", "missionFocusLevel", "hardenedToBodies", "startingKit", "sharedStash", "supplyX", "drugFindX",
             "delverGearX", "hackMinigame", "securityLevel", "hotZonesEnabled"
         };
 
@@ -456,6 +456,8 @@ namespace Site44
                     () => new[] { "Wounds carry down with the party.", "Every wound that can still be tended is dressed.", "Injuries and infections are removed; scars, illnesses and missing parts stay.", "Everything the game can fix is fixed, including missing parts and scars." }[Mathf.Clamp(S.delveDescentCare, 0, 3)]),
                 Toggle("Restore hunger and rest on descent", "Fills food and rest for the whole party at each extraction gate.",
                     () => S.delveDescentRest, v => S.delveDescentRest = v, false, "Delve"),
+                Toggle("Shared party supplies", "Medicine carried by any colonist is pooled for the whole party, and whoever tends a wound draws what is needed from the pool. Switch it off to make each colonist rely on their own pack.",
+                    () => S.sharedStash, v => S.sharedStash = v, true, "Delve"),
                 Choice("Mission focus (mood bonus in a complex)", "A steady mood lift for colonists working inside a ruined complex. Raise it if mental breaks are too frequent.",
                     () => S.missionFocusLevel, v => S.missionFocusLevel = v, 2, new[] { "off", "low (+3)", "normal (+6)", "high (+10)" }),
                 Toggle("Delvers ignore plain corpses", "Colonists inside a complex stop being upset by ordinary corpses. Rotting corpses still bother them.",

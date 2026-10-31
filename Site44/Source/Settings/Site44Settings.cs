@@ -91,6 +91,7 @@ namespace Site44
         public int missionFocusLevel = 2;
         public bool hardenedToBodies = true;
         public bool startingKit = true;
+        public bool sharedStash = true;                       // medicine is pooled for the whole party and any doctor draws from it
         public float drugFindX = 1f;
         public float delverGearX = 1f;
         public bool hotZonesEnabled = true;
@@ -154,7 +155,7 @@ namespace Site44
         {
             delveAllowRaids = true; delveAllowCaravanEvents = true; delveAllowOtherThreats = true; delveAllowOutsideVisitors = true; delveAllowWeather = true;
             delveRecovery = 0; delveInfection = 0; delveDescentCare = 0; delveDescentRest = false;
-            missionFocusLevel = 0; hardenedToBodies = false; startingKit = false;
+            missionFocusLevel = 0; hardenedToBodies = false; startingKit = false; sharedStash = false;
             supplyX = 4f; drugFindX = 0f; delverGearX = 0f;
             hackMinigame = false; securityLevel = 0; hotZonesEnabled = false;
         }
@@ -218,6 +219,7 @@ namespace Site44
             Scribe_Values.Look(ref missionFocusLevel, "missionFocusLevel", 2);
             Scribe_Values.Look(ref hardenedToBodies, "hardenedToBodies", true);
             Scribe_Values.Look(ref startingKit, "startingKit", true);
+            Scribe_Values.Look(ref sharedStash, "sharedStash", true);
             Scribe_Values.Look(ref drugFindX, "drugFindX", 1f);
             Scribe_Values.Look(ref delverGearX, "delverGearX", 1f);
             Scribe_Values.Look(ref hotZonesEnabled, "hotZonesEnabled", true);

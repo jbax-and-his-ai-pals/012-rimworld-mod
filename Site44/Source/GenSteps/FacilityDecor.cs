@@ -68,10 +68,15 @@ namespace Site44
                     FurnishWithChairs("Table2x2c", 4, false);
                     Furnish("Couch", 0, 1, true);
                     Furnish("Shelf", 0, 1, true);
+                    if (Rand.Chance(0.35f))
+                    {
+                        Furnish("Bed", 1, 1, true);
+                    }
                     break;
                 case "Ward":
                     Furnish("HospitalBed", Mathf.Clamp(room.Cells.Count / 12, 2, 6), Mathf.Clamp(room.Cells.Count / 8, 3, 8), true);
                     Furnish("VitalsMonitor", 1, 2, true);
+                    Furnish("Site44_MedBayConsole", 0, 1, true);
                     Furnish("Stool", 1, 2, false);
                     ScatterItems("MedicineIndustrial", 0, 1, 2, 5);
                     break;
@@ -146,6 +151,7 @@ namespace Site44
                     break;
                 case "Infirmary":
                     Furnish("HospitalBed", 2, 4, true);
+                    Furnish("Site44_MedBayConsole", 1, 1, true);
                     Furnish("VitalsMonitor", 1, 2, true);
                     Furnish("AncientOperatingTable", 0, 1, false);
                     Furnish("ShelfSmall", 1, 2, true);

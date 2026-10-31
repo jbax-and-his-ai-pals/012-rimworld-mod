@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <JobDef>
+    <defName>Site44_UseMedBay</defName>
+    <driverClass>Site44.JobDriver_UseMedBay</driverClass>
+    <reportString>running the med-bay console for TargetB.</reportString>
+  </JobDef>
+
+  <!-- Placed in wards and infirmaries. A second colonist works it to heal whoever lies in a bed nearby. -->
+  <ThingDef ParentName="BuildingBase">
+    <defName>Site44_MedBayConsole</defName>
+    <label>med-bay console</label>
+    <description>A medical console wired to the beds around it. A colonist who knows medicine can run its treatment cycle on whoever is lying in a bed nearby: wounds close, infections clear and lost blood is replaced. It cannot rebuild a lost part or remove a scar.</description>
+    <thingClass>Site44.Building_MedBayConsole</thingClass>
+    <category>Building</category>
+    <graphicData>
+      <texPath>Things/Building/Misc/AncientTerminal/AncientTerminal</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <color>(0.6,1,0.85)</color>
+      <shadowData>
+        <volume>(0.55, 0.30, 0.40)</volume>
+      </shadowData>
+    </graphicData>
+    <size>(1,1)</size>
+    <statBases>
+      <MaxHitPoints>200</MaxHitPoints>
+    </statBases>
+    <useHitPoints>false</useHitPoints>
+    <fillPercent>0.20</fillPercent>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <rotatable>false</rotatable>
+    <selectable>true</selectable>
+    <building>
+      <isInert>true</isInert>
+      <deconstructible>false</deconstructible>
+    </building>
+  </ThingDef>
+
+</Defs>
